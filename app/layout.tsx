@@ -32,6 +32,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
+  const envUrl = process.env['NEXT_PUBLIC_SUPABASE_URL'] || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const envKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
   return (
     <html lang="pt-BR" className={`${inter.variable} dark`} suppressHydrationWarning>
       <head>
@@ -39,8 +42,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           dangerouslySetInnerHTML={{
             __html: `
               window.__ENV = {
-                NEXT_PUBLIC_SUPABASE_URL: ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || '')},
-                NEXT_PUBLIC_SUPABASE_ANON_KEY: ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '')}
+                NEXT_PUBLIC_SUPABASE_URL: ${JSON.stringify(envUrl)},
+                NEXT_PUBLIC_SUPABASE_ANON_KEY: ${JSON.stringify(envKey)}
               };
               window.addEventListener('error', (e) => {
                 if (e.message && e.message.includes('ChunkLoadError')) {
