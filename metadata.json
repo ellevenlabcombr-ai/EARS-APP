@@ -1,0 +1,7 @@
+{
+  "name": "EARS",
+  "description": "Sistema de monitoramento de wellness e gestão de atletas da EARS (7 a 19 anos).",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

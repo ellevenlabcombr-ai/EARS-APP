@@ -1,0 +1,28 @@
+{
+  "name": "Elleven App",
+  "short_name": "Elleven",
+  "description": "App do Atleta Elleven",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A1120",
+  "theme_color": "#0A1120",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

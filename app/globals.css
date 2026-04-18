@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    @apply bg-[#050B14] text-slate-50;
+    /* Prevent overscroll bounce on mobile */
+    overscroll-behavior-y: none;
+  }
+
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+@layer utilities {
+  .pt-safe {
+    padding-top: var(--safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+  .pl-safe {
+    padding-left: var(--safe-area-inset-left);
+  }
+  .pr-safe {
+    padding-right: var(--safe-area-inset-right);
+  }
+  
+  .mt-safe {
+    margin-top: var(--safe-area-inset-top);
+  }
+  .mb-safe {
+    margin-bottom: var(--safe-area-inset-bottom);
+  }
+
+  /* Dynamic viewport height */
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+  .h-dvh {
+    height: 100dvh;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body, html {
+    background: #050B14 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #050B14 !important;
+  }
+
+  /* Ensure all cinematic elements are visible in dark mode */
+  .bg-slate-900\/50, 
+  .bg-slate-800\/50,
+  .bg-slate-800\/40,
+  .bg-slate-900\/40,
+  .bg-slate-800,
+  .bg-slate-900,
+  .bg-cyan-500\/10,
+  .bg-rose-500\/10,
+  .bg-amber-500\/10 {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  .border-slate-800,
+  .border-slate-700,
+  .border-cyan-500\/30 {
+    border-color: rgba(30, 41, 59, 1) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Force text colors */
+  .text-white, .text-slate-50, .text-slate-200, .text-slate-300 { color: white !important; }
+  .text-slate-400 { color: #94a3b8 !important; }
+  .text-cyan-400 { color: #22d3ee !important; }
+  .text-rose-400 { color: #fb7185 !important; }
+  .text-amber-400 { color: #fbbf24 !important; }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
