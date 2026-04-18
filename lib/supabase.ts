@@ -1,7 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim();
-const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim();
+const getEnvVar = (key: 'NEXT_PUBLIC_SUPABASE_URL' | 'NEXT_PUBLIC_SUPABASE_ANON_KEY') => {
+  if (typeof window !== 'undefined' && (window as any).__ENV && (window as any).__ENV[key]) {
+    return (window as any).__ENV[key];
+  }
+  if (key === 'NEXT_PUBLIC_SUPABASE_URL') return process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  if (key === 'NEXT_PUBLIC_SUPABASE_ANON_KEY') return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  return '';
+};
+
+const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL').trim();
+const supabaseAnonKey = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY').trim();
 
 const isValidUrl = (url: string) => {
   if (!url || url.includes('TODO_')) return false;

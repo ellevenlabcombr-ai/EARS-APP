@@ -38,6 +38,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              window.__ENV = {
+                NEXT_PUBLIC_SUPABASE_URL: ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || '')},
+                NEXT_PUBLIC_SUPABASE_ANON_KEY: ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '')}
+              };
               window.addEventListener('error', (e) => {
                 if (e.message && e.message.includes('ChunkLoadError')) {
                   console.warn('ChunkLoadError detected, reloading page...');
