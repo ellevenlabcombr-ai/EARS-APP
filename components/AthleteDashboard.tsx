@@ -440,6 +440,15 @@ export function AthleteDashboard({
   const [loadingAthlete, setLoadingAthlete] = useState(true);
   const [athleteCode, setAthleteCode] = useState<string | null>(null);
 
+  // Motivational Quote
+  const [motivationalQuote, setMotivationalQuote] = useState(motivationalQuotes[0]);
+
+  // Athletes setup states
+  const [setupLastPeriod, setSetupLastPeriod] = useState<string>("");
+  const [setupCycleLength, setSetupCycleLength] = useState<number>(28);
+  const [menstrualSymptoms, setMenstrualSymptoms] = useState<string[]>([]);
+  const [workloadData, setWorkloadData] = useState<any[]>([]);
+
   // Records & Tracking
   const [latestPainMap, setLatestPainMap] = useState<Record<string, { level: number; type: string }>>({});
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
@@ -623,8 +632,6 @@ export function AthleteDashboard({
         console.error("Athlete fetch error:", athleteError);
       } else if (athlete) {
         setAthleteData(athlete);
-        setXp(athlete.xp || 0);
-        setCoins(athlete.coins || 0);
         setAthleteCode(athlete.athlete_code);
       }
 
@@ -1202,7 +1209,7 @@ export function AthleteDashboard({
 
         <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
-            <div className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-full border-4 ${theme.border} shadow-2xl transition-all duration-500 hover:scale-105`}>
+            <div className={`relative w-32 h-32 sm:w-44 sm:h-44 rounded-full border-4 ${theme.border} shadow-2xl transition-all duration-500 hover:scale-105`}>
               <div className="absolute inset-0 rounded-full overflow-hidden">
                 {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
                   <Image 
@@ -1215,33 +1222,24 @@ export function AthleteDashboard({
                   />
                 ) : (
                   <div className={`w-full h-full ${theme.bgAlpha} flex items-center justify-center`}>
-                    <User className={`w-12 h-12 sm:w-16 sm:h-16 ${theme.icon}`} />
+                    <User className={`w-16 h-16 sm:w-24 sm:h-24 ${theme.icon}`} />
                   </div>
                 )}
               </div>
               
               {/* Readiness Badge next to photo */}
-              <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1 rounded-full border-2 border-slate-800 shadow-xl z-20">
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex flex-col items-center justify-center border ${currentReadiness >= 80 ? 'border-emerald-500/50 bg-emerald-500/10' : currentReadiness >= 50 ? 'border-amber-500/50 bg-amber-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
-                  <span className={`text-[10px] sm:text-xs font-black ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+              <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1.5 rounded-full border-2 border-slate-800 shadow-xl z-20">
+                <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center border ${currentReadiness >= 80 ? 'border-emerald-500/50 bg-emerald-500/10' : currentReadiness >= 50 ? 'border-amber-500/50 bg-amber-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
+                  <span className={`text-[11px] sm:text-sm font-black ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                     {currentReadiness}%
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-              <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-2">
+              <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] text-center">
                 {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
               </h2>
-              {athleteData?.birth_date && (
-                <p className={`text-[10px] sm:text-xs font-black ${theme.text} uppercase tracking-[0.2em]`}>
-                  {(() => {
-                    const age = athleteAge;
-                    if (!age) return '';
-                    return `${age.years} anos, ${age.months} meses e ${age.days} dias`;
-                  })()}
-                </p>
-              )}
               {athleteCode && (
                 <span className={`px-3 py-1 ${theme.bgAlpha} ${theme.text} text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-widest border ${theme.borderAlpha} shadow-lg`}>
                   #{athleteCode}
@@ -1249,11 +1247,6 @@ export function AthleteDashboard({
               )}
             </div>
           </div>
-          <p className="text-slate-400 font-medium text-sm sm:text-base max-w-md mx-auto">
-            {lang === "pt"
-              ? "Pronto para dominar o dia?"
-              : "Ready to dominate the day?"}
-          </p>
         </div>
 
         {/* Motivational Quote */}
