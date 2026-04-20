@@ -117,7 +117,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
   const Slider = ({ label, value, onChange }: { label: string, value: number, onChange: (v: number) => void }) => (
     <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
       <div className="flex justify-between items-end">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+        <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
         <span className={`text-lg font-black ${value > 0 ? (value >= 4 ? 'text-rose-400' : 'text-amber-400') : 'text-emerald-400'}`}>
           {value}
         </span>
@@ -130,7 +130,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
       />
-      <div className="flex justify-between text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+      <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
         <span>Nenhum (0)</span>
         <span>Severo (6)</span>
       </div>
@@ -139,7 +139,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
   const BalanceSelect = ({ label, value, onChange }: { label: string, value: string, onChange: (v: string) => void }) => (
     <div className="space-y-3 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
       <div className="grid grid-cols-3 gap-2">
         {[
           { id: 'stable', label: 'Estável' },
@@ -149,7 +149,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           <button
             key={opt.id}
             onClick={() => onChange(opt.id)}
-            className={`py-2 px-1 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+            className={`py-2 px-1 rounded-xl text-xxs font-black uppercase tracking-widest transition-all ${
               value === opt.id 
                 ? 'bg-cyan-500 text-[#050B14] shadow-lg shadow-cyan-500/20' 
                 : 'bg-slate-900/50 text-slate-500 border border-slate-800 hover:border-slate-700'
@@ -185,13 +185,13 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
         <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Score Neurológico</p>
+            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score Neurológico</p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-black">{score}</span>
               <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
             </div>
             {alerts.length > 0 && (
-              <div className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
+              <div className="mt-3 flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
                 <AlertTriangle className="w-3 h-3" /> {alerts[0]} {alerts.length > 1 && `(+${alerts.length - 1})`}
               </div>
             )}
@@ -205,7 +205,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
         <div className="space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center justify-between">
             <span>Sintomas (0-6)</span>
-            <span className="text-[10px] text-slate-500">Impacto: {metrics.symptomScore}%</span>
+            <span className="text-xxs text-slate-500">Impacto: {metrics.symptomScore}%</span>
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Slider label="Dor de Cabeça" value={symptoms.headache} onChange={(v) => setSymptoms({...symptoms, headache: v})} />
@@ -224,16 +224,16 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           <div className="space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center justify-between">
               <span>Memória (Recall Imediato)</span>
-              <span className="text-[10px] text-slate-500">Score: {metrics.memoryScore}%</span>
+              <span className="text-xxs text-slate-500">Score: {metrics.memoryScore}%</span>
             </h3>
             <div className="bg-slate-900/30 p-5 rounded-2xl border border-slate-800/50 space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lista de Palavras</p>
+                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Lista de Palavras</p>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => setShowWords(!showWords)}
-                  className="h-7 text-[10px] font-bold uppercase tracking-widest border-slate-700 text-slate-300"
+                  className="h-7 text-xxs font-bold uppercase tracking-widest border-slate-700 text-slate-300"
                 >
                   {showWords ? <><EyeOff className="w-3 h-3 mr-1" /> Ocultar</> : <><Eye className="w-3 h-3 mr-1" /> Mostrar</>}
                 </Button>
@@ -248,13 +248,13 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
                   ))}
                 </div>
               ) : (
-                <div className="h-8 flex items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">
+                <div className="h-8 flex items-center text-xxs font-bold text-slate-500 uppercase tracking-widest italic">
                   Palavras ocultas para o teste
                 </div>
               )}
 
               <div className="pt-4 border-t border-slate-800/50">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Palavras Lembradas Corretamente</p>
+                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest mb-3">Palavras Lembradas Corretamente</p>
                 <div className="flex gap-2">
                   {[0, 1, 2, 3, 4, 5].map(num => (
                     <button
@@ -278,7 +278,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           <div className="space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center justify-between">
               <span>Equilíbrio (BESS Simplificado)</span>
-              <span className="text-[10px] text-slate-500">Score: {metrics.balanceScore}%</span>
+              <span className="text-xxs text-slate-500">Score: {metrics.balanceScore}%</span>
             </h3>
             <div className="space-y-3">
               <BalanceSelect label="Apoio Bipodal (Pés Juntos)" value={balance.doubleLeg} onChange={(v) => setBalance({...balance, doubleLeg: v})} />
@@ -291,10 +291,10 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
       {/* Footer Actions */}
       <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
+        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8">
+        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
           <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
         </Button>
       </div>

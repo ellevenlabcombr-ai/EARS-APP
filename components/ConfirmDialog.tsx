@@ -52,7 +52,7 @@ export function ConfirmDialog({
                 variant="destructive" 
                 onClick={onConfirm} 
                 disabled={loading}
-                className="bg-rose-600 hover:bg-rose-700 text-white min-w-[100px]"
+                className="bg-rose-600 hover:bg-rose-700 text-white min-w-[6.25rem]"
               >
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

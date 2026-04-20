@@ -134,7 +134,7 @@ export function SleepAssessment({ athleteId, athleteName, onBack, onSave }: Slee
 
         <div className={`px-6 py-3 rounded-2xl border flex items-center gap-4 transition-colors ${getScoreBg(score)}`}>
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Score de Recuperação</p>
+            <p className="text-xxs uppercase tracking-widest text-slate-400 font-bold">Score de Recuperação</p>
             <p className={`text-3xl font-black ${getScoreColor(score)}`}>{score.toFixed(1)}</p>
           </div>
           <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center">

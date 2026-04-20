@@ -88,7 +88,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
           </div>
           <div>
             <h2 className="text-lg font-black text-white uppercase tracking-tight">Dinamometria (K-Force)</h2>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Avaliação de Força Isométrica e Simetria</p>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Avaliação de Força Isométrica e Simetria</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
@@ -106,7 +106,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
             return (
               <Card key={group.id} className="bg-slate-900/40 border-slate-800/50">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-black text-white uppercase tracking-widest flex items-center justify-between">
+                  <CardTitle className="text-xxs font-black text-white uppercase tracking-widest flex items-center justify-between">
                     {group.label}
                     {asymmetry > 15 && (
                       <span className="flex items-center gap-1 text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
@@ -117,7 +117,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Direito (kg)</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Direito (kg)</label>
                     <input 
                       type="number" 
                       value={rightVal || ''}
@@ -127,7 +127,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Esquerdo (kg)</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Esquerdo (kg)</label>
                     <input 
                       type="number" 
                       value={leftVal || ''}
@@ -137,7 +137,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
                     />
                   </div>
                   <div className="flex flex-col justify-center items-center bg-slate-950/50 rounded-2xl border border-slate-800/50 p-3">
-                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Assimetria</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimetria</p>
                     <div className={`text-xl font-black ${asymmetry > 15 ? 'text-rose-400' : asymmetry > 10 ? 'text-amber-400' : 'text-emerald-400'}`}>
                       {asymmetry}%
                     </div>
@@ -149,13 +149,13 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
 
           <Card className="bg-slate-900/40 border-slate-800/50">
             <CardHeader>
-              <CardTitle className="text-[10px] font-black text-white uppercase tracking-widest">Observações Clínicas</CardTitle>
+              <CardTitle className="text-xxs font-black text-white uppercase tracking-widest">Observações Clínicas</CardTitle>
             </CardHeader>
             <CardContent>
               <textarea 
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-colors min-h-[100px] resize-none text-sm"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-colors min-h-[6.25rem] resize-none text-sm"
                 placeholder="Anote observações sobre dor, compensações ou fadiga durante os testes..."
               />
             </CardContent>
@@ -177,7 +177,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
                   
                   return (
                     <div key={group.id} className="space-y-2">
-                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                      <div className="flex justify-between text-xxs font-black uppercase tracking-widest">
                         <span className="text-slate-400">{group.label.split('(')[0]}</span>
                         <span className={asymmetry > 15 ? 'text-rose-400' : asymmetry > 10 ? 'text-amber-400' : 'text-emerald-400'}>
                           {asymmetry}%
@@ -196,28 +196,28 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
               </div>
 
               <div className="mt-8 p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                <h4 className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                <h4 className="text-xxs font-black text-white uppercase tracking-widest flex items-center gap-2">
                   <Info className="w-3 h-3 text-amber-400" /> Referência Clínica
                 </h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">0-10%: Normal / Simétrico</span>
+                    <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">0-10%: Normal / Simétrico</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">10-15%: Atenção / Monitorar</span>
+                    <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">10-15%: Atenção / Monitorar</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">&gt;15%: Risco / Intervir</span>
+                    <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">&gt;15%: Risco / Intervir</span>
                   </div>
                 </div>
               </div>
 
               <Button 
                 onClick={handleSave}
-                className="w-full mt-8 bg-amber-500 hover:bg-amber-600 text-[#050B14] font-black uppercase text-[10px] tracking-widest py-6 rounded-xl shadow-lg shadow-amber-500/20"
+                className="w-full mt-8 bg-amber-500 hover:bg-amber-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-amber-500/20"
               >
                 <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
               </Button>

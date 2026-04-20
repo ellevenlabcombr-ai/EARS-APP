@@ -88,7 +88,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
           </div>
           <div>
             <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Física</h2>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Performance e Composição</p>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Performance e Composição</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
@@ -107,7 +107,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' : 'border-slate-700 text-slate-500'}`}>
                 <s.icon className="w-5 h-5" />
               </div>
-              <span className="text-[8px] font-black uppercase tracking-widest text-center max-w-[60px]">{s.title}</span>
+              <span className="text-xxs font-black uppercase tracking-widest text-center max-w-[3.75rem]">{s.title}</span>
             </div>
             {i < steps.length - 1 && (
               <div className={`flex-1 h-[2px] mx-2 mb-6 ${step > s.id ? 'bg-emerald-500' : 'bg-slate-800'}`}></div>
@@ -127,7 +127,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Peso (kg)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Peso (kg)</label>
                   <input 
                     type="number" 
                     value={formData.weight}
@@ -137,7 +137,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Altura (cm)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Altura (cm)</label>
                   <input 
                     type="number" 
                     value={formData.height}
@@ -147,7 +147,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Gordura Corporal (%)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Gordura Corporal (%)</label>
                   <input 
                     type="number" 
                     value={formData.fatPercentage}
@@ -157,7 +157,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Massa Muscular (kg)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Massa Muscular (kg)</label>
                   <input 
                     type="number" 
                     value={formData.muscleMass}
@@ -181,7 +181,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Agachamento (kg)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Agachamento (kg)</label>
                   <input 
                     type="number" 
                     value={formData.squat}
@@ -191,7 +191,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Supino (kg)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Supino (kg)</label>
                   <input 
                     type="number" 
                     value={formData.benchPress}
@@ -201,7 +201,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Lev. Terra (kg)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Lev. Terra (kg)</label>
                   <input 
                     type="number" 
                     value={formData.deadlift}
@@ -221,7 +221,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Salto Vertical (cm)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto Vertical (cm)</label>
                   <input 
                     type="number" 
                     value={formData.verticalJump}
@@ -231,7 +231,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Salto Horizontal (cm)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto Horizontal (cm)</label>
                   <input 
                     type="number" 
                     value={formData.broadJump}
@@ -241,7 +241,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sprint 30m (s)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Sprint 30m (s)</label>
                   <input 
                     type="number" 
                     value={formData.sprint30m}
@@ -265,7 +265,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">VO2 Máx (ml/kg/min)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">VO2 Máx (ml/kg/min)</label>
                   <input 
                     type="number" 
                     value={formData.vo2Max}
@@ -275,7 +275,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Beep Test (Nível)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Beep Test (Nível)</label>
                   <input 
                     type="text" 
                     value={formData.beepTest}
@@ -285,7 +285,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Freq. Cardíaca Repouso (bpm)</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Freq. Cardíaca Repouso (bpm)</label>
                   <input 
                     type="number" 
                     value={formData.restingHeartRate}
@@ -311,7 +311,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
                 <textarea 
                   value={formData.notes}
                   onChange={(e) => handleChange('notes', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[150px] resize-none"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[9.375rem] resize-none"
                   placeholder="Descreva observações relevantes sobre a performance física do atleta..."
                 />
               </CardContent>
@@ -324,7 +324,7 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
         <Button 
           variant="ghost" 
           onClick={() => step > 1 ? setStep(step - 1) : onCancel()}
-          className="text-slate-400 hover:text-white uppercase text-[10px] font-black tracking-widest"
+          className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest"
         >
           <ChevronLeft className="w-4 h-4 mr-2" /> {step === 1 ? 'Cancelar' : 'Anterior'}
         </Button>
@@ -332,14 +332,14 @@ export default function PhysicalAssessment({ athleteId, onCancel, onSave }: Phys
         {step < 4 ? (
           <Button 
             onClick={() => setStep(step + 1)}
-            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-[10px] font-black tracking-widest px-8"
+            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-xxs font-black tracking-widest px-8"
           >
             Próximo <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         ) : (
           <Button 
             onClick={handleSave}
-            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-[10px] font-black tracking-widest px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-xxs font-black tracking-widest px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
           >
             <Save className="w-4 h-4 mr-2" /> Finalizar Avaliação
           </Button>

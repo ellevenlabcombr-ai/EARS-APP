@@ -80,7 +80,7 @@ export function AttachmentVersionHistory({
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white uppercase tracking-widest">Histórico de Versões</h3>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                  <p className="text-xxs text-slate-500 uppercase tracking-widest font-bold">
                     {versions[0]?.document_name || versions[0]?.file_name || 'Documento'}
                   </p>
                 </div>
@@ -94,7 +94,7 @@ export function AttachmentVersionHistory({
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Carregando histórico...</p>
+                  <p className="text-xxs text-slate-500 uppercase tracking-widest font-black">Carregando histórico...</p>
                 </div>
               ) : versions.length === 0 ? (
                 <div className="text-center py-12">
@@ -123,12 +123,12 @@ export function AttachmentVersionHistory({
                               {new Date(version.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {version.is_current_version && (
-                              <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-500 uppercase tracking-widest px-1.5 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+                              <span className="text-xxs font-black bg-emerald-500/10 text-emerald-500 uppercase tracking-widest px-1.5 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
                                 <CheckCircle2 size={8} /> Atual
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-0.5">
+                          <p className="text-xxs text-slate-500 uppercase tracking-widest font-bold mt-0.5">
                             {(version.file_size / 1024 / 1024).toFixed(2)} MB • {version.category}
                           </p>
                         </div>
@@ -161,7 +161,7 @@ export function AttachmentVersionHistory({
                     {version.version_note && (
                       <div className="flex items-start gap-2 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/50">
                         <Clock size={12} className="text-slate-600 mt-0.5 shrink-0" />
-                        <p className="text-[10px] text-slate-400 leading-relaxed italic">
+                        <p className="text-xxs text-slate-400 leading-relaxed italic">
                           &quot;{version.version_note}&quot;
                         </p>
                       </div>
@@ -175,7 +175,7 @@ export function AttachmentVersionHistory({
               <Button 
                 variant="outline" 
                 onClick={onClose}
-                className="border-slate-700 text-slate-300 hover:bg-slate-800 font-black uppercase tracking-widest text-[10px]"
+                className="border-slate-700 text-slate-300 hover:bg-slate-800 font-black uppercase tracking-widest text-xxs"
               >
                 Fechar
               </Button>

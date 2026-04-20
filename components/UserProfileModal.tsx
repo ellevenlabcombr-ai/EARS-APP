@@ -257,7 +257,7 @@ export function UserProfileModal({ isOpen, onClose, onProfileUpdated }: UserProf
                         ) : (
                           <>
                             <Camera size={24} className="text-white mb-1" />
-                            <span className="text-[8px] font-bold text-white uppercase tracking-wider">Alterar</span>
+                            <span className="text-xxs font-bold text-white uppercase tracking-wider">Alterar</span>
                           </>
                         )}
                       </button>
@@ -269,7 +269,7 @@ export function UserProfileModal({ isOpen, onClose, onProfileUpdated }: UserProf
                         className="hidden" 
                       />
                     </div>
-                    <p className="text-[10px] text-slate-500 font-medium text-center">
+                    <p className="text-xxs text-slate-500 font-medium text-center">
                       Clique na imagem para alterar a foto.<br/>Recomendado: 400x400px.
                     </p>
                   </div>
@@ -277,7 +277,7 @@ export function UserProfileModal({ isOpen, onClose, onProfileUpdated }: UserProf
                   {/* Form Section */}
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nome</label>
+                      <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Nome</label>
                       <input 
                         type="text" 
                         value={name}
@@ -288,7 +288,7 @@ export function UserProfileModal({ isOpen, onClose, onProfileUpdated }: UserProf
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">E-mail</label>
+                      <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">E-mail</label>
                       <input 
                         type="email" 
                         value={email}

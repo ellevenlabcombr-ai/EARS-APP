@@ -17,7 +17,7 @@ export function TrendChart({ data }: TrendChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
             <Tooltip 
-              contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '10px', padding: '4px' }}
+              contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '0.625rem', padding: '0.25rem' }}
               itemStyle={{ color: '#e2e8f0' }}
               labelStyle={{ display: 'none' }}
             />

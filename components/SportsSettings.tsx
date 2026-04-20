@@ -172,7 +172,7 @@ export const SportsSettings = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">
                   {lang === "pt" ? "Nome da Modalidade" : "Sport Name"}
                 </label>
                 <input
@@ -184,7 +184,7 @@ export const SportsSettings = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">
                   {lang === "pt" ? "Adicionar Posição" : "Add Position"}
                 </label>
                 <div className="flex gap-2">
@@ -268,12 +268,12 @@ export const SportsSettings = () => {
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {sport.positions.slice(0, 4).map((pos, i) => (
-                  <span key={i} className="text-[9px] font-black px-2 py-0.5 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-md uppercase tracking-widest">
+                  <span key={i} className="text-xxs font-black px-2 py-0.5 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-md uppercase tracking-widest">
                     {pos}
                   </span>
                 ))}
                 {sport.positions.length > 4 && (
-                  <span className="text-[9px] font-black px-2 py-0.5 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-md uppercase tracking-widest">
+                  <span className="text-xxs font-black px-2 py-0.5 bg-slate-800/50 border border-slate-700/50 text-slate-500 rounded-md uppercase tracking-widest">
                     +{sport.positions.length - 4}
                   </span>
                 )}

@@ -125,7 +125,7 @@ export function SmartAgenda() {
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`px-4 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
                   filter === cat 
                     ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20' 
                     : 'text-slate-500 hover:text-slate-300'
@@ -157,7 +157,7 @@ export function SmartAgenda() {
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight min-w-[200px] text-center">
+            <h2 className="text-lg font-black text-white uppercase tracking-tight min-w-[12.5rem] text-center">
               {format(startOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })} - {format(endOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })}
             </h2>
             <button 

@@ -153,7 +153,7 @@ export function BrandingSettings() {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Logo Preview */}
         <div className="flex-shrink-0">
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Logo do Sistema</h3>
+          <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-4">Logo do Sistema</h3>
           <div className="relative w-48 h-48 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center overflow-hidden group">
             {logoUrl ? (
               <>
@@ -188,7 +188,7 @@ export function BrandingSettings() {
                 className="flex flex-col items-center gap-2 text-slate-600 cursor-pointer hover:text-cyan-500 transition-colors"
               >
                 <ImageIcon size={48} strokeWidth={1} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Nenhum Logo</span>
+                <span className="text-xxs font-bold uppercase tracking-widest">Nenhum Logo</span>
               </div>
             )}
             
@@ -207,7 +207,7 @@ export function BrandingSettings() {
             accept="image/*"
           />
           
-          <p className="text-[10px] text-slate-500 mt-4 max-w-[200px]">
+          <p className="text-xxs text-slate-500 mt-4 max-w-[12.5rem]">
             Recomendado: PNG transparente ou SVG. Tamanho máximo 2MB.
           </p>
         </div>
@@ -215,7 +215,7 @@ export function BrandingSettings() {
         {/* Form */}
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nome da Empresa / App</label>
+            <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Nome da Empresa / App</label>
             <input 
               type="text" 
               value={companyName}

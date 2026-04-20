@@ -196,12 +196,12 @@ export function ClinicalSettings() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <HeartPulse className="text-rose-500 w-5 h-5" />
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Limites Críticos (Risco)</h3>
+            <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Limites Críticos (Risco)</h3>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Prontidão menor que</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Prontidão menor que</label>
               <div className="relative">
                 <input 
                   type="number" 
@@ -209,11 +209,11 @@ export function ClinicalSettings() {
                   onChange={(e) => setCriticalReadiness(parseInt(e.target.value) || 0)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-rose-500 outline-none transition-colors"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-600">%</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xxs font-bold text-slate-600">%</span>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Dor maior ou igual a</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Dor maior ou igual a</label>
               <input 
                 type="number" 
                 value={criticalPain}
@@ -230,12 +230,12 @@ export function ClinicalSettings() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <AlertTriangle className="text-amber-500 w-5 h-5" />
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Faixa de Atenção</h3>
+            <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Faixa de Atenção</h3>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Prontidão (Min - Max)</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Prontidão (Min - Max)</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
@@ -253,7 +253,7 @@ export function ClinicalSettings() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Dor (Min - Max)</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Dor (Min - Max)</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
@@ -280,12 +280,12 @@ export function ClinicalSettings() {
       <div className="space-y-6 pt-4 border-t border-slate-800/50">
         <div className="flex items-center gap-3 mb-2">
           <MessageSquare className="text-cyan-500 w-5 h-5" />
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mensagens Padrão</h3>
+          <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Mensagens Padrão</h3>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-rose-400 uppercase tracking-wider ml-1">Mensagem de Risco</label>
+            <label className="text-xxs font-bold text-rose-400 uppercase tracking-wider ml-1">Mensagem de Risco</label>
             <textarea 
               value={riskMessage}
               onChange={(e) => setRiskMessage(e.target.value)}
@@ -294,7 +294,7 @@ export function ClinicalSettings() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-amber-400 uppercase tracking-wider ml-1">Mensagem de Atenção</label>
+            <label className="text-xxs font-bold text-amber-400 uppercase tracking-wider ml-1">Mensagem de Atenção</label>
             <textarea 
               value={attentionMessage}
               onChange={(e) => setAttentionMessage(e.target.value)}

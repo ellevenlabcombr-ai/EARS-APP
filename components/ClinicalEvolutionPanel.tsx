@@ -74,7 +74,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#0A1120] border border-slate-800 p-3 rounded-xl shadow-2xl backdrop-blur-md">
-        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{label}</p>
+        <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
@@ -132,11 +132,11 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
               Evolução: {regionName}
             </h3>
             <div className="flex items-center gap-2">
-              <span className={`text-[10px] font-black uppercase tracking-widest ${phaseColor}`}>
+              <span className={`text-xxs font-black uppercase tracking-widest ${phaseColor}`}>
                 Fase: {phase}
               </span>
               <span className="w-1 h-1 rounded-full bg-slate-700" />
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">
                 Últimos 7 dias
               </p>
             </div>
@@ -145,7 +145,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
         
         {riskScore !== undefined && (
           <div className="text-right">
-            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Score de Risco</p>
+            <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-0.5">Score de Risco</p>
             <p className={`text-lg font-black ${riskColor}`}>{riskScore}%</p>
           </div>
         )}
@@ -156,7 +156,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
         <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
           <TrendingUp className="w-12 h-12 text-cyan-500" />
         </div>
-        <p className="text-[8px] font-black text-cyan-500 uppercase tracking-widest mb-1">Próximo Passo Clínico</p>
+        <p className="text-xxs font-black text-cyan-500 uppercase tracking-widest mb-1">Próximo Passo Clínico</p>
         <p className="text-xs font-bold text-white leading-relaxed">
           {nextStep}
         </p>
@@ -165,7 +165,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
       {/* Variation Cards */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-800/50">
-          <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Δ Dor</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Δ Dor</p>
           <div className="flex items-center justify-between">
             <span className={`text-sm font-black ${deltaPain < 0 ? 'text-emerald-400' : deltaPain > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
               {deltaPain > 0 ? `+${deltaPain}` : deltaPain}
@@ -174,7 +174,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
           </div>
         </div>
         <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-800/50">
-          <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Δ Força</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Δ Força</p>
           <div className="flex items-center justify-between">
             <span className={`text-sm font-black ${deltaStrength > 0 ? 'text-emerald-400' : deltaStrength < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
               {deltaStrength > 0 ? `+${deltaStrength}%` : `${deltaStrength}%`}
@@ -183,7 +183,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
           </div>
         </div>
         <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-800/50">
-          <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Δ ADM</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Δ ADM</p>
           <div className="flex items-center justify-between">
             <span className={`text-sm font-black ${deltaRom > 0 ? 'text-emerald-400' : deltaRom < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
               {deltaRom > 0 ? `+${deltaRom}%` : `${deltaRom}%`}
@@ -197,7 +197,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
       <div className="space-y-4">
         <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <Zap className="w-3 h-3 text-rose-500" /> Intensidade da Dor
             </span>
           </div>
@@ -237,7 +237,7 @@ export function ClinicalEvolutionPanel({ regionName, data, riskScore, lang = "pt
 
         <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <Maximize2 className="w-3 h-3 text-cyan-500" /> Força & ADM
             </span>
           </div>

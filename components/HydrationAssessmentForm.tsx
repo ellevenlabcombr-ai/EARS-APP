@@ -123,7 +123,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
     return (
       <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
         <div className="flex justify-between items-end">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
           <span className={`text-lg font-black ${valueColor}`}>{value}</span>
         </div>
         <input
@@ -135,7 +135,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
           onChange={(e) => onChange(Number(e.target.value))}
           className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
           <span>{min}</span>
           <span>{max}</span>
         </div>
@@ -145,7 +145,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
 
   const NumberInput = ({ label, value, unit, onChange, step = 1 }: { label: string, value: number, unit: string, onChange: (v: number) => void, step?: number }) => (
     <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
       <div className="relative">
         <input
           type="number"
@@ -191,7 +191,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
 
         <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Score de Hidratação</p>
+            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score de Hidratação</p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-black">{score}</span>
               <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
@@ -199,7 +199,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
             {alerts.length > 0 && (
               <div className="mt-3 flex flex-col gap-1.5">
                 {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
+                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
                     <AlertTriangle className="w-3 h-3" /> {alert}
                   </div>
                 ))}
@@ -213,13 +213,13 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
       {/* Indices Preview */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Hidratação</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Hidratação</p>
           <p className={`text-2xl font-black ${metrics.hydrationIndex > 70 ? 'text-emerald-400' : metrics.hydrationIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.hydrationIndex}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Estresse Fisiológico</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Estresse Fisiológico</p>
           <p className={`text-2xl font-black ${metrics.physiologicalStress < 30 ? 'text-emerald-400' : metrics.physiologicalStress < 70 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.physiologicalStress}%
           </p>
@@ -249,7 +249,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
             <NumberInput label="Variação de Peso (Ex: -2 para perda de 2%)" value={data.weightVariation} unit="%" step={0.1} onChange={(v) => setData({...data, weightVariation: v})} />
             
             <div className="pt-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Sintomas Relatados</label>
+              <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Sintomas Relatados</label>
               <div className="grid grid-cols-2 gap-2">
                 <Checkbox label="Dor de Cabeça" checked={data.symptoms.headache} onChange={(v) => setData({...data, symptoms: {...data.symptoms, headache: v}})} />
                 <Checkbox label="Tontura" checked={data.symptoms.dizziness} onChange={(v) => setData({...data, symptoms: {...data.symptoms, dizziness: v}})} />
@@ -263,10 +263,10 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
 
       {/* Footer Actions */}
       <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
+        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8">
+        <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
           <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
         </Button>
       </div>

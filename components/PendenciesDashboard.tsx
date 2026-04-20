@@ -185,7 +185,7 @@ export function PendenciesDashboard() {
               className="bg-[#0A1120] border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition-all group"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${getPriorityColor(pendency.priority)}`}>
+                <div className={`px-3 py-1 rounded-full border text-xxs font-black uppercase tracking-widest flex items-center gap-2 ${getPriorityColor(pendency.priority)}`}>
                   <div className={`w-1.5 h-1.5 rounded-full bg-current`} />
                   Prioridade {pendency.priority === 'high' ? 'Alta' : pendency.priority === 'medium' ? 'Média' : 'Baixa'}
                 </div>
@@ -208,12 +208,12 @@ export function PendenciesDashboard() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-white uppercase tracking-tight">{pendency.athleteName}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">Atleta</p>
+                    <p className="text-xxs text-slate-500 uppercase tracking-widest">Atleta</p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Prazo</p>
+                  <p className="text-xxs text-slate-500 uppercase tracking-widest mb-1">Prazo</p>
                   <p className="text-xs font-bold text-rose-400">{new Date(pendency.dueDate).toLocaleDateString('pt-BR')}</p>
                 </div>
               </div>

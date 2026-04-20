@@ -125,7 +125,7 @@ export function AttachmentUploadForm({
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
+                  <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
                     Nome do Documento <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -139,7 +139,7 @@ export function AttachmentUploadForm({
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
+                  <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
                     Categoria <span className="text-rose-500">*</span>
                   </label>
                   <select
@@ -155,7 +155,7 @@ export function AttachmentUploadForm({
 
                 {versionGroupId && (
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
+                    <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
                       Observação da Versão (Opcional)
                     </label>
                     <textarea
@@ -168,7 +168,7 @@ export function AttachmentUploadForm({
                 )}
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
+                  <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-1.5">
                     Arquivo <span className="text-rose-500">*</span>
                   </label>
                   <div 
@@ -189,8 +189,8 @@ export function AttachmentUploadForm({
                           <FileText size={24} />
                         </div>
                         <div className="text-center">
-                          <p className="text-sm font-medium text-white truncate max-w-[200px]">{file.name}</p>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">
+                          <p className="text-sm font-medium text-white truncate max-w-[12.5rem]">{file.name}</p>
+                          <p className="text-xxs text-slate-500 uppercase tracking-widest mt-1">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                           </p>
                         </div>
@@ -202,7 +202,7 @@ export function AttachmentUploadForm({
                         </div>
                         <div className="text-center">
                           <p className="text-sm font-medium text-slate-400">Clique ou arraste o arquivo</p>
-                          <p className="text-[10px] text-slate-600 uppercase tracking-widest mt-1">PDF, Imagens (Max 50MB)</p>
+                          <p className="text-xxs text-slate-600 uppercase tracking-widest mt-1">PDF, Imagens (Max 50MB)</p>
                         </div>
                       </>
                     )}
@@ -230,7 +230,7 @@ export function AttachmentUploadForm({
                 <Button 
                   type="submit" 
                   disabled={isUploading}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase tracking-widest min-w-[140px]"
+                  className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase tracking-widest min-w-[8.75rem]"
                 >
                   {isUploading ? (
                     <div className="w-4 h-4 border-2 border-[#050B14] border-t-transparent rounded-full animate-spin" />

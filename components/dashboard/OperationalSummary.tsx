@@ -64,7 +64,7 @@ export function OperationalSummary({
                 <div className={`p-2 rounded-lg ${stat.bg} ${stat.color}`}>
                   <stat.icon size={18} />
                 </div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">
                   {stat.label}
                 </p>
               </div>

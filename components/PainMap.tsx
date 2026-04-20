@@ -454,7 +454,7 @@ export function PainMap({
   const renderBody = (isFront: boolean) => {
     const parts = bodyParts.filter((p) => (isFront ? p.front : p.back));
     return (
-      <div className={`relative w-full ${readOnly ? 'max-w-[180px] sm:max-w-[220px]' : 'max-w-[240px] md:max-w-[300px]'} mx-auto aspect-[1/2.2] bg-slate-950 rounded-3xl overflow-hidden border border-cyan-500/30 shadow-[0_0_40px_rgba(6,182,212,0.15)] group`}>
+      <div className={`relative w-full ${readOnly ? 'max-w-[11.25rem] sm:max-w-[13.75rem]' : 'max-w-[15rem] md:max-w-[18.75rem]'} mx-auto aspect-[1/2.2] bg-slate-950 rounded-3xl overflow-hidden border border-cyan-500/30 shadow-[0_0_40px_rgba(6,182,212,0.15)] group`}>
         {/* Sci-Fi Grid Background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-50" />
 
@@ -668,7 +668,7 @@ export function PainMap({
             variant="ghost"
             size="sm"
             onClick={handleClearAll}
-            className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-[10px] font-black uppercase tracking-widest"
+            className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xxs font-black uppercase tracking-widest"
           >
             <X className="w-3 h-3 mr-1" /> Limpar Todo o Mapa
           </Button>
@@ -737,7 +737,7 @@ export function PainMap({
                       );
                     })}
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-3 px-1">
+                  <div className="flex justify-between text-xxs text-slate-500 font-bold uppercase tracking-widest mt-3 px-1">
                     <span>0 - {lang === "pt" ? "Normal" : "Normal"}</span>
                     <span>10 - {lang === "pt" ? "Crítico" : "Critical"}</span>
                   </div>

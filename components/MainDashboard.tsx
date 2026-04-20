@@ -430,10 +430,10 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
 
                   {/* Athlete Selector for Evaluations */}
                   <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 mb-8">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Atleta Selecionado</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest block mb-3">Atleta Selecionado</label>
                     <div className="flex flex-wrap gap-3">
                       <select 
-                        className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors min-w-[250px]"
+                        className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors min-w-[15.625rem]"
                         onChange={(e) => {
                           const athlete = athletesList.find(a => a.id === e.target.value);
                           setSelectedAthleteForEval(athlete);
@@ -756,7 +756,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed lg:static inset-y-0 left-0 z-[90] w-[88px] bg-[#0A1120] border-r border-slate-800/50 flex flex-col pt-safe pb-safe transition-transform duration-300 lg:translate-x-0 ${!isDesktop && !isMobileMenuOpen ? '-translate-x-full' : 'translate-x-0'}`}
+        className={`fixed lg:static inset-y-0 left-0 z-[90] w-[5.5rem] bg-[#0A1120] border-r border-slate-800/50 flex flex-col pt-safe pb-safe transition-transform duration-300 lg:translate-x-0 ${!isDesktop && !isMobileMenuOpen ? '-translate-x-full' : 'translate-x-0'}`}
       >
         {/* Logo */}
         <div className="h-20 flex items-center justify-center border-b border-slate-800/50 shrink-0">
@@ -801,7 +801,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
                   </button>
                   
                   {/* Simple Tooltip */}
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[110] border border-slate-700 pointer-events-none">
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2 py-1 bg-slate-800 text-white text-xxs font-bold uppercase tracking-widest rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[110] border border-slate-700 pointer-events-none">
                     {item.label}
                   </div>
                 </div>
@@ -885,7 +885,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
 
           {/* Central Operational Menu */}
           <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-            <div className="flex items-center gap-2 sm:gap-6 bg-slate-950/50 p-1.5 rounded-2xl border border-slate-800/50 backdrop-blur-md max-w-[450px] overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-2 sm:gap-6 bg-slate-950/50 p-1.5 rounded-2xl border border-slate-800/50 backdrop-blur-md max-w-[28.125rem] overflow-x-auto no-scrollbar">
               {operationalItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeMode === item.id;
@@ -894,7 +894,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
                   <div key={item.id} className="relative group">
                     <button
                       onClick={() => handleNavigation(item.id as View)}
-                      className={`flex items-center gap-2 px-3 sm:px-4 h-11 min-w-[44px] rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap active:scale-95 ${
+                      className={`flex items-center gap-2 px-3 sm:px-4 h-11 min-w-[2.75rem] rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap active:scale-95 ${
                         isActive 
                           ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.1)]" 
                           : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
@@ -905,7 +905,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
                     </button>
 
                     {/* Tooltip for Mobile/Compact */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 border border-slate-800 shadow-2xl pointer-events-none">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-3 py-1.5 bg-slate-900 text-white text-xxs font-black uppercase tracking-widest rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 border border-slate-800 shadow-2xl pointer-events-none">
                       {item.label}
                     </div>
                   </div>
@@ -916,11 +916,11 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
 
           <div className="flex items-center gap-4">
             <div className="hidden xl:flex flex-col items-end mr-2">
-              <h2 className="text-[10px] font-black text-white uppercase tracking-[0.2em] opacity-50">{getPageTitle()}</h2>
+              <h2 className="text-xxs font-black text-white uppercase tracking-[0.2em] opacity-50">{getPageTitle()}</h2>
             </div>
             <div className="flex items-center gap-2 bg-emerald-500/5 px-2 py-1 rounded-full border border-emerald-500/10">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest hidden sm:block">Online</span>
+              <span className="text-xxs font-black text-emerald-500 uppercase tracking-widest hidden sm:block">Online</span>
             </div>
             <button 
               onClick={() => setIsProfileModalOpen(true)}
@@ -942,7 +942,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
           </div>
         </header>
 
-        <div className="flex-1 p-4 sm:p-6 max-w-[1280px] w-full mx-auto">
+        <div className="flex-1 p-4 sm:p-6 max-w-[80rem] w-full mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}

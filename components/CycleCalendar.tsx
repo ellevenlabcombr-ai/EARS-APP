@@ -89,7 +89,7 @@ export function CycleCalendar({
 
       <div className="grid grid-cols-7 gap-1">
         {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
-          <div key={i} className="text-center text-[10px] font-black text-slate-500 uppercase pb-2">
+          <div key={i} className="text-center text-xxs font-black text-slate-500 uppercase pb-2">
             {d}
           </div>
         ))}
@@ -116,7 +116,7 @@ export function CycleCalendar({
               )}
               
               {/* Tooltip-like info on hover */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-slate-900 border border-slate-700 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap z-50 text-[10px] font-bold uppercase tracking-wider text-white">
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-slate-900 border border-slate-700 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap z-50 text-xxs font-bold uppercase tracking-wider text-white">
                 Dia {dayInCycle} • {getDayInfo(date).phase}
               </div>
             </div>
@@ -127,19 +127,19 @@ export function CycleCalendar({
       <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-900">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-rose-500/40 border border-rose-500/50" />
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menstrual</span>
+          <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Menstrual</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Folicular</span>
+          <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Folicular</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-amber-500/40 border border-amber-500/50" />
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ovulatória</span>
+          <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Ovulatória</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-indigo-500/20 border border-indigo-500/30" />
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lútea</span>
+          <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Lútea</span>
         </div>
       </div>
     </div>

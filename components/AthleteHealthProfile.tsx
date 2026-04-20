@@ -173,7 +173,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#0A1120] border border-slate-800 p-3 rounded-xl shadow-2xl">
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{label}</p>
+        <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
@@ -356,7 +356,7 @@ const renderDataNode = (key: string, value: any, depth = 0) => {
   if (typeof value === 'object' && !Array.isArray(value)) {
     return (
       <div key={key} className={`mt-2 ${depth > 0 ? 'ml-4 border-l border-slate-700/50 pl-3' : 'p-3 rounded-xl bg-slate-900/30 border border-slate-800/30'}`}>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight block mb-2">{translatedKey}</span>
+        <span className="text-xxs font-bold text-slate-400 uppercase tracking-tight block mb-2">{translatedKey}</span>
         <div className="space-y-2">
           {Object.entries(value).map(([subKey, subValue]) => renderDataNode(subKey, subValue, depth + 1))}
         </div>
@@ -366,7 +366,7 @@ const renderDataNode = (key: string, value: any, depth = 0) => {
 
   return (
     <div key={key} className={`flex items-center justify-between ${depth === 0 ? 'p-3 rounded-xl bg-slate-900/30 border border-slate-800/30' : 'py-1'}`}>
-      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">{translatedKey}</span>
+      <span className="text-xxs font-bold text-slate-500 uppercase tracking-tight">{translatedKey}</span>
       <span className="text-xs font-bold text-white text-right ml-4">
         {translateValue(value)}
       </span>
@@ -1659,7 +1659,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl backdrop-blur-md transition-all group"
                 >
                   <QrCode className="w-4 h-4 text-cyan-400" />
-                  <span className="text-[10px] md:text-xs font-black tracking-widest uppercase">#{athlete.athlete_code}</span>
+                  <span className="text-xxs md:text-xs font-black tracking-widest uppercase">#{athlete.athlete_code}</span>
                 </button>
               </div>
             )}
@@ -1693,13 +1693,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 
                 {/* Status Badge Over Photo */}
                 <div className={`absolute bottom-0 left-0 right-0 py-1.5 md:py-2 text-center backdrop-blur-md border-t border-white/10 ${statusCfg.bg.replace('/10', '/40')} ${statusCfg.color}`}>
-                  <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">{statusCfg.label}</span>
+                  <span className="text-xxs md:text-xxs font-black uppercase tracking-[0.2em]">{statusCfg.label}</span>
                 </div>
               </div>
               
               {/* Floating Readiness Indicator */}
               <div className="absolute -top-2 -right-2 md:-top-3 md:-right-3 w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-[#0A1120] border-2 border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-                <span className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-tighter">Score</span>
+                <span className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-tighter">Score</span>
                 <span className={`text-lg md:text-xl font-black ${athlete.readiness < 70 ? 'text-rose-500' : 'text-cyan-400'}`}>
                   {athlete.readiness}%
                 </span>
@@ -1728,8 +1728,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
                     </div>
                     <div className="text-left">
-                      <p className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Modalidade</p>
-                      <p className="text-[10px] md:text-xs font-bold text-white uppercase tracking-tight">
+                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Modalidade</p>
+                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">
                         {athlete.modalidade === 'Volleyball' && language === 'pt' ? 'Vôlei' : (athlete.modalidade || '-')}
                       </p>
                     </div>
@@ -1740,8 +1740,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
                     </div>
                     <div className="text-left">
-                      <p className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Posição</p>
-                      <p className="text-[10px] md:text-xs font-bold text-white uppercase tracking-tight">{athlete.position || '-'}</p>
+                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Posição</p>
+                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">{athlete.position || '-'}</p>
                     </div>
                   </div>
 
@@ -1750,8 +1750,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
                     </div>
                     <div className="text-left">
-                      <p className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Categoria</p>
-                      <p className="text-[10px] md:text-xs font-bold text-white uppercase tracking-tight">{athlete.category || '-'}</p>
+                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Categoria</p>
+                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">{athlete.category || '-'}</p>
                     </div>
                   </div>
 
@@ -1760,7 +1760,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
                     </div>
                     <div className="text-left">
-                      <p className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Idade</p>
+                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Idade</p>
                       <p className="text-xs font-bold text-white uppercase tracking-tight">{athleteAge || '-'} Anos</p>
                     </div>
                   </div>
@@ -1775,9 +1775,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               transition={{ delay: 0.2 }}
               className="hidden lg:block pb-2"
             >
-              <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 min-w-[180px]`}>
+              <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 min-w-[11.25rem]`}>
                 <div className={`w-3 h-3 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.5)]`}></div>
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Risco Clínico</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-[0.2em]">Risco Clínico</p>
                 <span className={`text-xl font-black uppercase tracking-widest ${riskCfg.color}`}>
                   {riskCfg.label}
                 </span>
@@ -1809,7 +1809,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
+                <span className="text-xxs font-black uppercase tracking-widest">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -1877,19 +1877,19 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <div className={`p-1 ${card.bg} rounded-lg mb-1.5`}>
                   <card.icon className={`w-3.5 h-3.5 ${card.color}`} />
                 </div>
-                <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">{card.label}</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-0.5">{card.label}</p>
                 <p className={`text-base font-black tracking-tight ${card.color}`}>{card.value}</p>
                 
                 {card.alert ? (
                   <div className="mt-1.5 w-full pt-1.5 border-t border-rose-500/20 flex flex-col items-center gap-0.5">
-                    <span className="text-[6px] font-black text-rose-500 uppercase tracking-widest animate-pulse">{card.alert}</span>
+                    <span className="text-xxs font-black text-rose-500 uppercase tracking-widest animate-pulse">{card.alert}</span>
                   </div>
                 ) : (
                   <div className="mt-1.5 w-full pt-1.5 border-t border-slate-800/50 flex flex-col items-center gap-0.5">
                     <div className="flex items-center gap-1">
                       {card.trend === 'up' && <ArrowUpRight className="w-2 h-2 text-emerald-500" />}
                       {card.trend === 'down' && <ArrowDownRight className="w-2 h-2 text-rose-500" />}
-                      <span className="text-[6px] font-bold text-slate-600 uppercase tracking-tighter">Tendência</span>
+                      <span className="text-xxs font-bold text-slate-600 uppercase tracking-tighter">Tendência</span>
                     </div>
                   </div>
                 )}
@@ -1909,7 +1909,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             <CardContent className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="flex flex-col items-center">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Mapa de Reabilitação & Risco</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-6">Mapa de Reabilitação & Risco</p>
                   <div className="w-full">
                     <PainMap 
                       value={(() => {
@@ -1946,7 +1946,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     ].map(item => (
                       <div key={item.label} className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{item.label}</span>
+                        <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{item.label}</span>
                       </div>
                     ))}
                   </div>
@@ -1975,7 +1975,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
                           <div className="flex justify-between items-center mb-4">
                             <span className="text-xs font-black text-white uppercase tracking-tight">Regiões Prioritárias ({sportProfile.name})</span>
-                            <span className="text-[10px] text-cyan-500 font-bold flex items-center gap-1">
+                            <span className="text-xxs text-cyan-500 font-bold flex items-center gap-1">
                               <ShieldCheck className="w-3 h-3" /> Monitoramento Ativo
                             </span>
                           </div>
@@ -2002,13 +2002,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                                   className="flex items-center justify-between p-2.5 bg-slate-900/50 rounded-lg border border-slate-800/50 hover:border-slate-700 transition-all group"
                                 >
                                   <div className="flex flex-col items-start">
-                                    <span className="text-[10px] font-bold text-slate-300 uppercase group-hover:text-white transition-colors">{region.label}</span>
+                                    <span className="text-xxs font-bold text-slate-300 uppercase group-hover:text-white transition-colors">{region.label}</span>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                      <span className="text-[8px] font-black text-slate-500 uppercase tracking-tighter">Risco:</span>
-                                      <span className={`text-[8px] font-black uppercase ${riskColor}`}>{riskScore}%</span>
+                                      <span className="text-xxs font-black text-slate-500 uppercase tracking-tighter">Risco:</span>
+                                      <span className={`text-xxs font-black uppercase ${riskColor}`}>{riskScore}%</span>
                                     </div>
                                   </div>
-                                  <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${phaseColor}`}>
+                                  <span className={`px-2 py-0.5 rounded text-xxs font-black uppercase border ${phaseColor}`}>
                                     {phase}
                                   </span>
                                 </button>
@@ -2020,17 +2020,17 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
                           <div className="flex justify-between items-center mb-4">
                             <span className="text-xs font-black text-white uppercase tracking-tight">Resumo Evolutivo</span>
-                            <span className="text-[10px] text-slate-500 font-bold">Geral</span>
+                            <span className="text-xxs text-slate-500 font-bold">Geral</span>
                           </div>
                           <div className="space-y-3">
                             <div className="flex items-center justify-between p-2 bg-slate-900/50 rounded-lg border border-slate-800/50">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Status de Dor</span>
+                              <span className="text-xxs font-bold text-slate-400 uppercase">Status de Dor</span>
                               <span className="text-xs font-black text-emerald-400 flex items-center gap-1">
                                 <TrendingDown className="w-3 h-3" /> -15% esta semana
                               </span>
                             </div>
                             <div className="flex items-center justify-between p-2 bg-slate-900/50 rounded-lg border border-slate-800/50">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Ganho de Força</span>
+                              <span className="text-xxs font-bold text-slate-400 uppercase">Ganho de Força</span>
                               <span className="text-xs font-black text-cyan-400 flex items-center gap-1">
                                 <TrendingUp className="w-3 h-3" /> +8% esta semana
                               </span>
@@ -2042,16 +2042,16 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
                             <div className="flex justify-between items-center mb-4">
                               <span className="text-xs font-black text-white uppercase tracking-tight">Sintomas Detectados</span>
-                              <span className="text-[10px] text-slate-500 font-bold">{wellnessHistory[wellnessHistory.length - 1].date}</span>
+                              <span className="text-xxs text-slate-500 font-bold">{wellnessHistory[wellnessHistory.length - 1].date}</span>
                             </div>
                             <div className="flex flex-wrap gap-2">
                               {wellnessHistory[wellnessHistory.length - 1].pain > 0 && (
-                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${wellnessHistory[wellnessHistory.length - 1].pain >= 7 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : wellnessHistory[wellnessHistory.length - 1].pain >= 4 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                                <span className={`px-3 py-1 rounded-full text-xxs font-black uppercase tracking-widest ${wellnessHistory[wellnessHistory.length - 1].pain >= 7 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : wellnessHistory[wellnessHistory.length - 1].pain >= 4 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
                                   Dor: {wellnessHistory[wellnessHistory.length - 1].pain}/10
                                 </span>
                               )}
                               {wellnessHistory[wellnessHistory.length - 1].symptoms?.map((symptom: string) => (
-                                <span key={symptom} className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700">
+                                <span key={symptom} className="px-3 py-1 rounded-full text-xxs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700">
                                   {symptom}
                                 </span>
                               ))}
@@ -2060,7 +2060,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         ) : (
                           <div className="p-8 bg-slate-950/30 border border-dashed border-slate-800 rounded-xl flex flex-col items-center justify-center text-center">
                             <Activity className="w-8 h-8 text-slate-700 mb-3" />
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Selecione uma região para análise detalhada</p>
+                            <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Selecione uma região para análise detalhada</p>
                           </div>
                         )}
                       </div>
@@ -2070,7 +2070,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     <div className="grid grid-cols-1 gap-4">
                       <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex items-center justify-between">
                         <div>
-                          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Cor da Urina (Hidratação)</p>
+                          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Cor da Urina (Hidratação)</p>
                           <p className="text-xs text-slate-300 font-medium">
                             {wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].urine_color ? (
                               wellnessHistory[wellnessHistory.length - 1].urine_color === 1 ? "Muito clara" :
@@ -2094,7 +2094,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                       {trendAlerts.length > 0 && (
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                          <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+                          <p className="text-xxs font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-1">
                             <TrendingDown className="w-3 h-3" /> Alertas de Tendência
                           </p>
                           <ul className="space-y-1">
@@ -2146,7 +2146,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                         return (
                           <div className={`p-4 bg-${color}-500/5 border border-${color}-500/20 rounded-xl`}>
-                            <p className={`text-[9px] font-black text-${color}-500 uppercase tracking-widest mb-2`}>Conduta Prioritária</p>
+                            <p className={`text-xxs font-black text-${color}-500 uppercase tracking-widest mb-2`}>Conduta Prioritária</p>
                             <p className={`text-sm font-bold text-white mb-1`}>{conduta}</p>
                             <p className="text-xs text-slate-400 font-medium italic">{explicacao}</p>
                           </div>
@@ -2169,7 +2169,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <CardContent className="p-8 relative z-10">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <h3 className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">Resumo Inteligente (AI)</h3>
+                  <h3 className="text-xxs font-black text-cyan-500 uppercase tracking-widest">Resumo Inteligente (AI)</h3>
                 </div>
                 <div className="space-y-4">
                   <p className="text-base text-slate-300 leading-relaxed font-medium">
@@ -2179,7 +2179,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     )}
                   </p>
                   <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                    <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-2">Recomendação Clínica</p>
+                    <p className="text-xxs font-black text-emerald-400 uppercase tracking-widest mb-2">Recomendação Clínica</p>
                     <p className="text-sm text-emerald-100 font-medium">
                       Manter monitoramento diário e ajustar carga conforme percepção de esforço e recuperação.
                     </p>
@@ -2190,8 +2190,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           ) : (
             <Card className="bg-slate-900/20 border-slate-800/50 border-dashed shadow-xl flex flex-col items-center justify-center p-12 text-center h-full">
               <BrainCircuit className="w-12 h-12 text-slate-800 mb-4" />
-              <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2">Aguardando Dados</h3>
-              <p className="text-xs text-slate-500 max-w-[200px]">Inicie o monitoramento wellness para gerar insights inteligentes.</p>
+              <h3 className="text-xxs font-black text-slate-600 uppercase tracking-widest mb-2">Aguardando Dados</h3>
+              <p className="text-xs text-slate-500 max-w-[12.5rem]">Inicie o monitoramento wellness para gerar insights inteligentes.</p>
             </Card>
           )}
 
@@ -2207,7 +2207,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-pink-500/5 border border-pink-500/20 rounded-xl">
                     <div>
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Status Atual (Hoje)</p>
+                      <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status Atual (Hoje)</p>
                       <p className="text-lg font-black text-pink-400 uppercase tracking-tight">
                         {wellnessHistory[wellnessHistory.length - 1]?.menstrual_cycle || 'Não Informado'}
                       </p>
@@ -2216,13 +2216,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   
                   <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Histórico Recente</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-3">Histórico Recente</p>
                     <div className="flex gap-2 overflow-x-auto pb-2">
                       {wellnessHistory.length > 0 ? (
                         wellnessHistory.slice(-7).map((w, idx) => (
                           <div key={idx} className="flex-shrink-0 w-16 text-center">
-                            <p className="text-[8px] font-bold text-slate-600 mb-1">{w.date}</p>
-                            <div className={`h-6 rounded flex items-center justify-center text-[8px] font-black uppercase ${
+                            <p className="text-xxs font-bold text-slate-600 mb-1">{w.date}</p>
+                            <div className={`h-6 rounded flex items-center justify-center text-xxs font-black uppercase ${
                               w.menstrual_cycle ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' : 'bg-slate-800 text-slate-600'
                             }`}>
                               {w.menstrual_cycle ? w.menstrual_cycle.substring(0, 3) : '-'}
@@ -2230,7 +2230,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           </div>
                         ))
                       ) : (
-                        <p className="text-[9px] text-slate-600 italic py-2">Nenhum registro encontrado.</p>
+                        <p className="text-xxs text-slate-600 italic py-2">Nenhum registro encontrado.</p>
                       )}
                     </div>
                   </div>
@@ -2254,7 +2254,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             <CardContent className="p-6">
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <ClipboardList className="w-8 h-8 text-slate-800 mb-3" />
-                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Nenhuma tarefa pendente</p>
+                <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Nenhuma tarefa pendente</p>
               </div>
             </CardContent>
           </Card>
@@ -2269,9 +2269,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 Próxima Competição
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[180px]">
+            <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[11.25rem]">
               <div className="text-center space-y-2">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sem competições agendadas</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Sem competições agendadas</p>
                 <p className="text-2xl font-black text-slate-700 tracking-tighter">-- DIAS</p>
               </div>
             </CardContent>
@@ -2288,7 +2288,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="h-[220px] w-full">
+              <div className="h-[13.75rem] w-full">
                 <SafeRender componentName="WellnessHistoryChart">
                   <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={wellnessHistory}>
@@ -2320,7 +2320,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="h-[220px] w-full">
+              <div className="h-[13.75rem] w-full">
                 <SafeRender componentName="PainEvolutionChart">
                   <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={painData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -2328,9 +2328,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     <XAxis dataKey="date" stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} />
                     <YAxis stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }}
-                      itemStyle={{ color: '#e2e8f0', fontSize: '12px', fontWeight: 'bold' }}
-                      labelStyle={{ color: '#94a3b8', fontSize: '10px', textTransform: 'uppercase' }}
+                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '0.5rem' }}
+                      itemStyle={{ color: '#e2e8f0', fontSize: '0.75rem', fontWeight: 'bold' }}
+                      labelStyle={{ color: '#94a3b8', fontSize: '0.625rem', textTransform: 'uppercase' }}
                     />
                     <Line 
                       type="monotone" 
@@ -2359,7 +2359,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 Carga de Trabalho & Prontidão
               </CardTitle>
               <div className="flex items-center gap-2">
-                <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded uppercase tracking-widest border border-emerald-500/20">
+                <span className="text-xxs font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded uppercase tracking-widest border border-emerald-500/20">
                   ACWR: 1.05
                 </span>
               </div>
@@ -2394,28 +2394,28 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-black text-white tracking-tighter">{athlete.readiness}%</span>
-                      <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Prontidão</span>
+                      <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Prontidão</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sono: 85%</p>
+                      <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Sono: 85%</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Fadiga: 60%</p>
+                      <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Fadiga: 60%</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Estresse: 90%</p>
+                      <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Estresse: 90%</p>
                     </div>
                   </div>
                 </div>
 
                 {/* ACWR Chart */}
-                <div className="h-[160px] w-full">
-                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2 text-center">Relação Carga Aguda:Crônica (ACWR)</p>
+                <div className="h-[10rem] w-full">
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2 text-center">Relação Carga Aguda:Crônica (ACWR)</p>
                   <SafeRender componentName="ACWRChart">
                     <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={wellnessHistory.length > 0 ? wellnessHistory.slice(-7).map(w => ({
@@ -2431,8 +2431,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           <YAxis yAxisId="left" stroke="#475569" fontSize={8} fontWeight="bold" tickLine={false} axisLine={false} hide />
                           <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={8} fontWeight="bold" tickLine={false} axisLine={false} domain={[0, 2]} />
                           <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
-                            itemStyle={{ fontSize: '10px', fontWeight: 'bold' }}
+                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '0.75rem' }}
+                            itemStyle={{ fontSize: '0.625rem', fontWeight: 'bold' }}
                           />
                           <Bar yAxisId="left" dataKey="acute" name="Carga Aguda" fill="#22d3ee" radius={[4, 4, 0, 0]} barSize={15} />
                           <Line yAxisId="right" type="monotone" dataKey="ratio" name="ACWR" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b' }} />
@@ -2456,8 +2456,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-8">
-                <div className="h-[200px] w-full">
-                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-4 text-center">Força & Potência (Salto Vertical)</p>
+                <div className="h-[12.5rem] w-full">
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-4 text-center">Força & Potência (Salto Vertical)</p>
                   <SafeRender componentName="PhysicalAssessmentChart">
                     <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={clinicalAssessments.filter(a => a.assessment_type === 'physical').map(a => ({
@@ -2476,8 +2476,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           <XAxis dataKey="date" stroke="#475569" fontSize={9} fontWeight="bold" tickLine={false} axisLine={false} />
                           <YAxis stroke="#475569" fontSize={8} fontWeight="bold" tickLine={false} axisLine={false} domain={['dataMin - 5', 'dataMax + 5']} />
                           <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
-                            itemStyle={{ fontSize: '10px', fontWeight: 'bold' }}
+                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '0.75rem' }}
+                            itemStyle={{ fontSize: '0.625rem', fontWeight: 'bold' }}
                           />
                           <Area type="monotone" dataKey="value" name="CMJ (cm)" stroke="#22d3ee" strokeWidth={3} fill="url(#colorPerf)" />
                         </>
@@ -2489,11 +2489,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl">
-                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Melhora (30 dias)</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Melhora (30 dias)</p>
                     <p className="text-sm font-black text-slate-600">--%</p>
                   </div>
                   <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl">
-                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Status Atual</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status Atual</p>
                     <p className="text-sm font-black text-slate-600">--</p>
                   </div>
                 </div>
@@ -2513,7 +2513,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           <CardContent className="p-0">
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <ClipboardList className="w-6 h-6 text-slate-800 mb-2" />
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Nenhuma avaliação agendada</p>
+              <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Nenhuma avaliação agendada</p>
             </div>
           </CardContent>
         </Card>
@@ -2547,31 +2547,31 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nome Completo</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Nome Completo</p>
                     <p className="text-sm font-medium text-white">{athlete.name}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Apelido</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Apelido</p>
                       <p className="text-sm font-medium text-white">{athlete.nickname || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">RG</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">RG</p>
                       <p className="text-sm font-medium text-white">{athlete.rg || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">CPF</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">CPF</p>
                       <p className="text-sm font-medium text-white">{athlete.cpf || '-'}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Data de Nascimento</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Data de Nascimento</p>
                       <p className="text-sm font-medium text-white">
                         {athlete.birthDate || athlete.birth_date ? new Date(athlete.birthDate || athlete.birth_date || '').toLocaleDateString('pt-BR') : '-'}
                       </p>
                       {(athlete.birthDate || athlete.birth_date) && (
-                        <p className="text-[10px] font-bold text-cyan-500 uppercase tracking-widest mt-1">
+                        <p className="text-xxs font-bold text-cyan-500 uppercase tracking-widest mt-1">
                           {(() => {
                             const age = calculateDetailedAge(athlete.birthDate || athlete.birth_date);
                             if (!age) return '';
@@ -2581,12 +2581,12 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       )}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Sexo</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Sexo</p>
                       <p className="text-sm font-medium text-white">{athlete.gender === 'M' ? 'Masculino' : athlete.gender === 'F' ? 'Feminino' : '-'}</p>
                     </div>
                     {athlete.group_name && (
                       <div>
-                        <p className="text-[10px] font-bold text-cyan-500 uppercase tracking-widest mb-1">Projeto / Equipe</p>
+                        <p className="text-xxs font-bold text-cyan-500 uppercase tracking-widest mb-1">Projeto / Equipe</p>
                         <p className="text-sm font-black text-cyan-400 uppercase tracking-tight">{athlete.group_name}</p>
                       </div>
                     )}
@@ -2605,37 +2605,37 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <CardContent className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Modalidade</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Modalidade</p>
                       <p className="text-sm font-medium text-white">
                         {athlete.modalidade === 'Volleyball' && language === 'pt' ? 'Vôlei' : (athlete.modalidade || '-')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Clube</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Clube</p>
                       <p className="text-sm font-medium text-white">{athlete.club || '-'}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Categoria</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Categoria</p>
                       <p className="text-sm font-medium text-white">{athlete.category}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Posição</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Posição</p>
                       <p className="text-sm font-medium text-white">{athlete.position || '-'}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Peso</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Peso</p>
                       <p className="text-sm font-medium text-white">{athlete.weight ? `${athlete.weight} kg` : '-'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Altura</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Altura</p>
                       <p className="text-sm font-medium text-white">{athlete.height ? `${athlete.height} cm` : '-'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Dominância</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Dominância</p>
                       <p className="text-sm font-medium text-white">{athlete.dominance || '-'}</p>
                     </div>
                   </div>
@@ -2653,11 +2653,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <CardContent className="p-6 space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Telefone</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Telefone</p>
                       <p className="text-sm font-medium text-white">{athlete.phone || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Email</p>
+                      <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Email</p>
                       <p className="text-sm font-medium text-white break-all" title={athlete.email}>{athlete.email || '-'}</p>
                     </div>
                   </div>
@@ -2674,7 +2674,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Logradouro</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Logradouro</p>
                     <p className="text-sm font-medium text-white">
                       {athlete.address?.logradouro ? (
                         <>
@@ -2701,11 +2701,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Email de Acesso</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Email de Acesso</p>
                     <p className="text-sm font-medium text-white break-all">{athlete.email || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Senha Gerada</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Senha Gerada</p>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-black text-cyan-400 tracking-widest bg-cyan-500/10 px-3 py-1 rounded-lg border border-cyan-500/20">
                         {athlete.password || 'Não gerada'}
@@ -2723,11 +2723,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           ) : (
                             <Wand2 className="w-3.5 h-3.5" />
                           )}
-                          <span className="text-[10px] font-black uppercase tracking-widest">Gerar</span>
+                          <span className="text-xxs font-black uppercase tracking-widest">Gerar</span>
                         </Button>
                       )}
                     </div>
-                    <p className="text-[8px] text-slate-500 uppercase tracking-widest mt-2">Esta senha é gerada automaticamente pelo sistema.</p>
+                    <p className="text-xxs text-slate-500 uppercase tracking-widest mt-2">Esta senha é gerada automaticamente pelo sistema.</p>
                   </div>
                 </CardContent>
               </Card>
@@ -2743,27 +2743,27 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <CardContent className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Plano de Saúde</h4>
+                      <h4 className="text-xxs font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Plano de Saúde</h4>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Convênio</p>
+                        <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Convênio</p>
                         <p className="text-sm font-medium text-white">{athlete.convenio || '-'}</p>
                       </div>
                       <div className="space-y-4">
                         <div>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Carteirinha</p>
+                          <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Carteirinha</p>
                           <p className="text-sm font-medium text-white">{athlete.carteirinha || '-'}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Hospital Pref.</p>
+                          <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Hospital Pref.</p>
                           <p className="text-sm font-medium text-white">{athlete.hospital || '-'}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Alergias & Medicações</h4>
+                      <h4 className="text-xxs font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Alergias & Medicações</h4>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Possui Alergia?</p>
+                        <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Possui Alergia?</p>
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/50 border border-slate-700">
                           <div className={`w-1.5 h-1.5 rounded-full ${athlete.hasAllergy ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
                           <span className="text-xs font-bold text-white uppercase tracking-widest">{athlete.hasAllergy ? 'Sim' : 'Não'}</span>
@@ -2771,30 +2771,30 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       </div>
                       {athlete.hasAllergy && (
                         <div>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Descrição da Alergia</p>
+                          <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Descrição da Alergia</p>
                           <p className="text-sm font-medium text-rose-400">{athlete.alergiaDesc || '-'}</p>
                         </div>
                       )}
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Contato de Emergência / Responsável</h4>
+                      <h4 className="text-xxs font-black text-cyan-500 uppercase tracking-widest border-b border-slate-800 pb-2">Contato de Emergência / Responsável</h4>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nome do Responsável</p>
+                        <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Nome do Responsável</p>
                         <p className="text-sm font-medium text-white">{athlete.guardianName || '-'}</p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Telefone</p>
+                          <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Telefone</p>
                           <p className="text-sm font-medium text-white">{athlete.guardianPhone || '-'}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">CPF</p>
+                          <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">CPF</p>
                           <p className="text-sm font-medium text-white">{athlete.guardianCpf || '-'}</p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Email</p>
+                        <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-1">Email</p>
                         <p className="text-sm font-medium text-white truncate" title={athlete.guardianEmail}>{athlete.guardianEmail || '-'}</p>
                       </div>
                     </div>
@@ -2817,7 +2817,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {athleteAlerts.filter(a => a.status === 'active').length === 0 ? (
                   <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
                     <CheckCircle className="w-8 h-8 text-emerald-500/20 mb-2" />
-                    <p className="text-emerald-500/60 text-[10px] font-black uppercase tracking-widest">Nenhum alerta ativo</p>
+                    <p className="text-emerald-500/60 text-xxs font-black uppercase tracking-widest">Nenhum alerta ativo</p>
                   </div>
                 ) : (
                   athleteAlerts.filter(a => a.status === 'active').map(alert => (
@@ -2829,7 +2829,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           </div>
                           <div>
                             <p className="text-sm font-bold text-white">{alert.message}</p>
-                            <p className="text-[10px] text-slate-500 uppercase font-black mt-1">
+                            <p className="text-xxs text-slate-500 uppercase font-black mt-1">
                               Gerado em {new Date(alert.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
@@ -2846,7 +2846,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                               if (data) setAthleteAlerts(data);
                             }
                           }}
-                          className="h-8 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-white"
+                          className="h-8 text-xxs font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-white"
                         >
                           Resolver
                         </Button>
@@ -2857,7 +2857,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                 {athleteAlerts.filter(a => a.status === 'resolved').length > 0 && (
                   <div className="pt-4 border-t border-slate-800/50">
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                       <History className="w-3 h-3" />
                       Histórico Resolvido
                     </h3>
@@ -2868,7 +2868,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                             <CheckCircle className="w-3 h-3 text-emerald-500/40" />
                             <span className="text-xs text-slate-400">{alert.message}</span>
                           </div>
-                          <span className="text-[9px] font-bold text-slate-600 uppercase">
+                          <span className="text-xxs font-bold text-slate-600 uppercase">
                             Resolvido em {new Date(alert.resolved_at!).toLocaleDateString('pt-BR')}
                           </span>
                         </div>
@@ -2888,7 +2888,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <Button 
                   variant="ghost" 
                   onClick={() => setActiveAssessment('list')}
-                  className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest"
+                  className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest"
                 >
                   <ChevronRight className="w-4 h-4 mr-2 rotate-180" /> Voltar para Lista
                 </Button>
@@ -2924,11 +2924,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         <item.icon className={`w-6 h-6 ${item.color}`} />
                       </div>
                       <h3 className="text-sm font-black text-white uppercase tracking-tight mb-2">{item.label}</h3>
-                      <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-bold">
+                      <p className="text-xxs text-slate-500 leading-relaxed uppercase tracking-widest font-bold">
                         {item.description}
                       </p>
                       <div className="mt-6 flex items-center justify-between">
-                        <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Iniciar Avaliação</span>
+                        <span className="text-xxs font-black text-cyan-500 uppercase tracking-widest">Iniciar Avaliação</span>
                         <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
                       </div>
                     </CardContent>
@@ -3219,7 +3219,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     setVersionGroupIdForNewVersion(null);
                     setShowAttachmentUpload(true);
                   }} 
-                  className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest"
+                  className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest"
                 >
                   <Plus className="w-4 h-4 mr-2" /> Novo Anexo
                 </Button>
@@ -3230,8 +3230,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Modo de Segurança Ativo</p>
-                  <p className="text-[10px] text-amber-200/70 font-medium leading-relaxed">
+                  <p className="text-xxs font-black text-amber-500 uppercase tracking-widest">Modo de Segurança Ativo</p>
+                  <p className="text-xxs text-amber-200/70 font-medium leading-relaxed">
                     As tabelas de banco de dados não foram encontradas. Os arquivos estão sendo listados diretamente do armazenamento, 
                     por isso a filtragem por categoria e versões podem estar limitadas. Execute as migrações SQL para normalizar.
                   </p>
@@ -3306,21 +3306,21 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                               <h3 className="text-sm font-bold text-white uppercase tracking-tight truncate" title={file.document_name || file.file_name}>
                                 {file.document_name || file.file_name}
                               </h3>
-                              <span className="text-[8px] font-black bg-slate-800 text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded border border-slate-700">
+                              <span className="text-xxs font-black bg-slate-800 text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded border border-slate-700">
                                 v{file.version_number || 1}
                               </span>
                             </div>
-                            <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest bg-cyan-500/10 px-2 py-0.5 rounded-md">
+                            <span className="text-xxs font-black text-cyan-500 uppercase tracking-widest bg-cyan-500/10 px-2 py-0.5 rounded-md">
                               {file.category}
                             </span>
                           </div>
 
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-4">
+                          <p className="text-xxs text-slate-500 uppercase tracking-widest font-bold mb-4">
                             {file.mime_type?.split('/')[1]?.toUpperCase() || file.file_type?.toUpperCase() || 'ARQUIVO'} • {(file.file_size / 1024 / 1024).toFixed(2)} MB
                           </p>
 
                           <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800/50">
-                            <span className="text-[10px] text-slate-500 uppercase tracking-widest">
+                            <span className="text-xxs text-slate-500 uppercase tracking-widest">
                               {new Date(file.created_at).toLocaleDateString('pt-BR')}
                             </span>
                             <div className="flex items-center gap-3">
@@ -3329,7 +3329,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                                   setVersionGroupIdForNewVersion(file.version_group_id);
                                   setShowAttachmentUpload(true);
                                 }}
-                                className="text-[10px] font-black text-cyan-500 uppercase tracking-widest hover:text-cyan-400 transition-colors"
+                                className="text-xxs font-black text-cyan-500 uppercase tracking-widest hover:text-cyan-400 transition-colors"
                               >
                                 Nova Versão
                               </button>
@@ -3338,14 +3338,14 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                                   setSelectedAttachment(file);
                                   setShowAttachmentHistory(true);
                                 }}
-                                className="text-[10px] font-black text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-colors"
+                                className="text-xxs font-black text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-colors"
                               >
                                 Histórico
                               </button>
                               <button 
                                 onClick={() => setConfirmDeleteAttachment(file)}
                                 disabled={isDeletingAttachment === file.id}
-                                className="text-[10px] font-black text-rose-400 uppercase tracking-widest hover:text-rose-300 transition-colors disabled:opacity-50"
+                                className="text-xxs font-black text-rose-400 uppercase tracking-widest hover:text-rose-300 transition-colors disabled:opacity-50"
                               >
                                 {isDeletingAttachment === file.id ? 'Excluindo...' : 'Excluir'}
                               </button>
@@ -3366,7 +3366,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <FileText className="w-5 h-5 text-cyan-500" />
                 Prontuário Eletrônico
               </h2>
-              <Button onClick={() => { setShowSignatureStep(false); setShowClinicalNoteModal(true); }} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest">
+              <Button onClick={() => { setShowSignatureStep(false); setShowClinicalNoteModal(true); }} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest">
                 <Plus className="w-4 h-4 mr-2" /> Nova Evolução
               </Button>
             </div>
@@ -3380,7 +3380,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       </div>
                       <div className="flex items-center gap-2">
                         {note.signed && (
-                          <div className="flex items-center gap-1 text-emerald-400 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 mr-2">
+                          <div className="flex items-center gap-1 text-emerald-400 text-xxs font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 mr-2">
                             <Check className="w-3 h-3" /> Assinado
                           </div>
                         )}
@@ -3408,7 +3408,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       </div>
                       <div>
                         <p className="text-xs font-bold text-white">{note.professional}</p>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest">Fisioterapeuta Responsável</p>
+                        <p className="text-xxs text-slate-500 uppercase tracking-widest">Fisioterapeuta Responsável</p>
                       </div>
                     </div>
                   </CardContent>
@@ -3432,7 +3432,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 Histórico de Avaliações
               </h2>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total: {clinicalAssessments.length}</span>
+                <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Total: {clinicalAssessments.length}</span>
               </div>
             </div>
 
@@ -3440,12 +3440,12 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-900/60 border-b border-slate-800/50">
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Data</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Avaliação</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Score / Resultado</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Classificação</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Fonte</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Ações</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Data</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Avaliação</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Score / Resultado</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Classificação</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Fonte</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
@@ -3472,7 +3472,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                             <span className="text-xs font-bold text-white">
                               {new Date(assessment.assessment_date).toLocaleDateString('pt-BR')}
                             </span>
-                            <span className="text-[9px] text-slate-500 font-medium">
+                            <span className="text-xxs text-slate-500 font-medium">
                               {new Date(assessment.assessment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                             </span>
                           </div>
@@ -3507,7 +3507,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         </td>
                         <td className="px-6 py-4">
                           {assessment.classification ? (
-                            <span className={`text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest border ${
+                            <span className={`text-xxs font-black px-2 py-1 rounded uppercase tracking-widest border ${
                               assessment.classification_color === 'emerald-500' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                               assessment.classification_color === 'amber-500' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
                               assessment.classification_color === 'rose-500' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
@@ -3519,11 +3519,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                               {assessment.classification}
                             </span>
                           ) : (
-                            <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">-</span>
+                            <span className="text-xxs font-bold text-slate-600 uppercase tracking-widest">-</span>
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                          <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">
                             {assessment.source_table || '-'}
                           </span>
                         </td>
@@ -3559,7 +3559,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">Detalhes da Avaliação</h3>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">
                       {new Date(selectedAssessment.assessment_date).toLocaleDateString('pt-BR')} {new Date(selectedAssessment.assessment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                     </p>
                   </div>
@@ -3579,7 +3579,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Tipo</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Tipo</p>
                     <p className="text-sm font-bold text-white uppercase">
                       {selectedAssessment.assessment_type === 'sleep' ? 'Sono' :
                        selectedAssessment.assessment_type === 'orthopedic' ? 'Ortopédica' :
@@ -3598,7 +3598,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Classificação</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Classificação</p>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
                         selectedAssessment.classification_color === 'emerald-500' ? 'bg-emerald-500' :
@@ -3617,7 +3617,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {selectedAssessment.score !== null && (
                   <div className="p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/10 flex items-center justify-between">
                     <div>
-                      <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest mb-1">Pontuação Final</p>
+                      <p className="text-xxs font-black text-cyan-500 uppercase tracking-widest mb-1">Pontuação Final</p>
                       <p className="text-2xl font-black text-white">{selectedAssessment.score}</p>
                     </div>
                     <Activity className="w-8 h-8 text-cyan-500/20" />
@@ -3626,7 +3626,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                 {/* Data Details */}
                 <div className="space-y-4">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dados Detalhados</h4>
+                  <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dados Detalhados</h4>
                   <div className="grid grid-cols-1 gap-3">
                     {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value))}
                   </div>
@@ -3635,7 +3635,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Clinical Report */}
                 {selectedAssessment.clinical_report && (
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-black text-cyan-400 uppercase tracking-widest border-b border-cyan-900/30 pb-2 flex items-center gap-2">
+                    <h4 className="text-xxs font-black text-cyan-400 uppercase tracking-widest border-b border-cyan-900/30 pb-2 flex items-center gap-2">
                       <Sparkles className="w-3 h-3" />
                       Relatório Clínico (IA)
                     </h4>
@@ -3648,7 +3648,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Clinical Alerts */}
                 {selectedAssessment.clinical_alerts && selectedAssessment.clinical_alerts.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-widest border-b border-amber-900/30 pb-2 flex items-center gap-2">
+                    <h4 className="text-xxs font-black text-amber-400 uppercase tracking-widest border-b border-amber-900/30 pb-2 flex items-center gap-2">
                       <AlertCircle className="w-3 h-3" />
                       Alertas Clínicos
                     </h4>
@@ -3670,7 +3670,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           </div>
                           <div className="flex-1">
                             <p className="text-xs font-bold leading-tight">{alert.message}</p>
-                            <p className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-50">Prioridade: {alert.priority}</p>
+                            <p className="text-xxs font-black uppercase tracking-widest mt-1 opacity-50">Prioridade: {alert.priority}</p>
                           </div>
                         </div>
                       ))}
@@ -3681,7 +3681,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Alerts */}
                 {selectedAssessment.alerts && selectedAssessment.alerts.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black text-rose-400 uppercase tracking-widest border-b border-rose-900/30 pb-2">Alertas Detectados</h4>
+                    <h4 className="text-xxs font-black text-rose-400 uppercase tracking-widest border-b border-rose-900/30 pb-2">Alertas Detectados</h4>
                     <div className="space-y-2">
                       {selectedAssessment.alerts.map((alert: string, idx: number) => (
                         <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-500/10">
@@ -3698,7 +3698,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="p-6 border-t border-slate-800 bg-slate-900/50 flex justify-end">
                 <Button 
                   onClick={() => setSelectedAssessment(null)}
-                  className="bg-slate-800 hover:bg-slate-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-8 rounded-xl"
+                  className="bg-slate-800 hover:bg-slate-700 text-white font-black uppercase tracking-widest text-xxs h-10 px-8 rounded-xl"
                 >
                   Fechar
                 </Button>
@@ -3727,7 +3727,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">{t('postural.title')}</h3>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('postural.desc')}</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{t('postural.desc')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -3735,7 +3735,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     variant="outline" 
                     size="sm" 
                     onClick={() => setPosturalView(posturalView === 'technical' ? 'side-by-side' : 'technical')}
-                    className={`border-slate-800 font-bold uppercase text-[10px] ${posturalView === 'technical' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'text-slate-400'}`}
+                    className={`border-slate-800 font-bold uppercase text-xxs ${posturalView === 'technical' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'text-slate-400'}`}
                   >
                     <ClipboardList className="w-4 h-4 mr-2" /> {posturalView === 'technical' ? t('postural.view.photos') : t('postural.view.technical')}
                   </Button>
@@ -3743,7 +3743,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     variant="outline" 
                     size="sm" 
                     onClick={() => setShowGrid(!showGrid)}
-                    className={`border-slate-800 font-bold uppercase text-[10px] ${showGrid ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400'}`}
+                    className={`border-slate-800 font-bold uppercase text-xxs ${showGrid ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400'}`}
                   >
                     <Grid3X3 className="w-4 h-4 mr-2" /> {showGrid ? t('postural.grid.hide') : t('postural.grid.show')}
                   </Button>
@@ -3768,7 +3768,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           { id: 'feet', label: t('postural.segments.feet'), options: ['Normal', 'Pronado', 'Supinado', 'Desabamento de Arco'] },
                         ].map((item) => (
                           <div key={item.id} className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                            <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
                             <select 
                               value={posturalEvaluation[item.id as keyof typeof posturalEvaluation]}
                               onChange={(e) => setPosturalEvaluation({...posturalEvaluation, [item.id]: e.target.value})}
@@ -3790,10 +3790,10 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         />
                         
                         <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-                          <h5 className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <h5 className="text-xxs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                             <Info className="w-3 h-3" /> Dica Técnica
                           </h5>
-                          <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                          <p className="text-xxs text-slate-400 leading-relaxed font-medium">
                             Utilize a grade de referência nas fotos para medir desvios em centímetros ou graus. Compare sempre a vista anterior, posterior e lateral.
                           </p>
                         </div>
@@ -3805,7 +3805,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     {/* Left Photo */}
                     <div className="flex-1 relative border-r border-slate-800 bg-black group">
                       <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
-                        <p className="text-[10px] font-black text-white uppercase">{compareDates[0]?.date || '-'}</p>
+                        <p className="text-xxs font-black text-white uppercase">{compareDates[0]?.date || '-'}</p>
                       </div>
                       <div className="w-full h-full relative">
                         {compareDates[0]?.url ? (
@@ -3827,7 +3827,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     {/* Right Photo */}
                     <div className="flex-1 relative bg-black group">
                       <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
-                        <p className="text-[10px] font-black text-white uppercase">{compareDates[1]?.date || '-'}</p>
+                        <p className="text-xxs font-black text-white uppercase">{compareDates[1]?.date || '-'}</p>
                       </div>
                       <div className="w-full h-full relative">
                         {compareDates[1]?.url ? (
@@ -3859,22 +3859,22 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <div className="relative w-full h-full">
                         <Image src={photo.url} alt={photo.date} fill className="object-cover" />
                         <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-1">
-                          <p className="text-[8px] font-bold text-white text-center">{photo.date}</p>
+                          <p className="text-xxs font-bold text-white text-center">{photo.date}</p>
                         </div>
                       </div>
                     </button>
                   ))}
                   <button className="shrink-0 w-20 h-24 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 hover:border-cyan-500/50 transition-all">
                     <Plus className="w-5 h-5" />
-                    <span className="text-[8px] font-black uppercase">Nova Foto</span>
+                    <span className="text-xxs font-black uppercase">Nova Foto</span>
                   </button>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                  <Button variant="outline" className="flex-1 md:flex-none border-slate-800 text-slate-400 font-black uppercase text-[10px] py-6 px-8 rounded-xl">
+                  <Button variant="outline" className="flex-1 md:flex-none border-slate-800 text-slate-400 font-black uppercase text-xxs py-6 px-8 rounded-xl">
                     Exportar Comparativo
                   </Button>
-                  <Button className="flex-1 md:flex-none bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] py-6 px-10 rounded-xl shadow-lg shadow-cyan-500/20">
+                  <Button className="flex-1 md:flex-none bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs py-6 px-10 rounded-xl shadow-lg shadow-cyan-500/20">
                     Salvar Observações
                   </Button>
                 </div>
@@ -3901,7 +3901,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-white uppercase tracking-tight">{editingNoteId ? 'Editar Evolução' : 'Evolução Rápida'}</h3>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Registro de sessão simplificado</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Registro de sessão simplificado</p>
                   </div>
                 </div>
                 <button onClick={() => {
@@ -3917,7 +3917,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   <>
                     {/* Status Section */}
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                         <Activity className="w-3 h-3" /> Status do Paciente Hoje
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -3942,7 +3942,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         {/* Pain Slider */}
                         <div className="flex flex-col justify-center px-2">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">Nível de Dor (EVA)</span>
+                            <span className="text-xxs font-bold text-slate-500 uppercase">Nível de Dor (EVA)</span>
                             <span className={`text-lg font-black ${noteForm.pain > 6 ? 'text-rose-400' : noteForm.pain > 3 ? 'text-amber-400' : 'text-emerald-400'}`}>
                               {noteForm.pain}
                             </span>
@@ -3954,7 +3954,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                             onChange={(e) => setNoteForm({...noteForm, pain: parseInt(e.target.value)})}
                             className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                           />
-                          <div className="flex justify-between text-[8px] font-bold text-slate-600 mt-1">
+                          <div className="flex justify-between text-xxs font-bold text-slate-600 mt-1">
                             <span>0 (Sem Dor)</span>
                             <span>10 (Máxima)</span>
                           </div>
@@ -3964,13 +3964,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                     {/* Regions Section */}
                     <div className="space-y-3">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                         <MapPin className="w-3 h-3" /> Regiões Tratadas
                       </h4>
                       <div className="space-y-4">
                         {REGIONS_GROUPS.map(group => (
                           <div key={group.name}>
-                            <h5 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2">{group.name}</h5>
+                            <h5 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">{group.name}</h5>
                             <div className="flex flex-wrap gap-2">
                               {group.items.map(region => {
                                 const isSelected = noteForm.regions.includes(region);
@@ -3985,7 +3985,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                                           : [...prev.regions, region]
                                       }))
                                     }}
-                                    className={`px-3 py-2 rounded-xl text-[11px] font-bold transition-all border ${
+                                    className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                                       isSelected 
                                         ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400' 
                                         : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
@@ -4003,13 +4003,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                     {/* Treatments Section */}
                     <div className="space-y-3">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                         <Stethoscope className="w-3 h-3" /> Condutas Realizadas
                       </h4>
                       <div className="space-y-4">
                         {TREATMENTS_GROUPS.map(group => (
                           <div key={group.name}>
-                            <h5 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2">{group.name}</h5>
+                            <h5 className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">{group.name}</h5>
                             <div className="flex flex-wrap gap-2">
                               {group.items.map(treatment => {
                                 const isSelected = noteForm.treatments.includes(treatment);
@@ -4024,7 +4024,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                                           : [...prev.treatments, treatment]
                                       }))
                                     }}
-                                    className={`px-3 py-2 rounded-xl text-[11px] font-bold transition-all border flex items-center gap-1.5 ${
+                                    className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
                                       isSelected 
                                         ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
                                         : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
@@ -4044,12 +4044,12 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     {/* Observations Section */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                           <FileText className="w-3 h-3" /> Observações Adicionais (Opcional)
                         </h4>
                         <button 
                           onClick={toggleListening}
-                          className={`text-[9px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                          className={`text-xxs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                             isListening 
                               ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse' 
                               : 'bg-cyan-500/10 text-cyan-400 border border-transparent hover:bg-cyan-500/20'
@@ -4081,7 +4081,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       <FileText className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
                       <div>
                         <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest mb-1">Texto Técnico Gerado</h4>
-                        <p className="text-[10px] font-bold text-cyan-500/70 uppercase tracking-widest">Revise o documento antes de assinar digitalmente. Você pode editar o texto livremente.</p>
+                        <p className="text-xxs font-bold text-cyan-500/70 uppercase tracking-widest">Revise o documento antes de assinar digitalmente. Você pode editar o texto livremente.</p>
                       </div>
                     </div>
                     <textarea 
@@ -4100,7 +4100,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     setShowClinicalNoteModal(false);
                     setEditingNoteId(null);
                   }
-                }} className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
+                }} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
                   {showSignatureStep && !editingNoteId ? 'Voltar' : 'Cancelar'}
                 </Button>
                 
@@ -4113,7 +4113,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       setGeneratedNote(text);
                       setShowSignatureStep(true);
                     }}
-                    className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8"
+                    className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8"
                   >
                     Gerar Texto Técnico <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -4215,7 +4215,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       setNoteForm({ pain: 2, feeling: 'Melhor', regions: [], treatments: [], obs: '' });
                       setGeneratedNote('');
                     }}
-                    className="bg-emerald-500 hover:bg-emerald-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8"
+                    className="bg-emerald-500 hover:bg-emerald-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8"
                   >
                     <PenTool className="w-4 h-4 mr-2" /> Assinar e Salvar
                   </Button>
@@ -4250,7 +4250,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   <div>
                     <h2 className="text-lg font-black text-white uppercase tracking-widest">Identidade</h2>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Código do Atleta</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-tighter">Código do Atleta</p>
                   </div>
                 </div>
                 <button 
@@ -4296,7 +4296,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
       {/* Footer Info */}
       <footer className="bg-[#0A1120]/80 border-t border-slate-800/50 p-6 text-center">
-        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em]">
+        <p className="text-xxs font-bold text-slate-600 uppercase tracking-[0.3em]">
           EARS High Performance Clinical Monitoring • v2.0
         </p>
       </footer>
@@ -4438,7 +4438,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-white uppercase tracking-tight">Editar Anexo</h3>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Atualizar informações do documento</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Atualizar informações do documento</p>
                   </div>
                 </div>
                 <button onClick={() => setShowEditAttachmentModal(false)} className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
@@ -4448,7 +4448,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
               <div className="p-6 space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nome do Documento</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Nome do Documento</label>
                   <input 
                     type="text"
                     value={editingAttachment.document_name}
@@ -4458,7 +4458,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Categoria</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Categoria</label>
                   <select 
                     value={editingAttachment.category}
                     onChange={(e) => setEditingAttachment({ ...editingAttachment, category: e.target.value })}
@@ -4475,7 +4475,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <Button 
                   variant="outline"
                   onClick={() => setShowEditAttachmentModal(false)}
-                  className="flex-1 border-slate-800 text-slate-400 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl"
+                  className="flex-1 border-slate-800 text-slate-400 font-black uppercase tracking-widest text-xxs h-12 rounded-xl"
                 >
                   Cancelar
                 </Button>
@@ -4485,7 +4485,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     category: editingAttachment.category 
                   })}
                   disabled={isUpdatingAttachment}
-                  className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-lg shadow-cyan-500/20"
+                  className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase tracking-widest text-xxs h-12 rounded-xl shadow-lg shadow-cyan-500/20"
                 >
                   {isUpdatingAttachment ? 'Salvando...' : 'Salvar Alterações'}
                 </Button>

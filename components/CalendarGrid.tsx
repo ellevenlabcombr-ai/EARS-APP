@@ -42,7 +42,7 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
                 isSameDay(day, new Date()) ? 'bg-cyan-500/5' : ''
               }`}
             >
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">
                 {format(day, "EEE", { locale: ptBR })}
               </p>
               <p className={`text-lg font-black ${isSameDay(day, new Date()) ? 'text-cyan-400' : 'text-white'}`}>
@@ -54,13 +54,13 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
       </div>
 
       {/* Body */}
-      <div className="relative h-[800px] overflow-y-auto custom-scrollbar">
+      <div className="relative h-[50rem] overflow-y-auto custom-scrollbar">
         <div className="grid grid-cols-[80px_1fr]">
           {/* Time Column */}
           <div className="border-r border-slate-800">
             {hours.map(hour => (
               <div key={hour} className="h-20 p-2 text-right border-b border-slate-800/50">
-                <span className="text-[10px] font-black text-slate-600 uppercase">
+                <span className="text-xxs font-black text-slate-600 uppercase">
                   {hour.toString().padStart(2, '0')}:00
                 </span>
               </div>

@@ -148,7 +148,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[25rem] space-y-4">
         <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
         <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse">Carregando Projeto Águias...</p>
       </div>
@@ -227,7 +227,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                 <AlertCircle size={18} className="text-amber-500" />
                 Alertas do Grupo
               </h3>
-              <span className="px-2 py-1 bg-amber-500/10 text-amber-500 text-[10px] font-black rounded-md">
+              <span className="px-2 py-1 bg-amber-500/10 text-amber-500 text-xxs font-black rounded-md">
                 {alerts.length} ATIVOS
               </span>
             </div>
@@ -239,7 +239,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                     <div className={`w-2 h-2 rounded-full ${alert.type === 'pain' ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-white truncate">{alert.athleteName}</p>
-                      <p className="text-[10px] text-slate-500 uppercase font-bold">{alert.message}</p>
+                      <p className="text-xxs text-slate-500 uppercase font-bold">{alert.message}</p>
                     </div>
                   </div>
                 ))
@@ -263,7 +263,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
               {topInjuries.length > 0 ? (
                 topInjuries.map(([part, count], idx) => (
                   <div key={part} className="space-y-1.5">
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
+                    <div className="flex justify-between text-xxs font-black uppercase tracking-wider">
                       <span className="text-slate-400">{part.replace(/_/g, ' ')}</span>
                       <span className="text-white">{count} relatos</span>
                     </div>
@@ -290,7 +290,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                 <Users size={18} className="text-cyan-500" />
                 Lista de Atletas
               </h3>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">
                 {filteredAthletes.length} Atletas
               </span>
             </div>
@@ -299,11 +299,11 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-950/30">
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Atleta</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Prontidão</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Dor</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Status</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest"></th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest">Atleta</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest text-center">Prontidão</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest text-center">Dor</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest text-center">Status</th>
+                    <th className="px-6 py-4 text-xxs font-black text-slate-500 uppercase tracking-widest"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/30">
@@ -353,7 +353,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                               </div>
                             </div>
                           ) : (
-                            <span className="text-[10px] font-black text-slate-600 uppercase">Pendente</span>
+                            <span className="text-xxs font-black text-slate-600 uppercase">Pendente</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -362,7 +362,7 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                          <span className={`px-2 py-1 rounded-md text-xxs font-black uppercase tracking-wider ${
                             athlete.status === 'Apto' ? 'bg-emerald-500/10 text-emerald-500' :
                             athlete.status === 'Risco' ? 'bg-amber-500/10 text-amber-500' :
                             'bg-red-500/10 text-red-500'
@@ -388,24 +388,24 @@ export function EaglesDashboard({ onViewAthlete }: EaglesDashboardProps) {
                 <Calendar size={18} className="text-cyan-500" />
                 Agenda do Águias
               </h3>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hoje</span>
+              <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Hoje</span>
             </div>
 
             <div className="space-y-4">
               {appointments.length > 0 ? (
                 appointments.map((appt) => (
                   <div key={appt.id} className="flex items-center gap-4 p-4 bg-slate-950/50 border border-slate-800/50 rounded-2xl">
-                    <div className="flex flex-col items-center justify-center min-w-[60px] py-1 bg-slate-900 rounded-xl border border-slate-800">
+                    <div className="flex flex-col items-center justify-center min-w-[3.75rem] py-1 bg-slate-900 rounded-xl border border-slate-800">
                       <span className="text-xs font-black text-white">{appt.start_time?.substring(0, 5)}</span>
-                      <span className="text-[8px] font-black text-slate-500 uppercase">Início</span>
+                      <span className="text-xxs font-black text-slate-500 uppercase">Início</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-white truncate">{appt.title || appt.type}</p>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase truncate">
+                      <p className="text-xxs text-slate-500 font-bold uppercase truncate">
                         {appt.athletes?.name || "Atleta"} • {appt.type}
                       </p>
                     </div>
-                    <div className={`px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-widest ${
+                    <div className={`px-2 py-1 rounded-md text-xxs font-black uppercase tracking-widest ${
                       appt.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' :
                       appt.status === 'scheduled' ? 'bg-blue-500/10 text-blue-500' :
                       'bg-slate-800 text-slate-400'
@@ -443,13 +443,13 @@ function StatCard({ label, value, subValue, icon: Icon, color, isWarning }: any)
           <Icon size={20} />
         </div>
         {subValue && (
-          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+          <span className="text-xxs font-black uppercase tracking-widest opacity-60">
             {subValue}
           </span>
         )}
       </div>
       <div>
-        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">{label}</h4>
+        <h4 className="text-xxs font-black uppercase tracking-widest opacity-60 mb-1">{label}</h4>
         <p className="text-2xl font-black text-white tracking-tight">{value}</p>
       </div>
     </div>

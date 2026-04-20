@@ -384,7 +384,7 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[25rem] space-y-4">
         <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
         <p className="text-slate-500 text-sm font-black uppercase tracking-widest">
           Carregando Inteligência Clínica V2...
@@ -399,7 +399,7 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
         <div>
           <h1 className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tight flex items-center gap-3">
             🧠 Clinical Intelligence
-            <span className="text-[10px] bg-cyan-500 text-[#050B14] px-2 py-0.5 rounded-full tracking-widest">V2</span>
+            <span className="text-xxs bg-cyan-500 text-[#050B14] px-2 py-0.5 rounded-full tracking-widest">V2</span>
           </h1>
           <p className="text-slate-400 mt-1 text-sm">Sistema avançado de decisão clínica e priorização.</p>
         </div>

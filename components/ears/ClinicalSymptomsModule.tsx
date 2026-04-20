@@ -60,7 +60,7 @@ export const ClinicalSymptomsModule: React.FC<Props> = ({ selected, onChange }) 
                 <Icon className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="text-[10px] font-black uppercase tracking-tight">{s.label}</p>
+                <p className="text-xxs font-black uppercase tracking-tight">{s.label}</p>
                 <span className="text-xs">{s.emoji}</span>
               </div>
             </button>

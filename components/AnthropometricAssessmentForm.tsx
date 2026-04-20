@@ -121,7 +121,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     return (
       <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
         <div className="flex justify-between items-end">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
           <span className={`text-lg font-black ${valueColor}`}>{value}</span>
         </div>
         <input
@@ -132,7 +132,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
           onChange={(e) => onChange(Number(e.target.value))}
           className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
           <span>Baixo (0)</span>
           <span>Alto ({max})</span>
         </div>
@@ -142,7 +142,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
 
   const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
     <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
       <div className="relative">
         <input
           type="number"
@@ -178,7 +178,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
 
         <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Score Antropométrico</p>
+            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score Antropométrico</p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-black">{score}</span>
               <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
@@ -186,7 +186,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
             {alerts.length > 0 && (
               <div className="mt-3 flex flex-col gap-1.5">
                 {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
+                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
                     <AlertTriangle className="w-3 h-3" /> {alert}
                   </div>
                 ))}
@@ -200,19 +200,19 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
       {/* Indices Preview */}
       <div className="grid grid-cols-3 gap-4">
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">IMC</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">IMC</p>
           <p className={`text-2xl font-black ${metrics.bmi >= 18.5 && metrics.bmi <= 24.9 ? 'text-emerald-400' : 'text-amber-400'}`}>
             {metrics.bmi}
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Composição</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Composição</p>
           <p className={`text-2xl font-black ${metrics.compositionIndex > 70 ? 'text-emerald-400' : metrics.compositionIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.compositionIndex}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Proporção</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Proporção</p>
           <p className={`text-2xl font-black ${metrics.proportionIndex > 70 ? 'text-emerald-400' : metrics.proportionIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.proportionIndex}%
           </p>
@@ -250,10 +250,10 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
 
       {/* Footer Actions */}
       <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
+        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8">
+        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
           <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
         </Button>
       </div>

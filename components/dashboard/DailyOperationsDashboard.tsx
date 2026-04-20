@@ -198,7 +198,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[25rem] space-y-4">
         <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
         <p className="text-slate-500 text-sm font-black uppercase tracking-widest">
           Carregando Operação do Dia...
@@ -237,20 +237,20 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           <h1 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
             🏠 Agenda e Tarefas
           </h1>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
+          <p className="text-slate-400 text-xxs font-black uppercase tracking-widest">
             {currentTime ? format(currentTime, "EEEE, d 'de' MMMM", { locale: ptBR }) : '...'}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-2 mr-4 px-3 py-1 bg-slate-900/50 rounded-full border border-slate-800">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sistema Online</span>
+            <span className="text-xxs font-black text-slate-400 uppercase tracking-widest">Sistema Online</span>
           </div>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={fetchData}
-            className="bg-slate-900/50 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase tracking-widest text-[10px] px-4 h-9"
+            className="bg-slate-900/50 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase tracking-widest text-xxs px-4 h-9"
           >
             <RefreshCcw size={12} className="mr-2" />
             Atualizar
@@ -268,7 +268,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
             
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
-                <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                <span className="text-xxs font-black text-cyan-500 uppercase tracking-[0.2em] flex items-center gap-2">
                   <Clock size={12} /> Agora / Próximo
                 </span>
                 <h2 className="text-2xl font-black text-white tracking-tight">
@@ -289,7 +289,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
               <div className="flex items-center gap-3">
                 <Button 
                   onClick={() => updateAppointmentStatus(nextAppointment.id, 'completed')}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase tracking-widest text-[10px] px-6 h-11"
+                  className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase tracking-widest text-xxs px-6 h-11"
                 >
                   <Check size={16} className="mr-2" /> Concluir
                 </Button>
@@ -297,7 +297,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                   <Button 
                     variant="outline"
                     onClick={() => onViewAthlete(nextAppointment.athlete_id)}
-                    className="bg-slate-900/50 border-slate-800 text-white hover:bg-slate-800 font-black uppercase tracking-widest text-[10px] px-6 h-11"
+                    className="bg-slate-900/50 border-slate-800 text-white hover:bg-slate-800 font-black uppercase tracking-widest text-xxs px-6 h-11"
                   >
                     Ver Perfil
                   </Button>
@@ -318,13 +318,13 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">
                 {fullAgenda.filter(a => a.status === 'completed').length} Concluídos
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-slate-700"></div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">
                 {fullAgenda.filter(a => a.status !== 'completed').length} Restantes
               </span>
             </div>
@@ -352,7 +352,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                     <div className="flex items-center gap-6">
                       <div className="text-center w-16 shrink-0">
                         <p className="text-sm font-black text-white">{appt.start_time?.substring(0, 5)}</p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase">{appt.end_time?.substring(0, 5)}</p>
+                        <p className="text-xxs text-slate-500 font-bold uppercase">{appt.end_time?.substring(0, 5)}</p>
                       </div>
                       <div className="w-px h-10 bg-slate-800/50 hidden sm:block"></div>
                       <div className="min-w-0">
@@ -364,11 +364,11 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                         </div>
                         <div className="flex items-center gap-3">
                           {appt.athletes?.name && (
-                            <span className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1">
+                            <span className="text-xxs font-black uppercase text-slate-400 flex items-center gap-1">
                               <Users size={10} /> {appt.athletes.name}
                             </span>
                           )}
-                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-800/50">
+                          <span className="text-xxs font-black uppercase px-2 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-800/50">
                             {appt.type}
                           </span>
                         </div>
@@ -401,7 +401,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                           </Button>
                         </div>
                       )}
-                      <div className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      <div className={`px-3 py-1.5 rounded-lg text-xxs font-black uppercase tracking-widest border transition-all ${
                         appt.status === 'completed' 
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
                           : appt.status === 'cancelled'

@@ -58,19 +58,19 @@ export function SupabaseStatus() {
             <div className="flex flex-wrap gap-2">
               <button 
                 onClick={() => setShowDetails(!showDetails)}
-                className={`text-[10px] font-black ${isWarning ? 'text-amber-400 hover:text-amber-300' : 'text-rose-400 hover:text-rose-300'} uppercase tracking-widest transition-colors`}
+                className={`text-xxs font-black ${isWarning ? 'text-amber-400 hover:text-amber-300' : 'text-rose-400 hover:text-rose-300'} uppercase tracking-widest transition-colors`}
               >
                 {showDetails ? 'Ocultar Detalhes' : 'Ver Detalhes'}
               </button>
               <button 
                 onClick={() => window.location.reload()}
-                className={`text-[10px] font-black text-white uppercase tracking-widest ${isWarning ? 'bg-amber-500/20 hover:bg-amber-500/30' : 'bg-rose-500/20 hover:bg-rose-500/30'} px-2 py-1 rounded-md transition-colors`}
+                className={`text-xxs font-black text-white uppercase tracking-widest ${isWarning ? 'bg-amber-500/20 hover:bg-amber-500/30' : 'bg-rose-500/20 hover:bg-rose-500/30'} px-2 py-1 rounded-md transition-colors`}
               >
                 Tentar Novamente
               </button>
               
               {supabaseDebugInfo.isPlaceholder && (
-                <span className="text-[9px] font-black text-rose-500 uppercase tracking-tighter bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 animate-pulse">
+                <span className="text-xxs font-black text-rose-500 uppercase tracking-tighter bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 animate-pulse">
                   Configuração Pendente
                 </span>
               )}
@@ -79,29 +79,29 @@ export function SupabaseStatus() {
             {showDetails && (
               <div className={`mt-3 p-2 bg-black/40 rounded-lg border ${isWarning ? 'border-amber-500/20' : 'border-rose-500/20'}`}>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Detalhes do Erro:</p>
-                  <code className={`text-[10px] ${isWarning ? 'text-amber-300/80' : 'text-rose-300/80'} break-all font-mono block`}>
+                  <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Detalhes do Erro:</p>
+                  <code className={`text-xxs ${isWarning ? 'text-amber-300/80' : 'text-rose-300/80'} break-all font-mono block`}>
                     {status?.details || 'Nenhum detalhe disponível.'}
                   </code>
                   
                   <div className="mt-2 pt-2 border-t border-white/5 space-y-1">
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Estado da Configuração:</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Estado da Configuração:</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                       <div className="flex items-center gap-1.5">
                         <div className={`w-1.5 h-1.5 rounded-full ${supabaseDebugInfo.hasUrl ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                        <span className="text-[9px] text-slate-400 uppercase">URL Presente</span>
+                        <span className="text-xxs text-slate-400 uppercase">URL Presente</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className={`w-1.5 h-1.5 rounded-full ${supabaseDebugInfo.hasKey ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                        <span className="text-[9px] text-slate-400 uppercase">Key Presente</span>
+                        <span className="text-xxs text-slate-400 uppercase">Key Presente</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className={`w-1.5 h-1.5 rounded-full ${supabaseDebugInfo.isUrlValid ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                        <span className="text-[9px] text-slate-400 uppercase">URL Válida</span>
+                        <span className="text-xxs text-slate-400 uppercase">URL Válida</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className={`w-1.5 h-1.5 rounded-full ${!supabaseDebugInfo.isPlaceholder ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                        <span className="text-[9px] text-slate-400 uppercase">Não é Placeholder</span>
+                        <span className="text-xxs text-slate-400 uppercase">Não é Placeholder</span>
                       </div>
                     </div>
                   </div>

@@ -194,7 +194,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-slate-400 text-[10px] sm:text-sm font-bold uppercase tracking-wider hidden xs:inline truncate">Avaliação Ortopédica</span>
+            <span className="text-slate-400 text-xxs sm:text-sm font-bold uppercase tracking-wider hidden xs:inline truncate">Avaliação Ortopédica</span>
             <ChevronRight size={14} className="text-slate-600 hidden xs:inline shrink-0" />
             <span className="text-xs sm:text-sm font-black text-white uppercase tracking-widest text-cyan-400 truncate">
               {athleteName || 'Atleta'}
@@ -204,7 +204,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex flex-col items-end mr-4">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Score Ortopédico</span>
+            <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Score Ortopédico</span>
             <span className={`text-2xl font-black ${assessmentResults.color}`}>
               {assessmentResults.score}/100
             </span>
@@ -212,7 +212,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
           <button 
             onClick={handleSave}
             disabled={isSaving || showSuccess}
-            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
+            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-xxs sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
               showSuccess 
                 ? "bg-emerald-500 text-[#050B14]" 
                 : "bg-cyan-500 hover:bg-cyan-400 text-[#050B14] shadow-cyan-500/20"
@@ -241,7 +241,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center justify-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800/50">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Ortho Score</span>
+                <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Ortho Score</span>
                 <div className="relative">
                   <svg className="w-32 h-32 transform -rotate-90">
                     <circle
@@ -289,7 +289,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {assessmentResults.action.split(',').map((act, i) => (
-                      <span key={i} className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      <span key={i} className="px-3 py-1 bg-slate-800 rounded-full text-xxs font-bold text-slate-300 uppercase tracking-wider">
                         {act.trim()}
                       </span>
                     ))}
@@ -316,11 +316,11 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                       : "bg-[#0A1120] border-slate-800 text-slate-500 hover:border-slate-700"
                   }`}
                 >
-                  <span className="text-[10px] font-black uppercase tracking-widest block">{region}</span>
+                  <span className="text-xxs font-black uppercase tracking-widest block">{region}</span>
                   {activeRegions[region] && (
                     <div className="flex items-center justify-center gap-1">
                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
-                      <span className="text-[9px] font-bold">Ativo</span>
+                      <span className="text-xxs font-bold">Ativo</span>
                     </div>
                   )}
                 </button>
@@ -355,7 +355,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                             <button
                               key={side}
                               onClick={() => updateRegion(region as BodyRegion, { side: side as any })}
-                              className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                              className={`px-3 py-1 rounded-full text-xxs font-black uppercase tracking-widest transition-all ${
                                 data!.side === side ? "bg-cyan-500 text-[#050B14]" : "bg-slate-800 text-slate-500"
                               }`}
                             >
@@ -369,7 +369,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                         <div className="space-y-6">
                           <div>
                             <div className="flex justify-between mb-2">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Intensidade (0-10)</label>
+                              <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Intensidade (0-10)</label>
                               <span className="text-sm font-black text-rose-400">{data!.intensity}</span>
                             </div>
                             <input 
@@ -382,7 +382,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Tipo</label>
+                              <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Tipo</label>
                               <select 
                                 value={data!.type}
                                 onChange={(e) => updateRegion(region as BodyRegion, { type: e.target.value as any })}
@@ -394,7 +394,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                               </select>
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Início</label>
+                              <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Início</label>
                               <select 
                                 value={data!.onset}
                                 onChange={(e) => updateRegion(region as BodyRegion, { onset: e.target.value as any })}
@@ -407,7 +407,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Mecanismo de Lesão</label>
+                            <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Mecanismo de Lesão</label>
                             <select 
                               value={data!.mechanism}
                               onChange={(e) => updateRegion(region as BodyRegion, { mechanism: e.target.value as any })}
@@ -421,7 +421,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Sintomas Associados</label>
+                            <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Sintomas Associados</label>
                             <div className="flex flex-wrap gap-2">
                               {SYMPTOM_OPTIONS.map(symptom => (
                                 <button
@@ -432,7 +432,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                       : [...data!.symptoms, symptom];
                                     updateRegion(region as BodyRegion, { symptoms: newSymptoms });
                                   }}
-                                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                  className={`px-3 py-1.5 rounded-lg text-xxs font-bold uppercase tracking-wider transition-all ${
                                     data!.symptoms.includes(symptom)
                                       ? "bg-rose-500 text-white"
                                       : "bg-slate-800 text-slate-400 hover:bg-slate-700"
@@ -453,7 +453,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                 data!.worseWithTraining ? "bg-rose-500/10 border-rose-500 text-rose-400" : "bg-slate-900/50 border-slate-800 text-slate-500"
                               }`}
                             >
-                              <span className="text-[9px] font-black uppercase tracking-widest block">Piora no Treino?</span>
+                              <span className="text-xxs font-black uppercase tracking-widest block">Piora no Treino?</span>
                               <span className="text-xs font-bold">{data!.worseWithTraining ? 'Sim' : 'Não'}</span>
                             </button>
                             <button
@@ -462,7 +462,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                 data!.improvesWithRest ? "bg-emerald-500/10 border-emerald-500 text-emerald-400" : "bg-slate-900/50 border-slate-800 text-slate-500"
                               }`}
                             >
-                              <span className="text-[9px] font-black uppercase tracking-widest block">Melhora no Repouso?</span>
+                              <span className="text-xxs font-black uppercase tracking-widest block">Melhora no Repouso?</span>
                               <span className="text-xs font-bold">{data!.improvesWithRest ? 'Sim' : 'Não'}</span>
                             </button>
                             <button
@@ -471,7 +471,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                 data!.previousInjury ? "bg-amber-500/10 border-amber-500 text-amber-400" : "bg-slate-900/50 border-slate-800 text-slate-500"
                               }`}
                             >
-                              <span className="text-[9px] font-black uppercase tracking-widest block">Lesão Anterior?</span>
+                              <span className="text-xxs font-black uppercase tracking-widest block">Lesão Anterior?</span>
                               <span className="text-xs font-bold">{data!.previousInjury ? 'Sim' : 'Não'}</span>
                             </button>
                             <button
@@ -480,14 +480,14 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                 data!.recurrence ? "bg-rose-500/10 border-rose-500 text-rose-400" : "bg-slate-900/50 border-slate-800 text-slate-500"
                               }`}
                             >
-                              <span className="text-[9px] font-black uppercase tracking-widest block">Recorrência?</span>
+                              <span className="text-xxs font-black uppercase tracking-widest block">Recorrência?</span>
                               <span className="text-xs font-bold">{data!.recurrence ? 'Sim' : 'Não'}</span>
                             </button>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">ADM (Amplitude)</label>
+                              <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">ADM (Amplitude)</label>
                               <select 
                                 value={data!.rom}
                                 onChange={(e) => updateRegion(region as BodyRegion, { rom: e.target.value as any })}
@@ -500,7 +500,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                             </div>
                             <div>
                               <div className="flex justify-between mb-2">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Força (0-5)</label>
+                                <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Força (0-5)</label>
                                 <span className="text-xs font-black text-cyan-400">{data!.strength}</span>
                               </div>
                               <input 
@@ -513,7 +513,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Testes Especiais (Positivos)</label>
+                            <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Testes Especiais (Positivos)</label>
                             <input 
                               type="text"
                               placeholder="Ex: Lachman, Gaveta Anterior..."
@@ -524,7 +524,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Tratamentos Prévios</label>
+                            <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Tratamentos Prévios</label>
                             <div className="flex flex-wrap gap-2">
                               {TREATMENT_OPTIONS.map(treatment => (
                                 <button
@@ -535,7 +535,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                                       : [...data!.previousTreatments, treatment];
                                     updateRegion(region as BodyRegion, { previousTreatments: newTreatments });
                                   }}
-                                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                  className={`px-3 py-1.5 rounded-lg text-xxs font-bold uppercase tracking-wider transition-all ${
                                     data!.previousTreatments.includes(treatment)
                                       ? "bg-cyan-500 text-[#050B14]"
                                       : "bg-slate-800 text-slate-400 hover:bg-slate-700"
@@ -566,7 +566,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between mb-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Impacto no Treino (0-10)</label>
+                      <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Impacto no Treino (0-10)</label>
                       <span className="text-sm font-black text-amber-400">{functionalImpact.training}</span>
                     </div>
                     <input 
@@ -578,7 +578,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Impacto na Competição (0-10)</label>
+                      <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Impacto na Competição (0-10)</label>
                       <span className="text-sm font-black text-amber-400">{functionalImpact.competition}</span>
                     </div>
                     <input 
@@ -601,7 +601,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                         <AlertCircle size={24} />
                       </div>
                       <div className="text-left">
-                        <span className="text-[10px] font-black uppercase tracking-widest block">Limitação em Atividades Diárias?</span>
+                        <span className="text-xxs font-black uppercase tracking-widest block">Limitação em Atividades Diárias?</span>
                         <span className="text-sm font-bold">Dificuldade em tarefas comuns do dia a dia</span>
                       </div>
                     </div>
@@ -622,7 +622,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="space-y-2">
                   <div className="flex justify-between mb-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Qualidade do Agachamento</label>
+                    <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Qualidade do Agachamento</label>
                     <span className="text-sm font-black text-emerald-400">{functionalTests.squat}</span>
                   </div>
                   <input 
@@ -631,11 +631,11 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                     onChange={(e) => setFunctionalTests(prev => ({ ...prev, squat: parseInt(e.target.value) }))}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <p className="text-[9px] text-slate-500 uppercase font-bold text-center">Controle motor e estabilidade</p>
+                  <p className="text-xxs text-slate-500 uppercase font-bold text-center">Controle motor e estabilidade</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between mb-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Controle de Salto</label>
+                    <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Controle de Salto</label>
                     <span className="text-sm font-black text-emerald-400">{functionalTests.jump}</span>
                   </div>
                   <input 
@@ -644,11 +644,11 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                     onChange={(e) => setFunctionalTests(prev => ({ ...prev, jump: parseInt(e.target.value) }))}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <p className="text-[9px] text-slate-500 uppercase font-bold text-center">Aterrissagem e absorção de impacto</p>
+                  <p className="text-xxs text-slate-500 uppercase font-bold text-center">Aterrissagem e absorção de impacto</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between mb-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Equilíbrio / Estabilidade</label>
+                    <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Equilíbrio / Estabilidade</label>
                     <span className="text-sm font-black text-emerald-400">{functionalTests.balance}</span>
                   </div>
                   <input 
@@ -657,7 +657,7 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
                     onChange={(e) => setFunctionalTests(prev => ({ ...prev, balance: parseInt(e.target.value) }))}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <p className="text-[9px] text-slate-500 uppercase font-bold text-center">Propriocepção e controle postural</p>
+                  <p className="text-xxs text-slate-500 uppercase font-bold text-center">Propriocepção e controle postural</p>
                 </div>
               </div>
             </Card>

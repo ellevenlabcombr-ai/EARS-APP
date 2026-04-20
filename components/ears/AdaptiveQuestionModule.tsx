@@ -39,7 +39,7 @@ export const AdaptiveQuestionModule: React.FC<Props> = ({ id, label, value, onCh
               `}
             >
               <span className="text-2xl sm:text-3xl mb-1">{opt.emoji}</span>
-              <span className={`text-[10px] font-bold uppercase tracking-tighter ${isSelected ? 'text-white' : 'text-slate-500'}`}>
+              <span className={`text-xxs font-bold uppercase tracking-tighter ${isSelected ? 'text-white' : 'text-slate-500'}`}>
                 {opt.label}
               </span>
               {isSelected && (

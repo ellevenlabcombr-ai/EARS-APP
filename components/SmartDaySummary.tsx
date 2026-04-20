@@ -39,7 +39,7 @@ export function SmartDaySummary({ events }: SmartDaySummaryProps) {
           <Calendar className="w-5 h-5 text-cyan-400" />
         </div>
         <div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total do Dia</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Total do Dia</p>
           <p className="text-xl font-black text-white">{todayEvents.length}</p>
         </div>
       </motion.div>
@@ -54,7 +54,7 @@ export function SmartDaySummary({ events }: SmartDaySummaryProps) {
           <Stethoscope className="w-5 h-5 text-emerald-400" />
         </div>
         <div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Atendimentos</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Atendimentos</p>
           <p className="text-xl font-black text-white">{clinicalCount}</p>
         </div>
       </motion.div>
@@ -69,7 +69,7 @@ export function SmartDaySummary({ events }: SmartDaySummaryProps) {
           <AlertTriangle className="w-5 h-5 text-rose-400" />
         </div>
         <div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Alto Risco</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Alto Risco</p>
           <p className="text-xl font-black text-white">{highRiskCount}</p>
         </div>
       </motion.div>
@@ -84,7 +84,7 @@ export function SmartDaySummary({ events }: SmartDaySummaryProps) {
           <Activity className="w-5 h-5 text-amber-400" />
         </div>
         <div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Carga do Dia</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Carga do Dia</p>
           <p className={`text-xl font-black ${loadColor}`}>{loadLevel}</p>
         </div>
       </motion.div>

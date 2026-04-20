@@ -37,11 +37,11 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${colorClass}`}>
+                    <span className={`px-2 py-0.5 rounded text-xxs font-black uppercase border ${colorClass}`}>
                       {event.category}
                     </span>
                     {event.subcategory && (
-                      <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase border border-slate-700 text-slate-400">
+                      <span className="px-2 py-0.5 rounded text-xxs font-black uppercase border border-slate-700 text-slate-400">
                         {event.subcategory}
                       </span>
                     )}
@@ -83,13 +83,13 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
                 {event.category === 'clinical' && (
                   <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Score de Risco</span>
+                      <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Score de Risco</span>
                       <span className={`text-sm font-black ${event.risk_score && event.risk_score > 7 ? 'text-rose-500' : 'text-cyan-400'}`}>
                         {event.risk_score || 0}/10
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Prioridade do Sistema</span>
+                      <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Prioridade do Sistema</span>
                       <span className="text-sm font-black text-white">
                         {event.priority.toFixed(1)}/10
                       </span>

@@ -284,7 +284,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
           </div>
           <div>
             <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('func.title')}</h2>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{t('func.subtitle')}</p>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">{t('func.subtitle')}</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
@@ -303,7 +303,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-xs font-black text-white uppercase tracking-widest">{test.label}</h3>
-                      <div className="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-[10px] font-bold uppercase flex items-center gap-2">
+                      <div className="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xxs font-bold uppercase flex items-center gap-2">
                         <span className={getScoreColor(processedScores[test.id].score)}>{t('func.score_final')}: {processedScores[test.id].score}</span>
                         {processedScores[test.id].score === 0 && <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />}
                       </div>
@@ -314,7 +314,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                         {['left', 'right'].map((side) => (
                           <div key={side} className="space-y-2">
                             <div className="flex items-center justify-center gap-2">
-                              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? t('func.side_left') : t('func.side_right')}</p>
+                              <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? t('func.side_left') : t('func.side_right')}</p>
                               {test.asymmetric && side === 'right' && Math.abs((scores[test.id].left ?? 0) - (scores[test.id].right ?? 0)) >= 2 && (
                                 <AlertCircle className="w-3 h-3 text-amber-400" />
                               )}
@@ -324,7 +324,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                                 <button
                                   key={val}
                                   onClick={() => handleScoreChange(test.id, side as 'left' | 'right', val)}
-                                  className={`w-8 h-8 rounded flex items-center justify-center text-[10px] font-black transition-all ${
+                                  className={`w-8 h-8 rounded flex items-center justify-center text-xxs font-black transition-all ${
                                     scores[test.id][side as 'left' | 'right'] === val 
                                       ? 'bg-emerald-500 text-[#050B14]' 
                                       : 'text-slate-500 hover:text-slate-300'
@@ -360,18 +360,18 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                       <div className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${clearingTests[test.clearing!].pain ? 'bg-rose-500/10 border-rose-500/50' : 'bg-slate-950 border-slate-800'}`}>
                         <div className="flex items-center gap-2">
                           <Activity className={`w-3 h-3 ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`} />
-                          <span className={`text-[9px] font-bold uppercase ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>{t('func.clearing_prompt')}</span>
+                          <span className={`text-xxs font-bold uppercase ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>{t('func.clearing_prompt')}</span>
                         </div>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => handleClearingTest(test.clearing!, false)}
-                            className={`px-3 py-1 rounded text-[9px] font-black uppercase transition-all ${!clearingTests[test.clearing!].pain ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500'}`}
+                            className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${!clearingTests[test.clearing!].pain ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500'}`}
                           >
                             {t('func.no_pain')}
                           </button>
                           <button 
                             onClick={() => handleClearingTest(test.clearing!, true)}
-                            className={`px-3 py-1 rounded text-[9px] font-black uppercase transition-all ${clearingTests[test.clearing!].pain ? 'bg-rose-500 text-white' : 'text-slate-500'}`}
+                            className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${clearingTests[test.clearing!].pain ? 'bg-rose-500 text-white' : 'text-slate-500'}`}
                           >
                             {t('func.with_pain')}
                           </button>
@@ -382,13 +382,13 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
 
                   {/* Compensations Checklist */}
                   <div className="w-full md:w-64 space-y-3">
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{t('func.compensations')}</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{t('func.compensations')}</p>
                     <div className="space-y-1">
                       {test.compensations.map((comp) => (
                         <button
                           key={comp}
                           onClick={() => toggleCompensation(test.id, comp)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-medium transition-all flex items-center justify-between ${
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xxs font-medium transition-all flex items-center justify-between ${
                             scores[test.id].compensations.includes(comp)
                               ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                               : 'bg-slate-950/50 text-slate-500 border border-transparent hover:border-slate-800'
@@ -412,9 +412,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
             <div className={`h-1 ${riskBg} w-full`} />
             <CardContent className="p-6">
               <div className="text-center mb-6">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{t('func.score_label')}</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">{t('func.score_label')}</p>
                 <div className={`text-7xl font-black mb-1 ${riskColor}`}>{totalScore}</div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('func.score_max')}</p>
+                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">{t('func.score_max')}</p>
               </div>
 
               {/* Radar Chart */}
@@ -437,19 +437,19 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">{t('func.risk_analysis')}</h4>
+                    <h4 className="text-xxs font-black text-white uppercase tracking-widest">{t('func.risk_analysis')}</h4>
                     <ShieldCheck className={`w-4 h-4 ${riskColor}`} />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">{t('func.risk_status')}</span>
-                      <span className={`text-[10px] font-black uppercase ${riskColor}`}>
+                      <span className="text-xxs font-bold text-slate-500 uppercase">{t('func.risk_status')}</span>
+                      <span className={`text-xxs font-black uppercase ${riskColor}`}>
                         {alerts.risk === 'high' ? t('func.risk_high') : alerts.risk === 'moderate' ? t('func.risk_moderate') : t('func.risk_low')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">{t('func.corrective_focus')}</span>
-                      <span className="text-[10px] font-black text-cyan-400 uppercase">{categories.focus}</span>
+                      <span className="text-xxs font-bold text-slate-500 uppercase">{t('func.corrective_focus')}</span>
+                      <span className="text-xxs font-black text-cyan-400 uppercase">{categories.focus}</span>
                     </div>
                   </div>
                 </div>
@@ -457,22 +457,22 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                 {/* Clinical Alerts */}
                 {(alerts.pain_override || alerts.asymmetry_alert || alerts.severe_dysfunction) && (
                   <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-2">
-                    <h4 className="text-[10px] font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                    <h4 className="text-xxs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
                       <AlertCircle className="w-3 h-3" /> {t('func.clinical_alerts')}
                     </h4>
                     <div className="space-y-1">
                       {alerts.pain_override && (
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-rose-400 uppercase">
+                        <div className="flex items-center gap-2 text-xxs font-bold text-rose-400 uppercase">
                           <Zap className="w-3 h-3" /> {t('func.alerts.pain')}
                         </div>
                       )}
                       {alerts.asymmetry_alert && (
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-amber-400 uppercase">
+                        <div className="flex items-center gap-2 text-xxs font-bold text-amber-400 uppercase">
                           <AlertTriangle className="w-3 h-3" /> {t('func.alerts.asymmetry')}
                         </div>
                       )}
                       {alerts.severe_dysfunction && (
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-rose-500 uppercase">
+                        <div className="flex items-center gap-2 text-xxs font-bold text-rose-500 uppercase">
                           <AlertCircle className="w-3 h-3" /> {t('func.alerts.dysfunction')}
                         </div>
                       )}
@@ -481,10 +481,10 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                 )}
 
                 <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-                  <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <h4 className="text-xxs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                     <Target className="w-3 h-3" /> {t('func.suggestion_label')}
                   </h4>
-                  <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                  <p className="text-xxs text-slate-400 leading-relaxed font-medium">
                     {alerts.risk === 'high' 
                       ? t('func.suggestions.high')
                       : alerts.risk === 'moderate'
@@ -497,12 +497,12 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={t('func.notes_placeholder')}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[80px] resize-none text-[10px] font-medium"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[5rem] resize-none text-xxs font-medium"
                 />
 
                 <Button 
                   onClick={handleSave}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-[10px] tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
                 >
                   <Save className="w-4 h-4 mr-2" /> {t('func.save_btn')}
                 </Button>

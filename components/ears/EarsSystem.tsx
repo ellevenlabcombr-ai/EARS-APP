@@ -96,7 +96,7 @@ export default function EarsSystem() {
              </div>
              <div>
                 <h1 className="text-2xl font-black text-white uppercase tracking-tighter">EARS Intelligence</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Elite Athlete Readiness System</p>
+                <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Elite Athlete Readiness System</p>
              </div>
           </div>
 
@@ -154,16 +154,16 @@ export default function EarsSystem() {
         {/* System Footer Info */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-12 border-t border-white/5 gap-4">
           <div className="flex items-center gap-6">
-             <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">
+             <div className="flex items-center gap-2 text-xxs font-black text-slate-600 uppercase tracking-widest">
                 <Info className="w-4 h-4" />
                 Version 2.4.0 High-Performance
              </div>
-             <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">
+             <div className="flex items-center gap-2 text-xxs font-black text-slate-600 uppercase tracking-widest">
                 <Settings className="w-4 h-4" />
                 Algoritmo EARS 2.0 Ativo
              </div>
           </div>
-          <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">© 2026 EARS Sports Science Platform</p>
+          <p className="text-xxs font-black text-slate-700 uppercase tracking-widest">© 2026 EARS Sports Science Platform</p>
         </div>
       </div>
     </div>

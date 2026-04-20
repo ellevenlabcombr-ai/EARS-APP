@@ -1541,14 +1541,14 @@ END $storage$;`;
           <div className="w-full px-4">
             <button
               onClick={() => setShowSql(!showSql)}
-              className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 border border-cyan-500/30 rounded-lg transition-colors"
+              className="w-full py-2 text-xxs font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 border border-cyan-500/30 rounded-lg transition-colors"
             >
               {showSql ? 'Ocultar SQL de Reparo' : 'Ver SQL de Reparo'}
             </button>
             
             {showSql && (
               <div className="mt-4 p-4 bg-black/50 rounded-lg border border-slate-800 overflow-x-auto">
-                <pre className="text-[10px] text-slate-300 font-mono leading-relaxed">
+                <pre className="text-xxs text-slate-300 font-mono leading-relaxed">
                   {sqlToRun}
                 </pre>
                 <button
@@ -1556,7 +1556,7 @@ END $storage$;`;
                     navigator.clipboard.writeText(sqlToRun);
                     alert('SQL copiado!');
                   }}
-                  className="mt-2 text-[10px] font-bold text-cyan-500 hover:underline"
+                  className="mt-2 text-xxs font-bold text-cyan-500 hover:underline"
                 >
                   Copiar SQL
                 </button>

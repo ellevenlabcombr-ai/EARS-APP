@@ -113,19 +113,19 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               )}
 
               <div className="flex flex-wrap items-center gap-3 mt-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
+                <span className="text-xxs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
                   Prontidão: <span className={athlete.readiness_score && athlete.readiness_score < 50 ? 'text-rose-400' : 'text-white'}>{athlete.readiness_score ?? '--'}%</span>
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
+                <span className="text-xxs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
                   Dor: <span className={athlete.muscle_soreness && athlete.muscle_soreness >= 7 ? 'text-rose-400' : 'text-white'}>{athlete.muscle_soreness ?? '--'}</span>
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <span className="text-xxs font-black uppercase tracking-widest text-slate-500">
                   Check-in: {getTimeSince(athlete.last_checkin)}
                 </span>
               </div>
 
               {athlete.latest_assessment && (
-                <div className="flex items-center gap-2 mt-3 text-[10px] font-bold text-slate-400 bg-slate-800/30 px-3 py-1.5 rounded-lg border border-slate-800">
+                <div className="flex items-center gap-2 mt-3 text-xxs font-bold text-slate-400 bg-slate-800/30 px-3 py-1.5 rounded-lg border border-slate-800">
                   <ClipboardList size={12} className="text-cyan-500" />
                   <span className="uppercase tracking-wider">{athlete.latest_assessment.type}</span>
                   <span className="text-slate-600">•</span>
@@ -142,7 +142,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
           <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
             <Button 
               size="sm" 
-              className={`flex-1 sm:flex-none w-full sm:w-32 h-8 text-[10px] font-black uppercase tracking-widest ${isRisk ? 'bg-rose-500 hover:bg-rose-600 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-[#050B14]'}`}
+              className={`flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest ${isRisk ? 'bg-rose-500 hover:bg-rose-600 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-[#050B14]'}`}
               onClick={() => onViewAthlete(athlete.id)}
             >
               Avaliar Agora
@@ -150,7 +150,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
             <Button 
               size="sm" 
               variant="outline"
-              className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-[10px] font-black uppercase tracking-widest border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+              className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
               onClick={() => onViewAthlete(athlete.id)}
             >
               Ver Atleta
@@ -159,7 +159,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               <Button 
                 size="sm" 
                 variant="ghost"
-                className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 hover:bg-cyan-500/10"
+                className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 hover:bg-cyan-500/10"
                 onClick={() => onViewAthlete(athlete.id)}
               >
                 Ver Avaliação
@@ -181,7 +181,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               <AlertTriangle className="w-4 h-4 animate-pulse" />
               Ação Imediata
             </CardTitle>
-            <span className="text-[10px] font-black bg-rose-500 text-white px-2 py-0.5 rounded-full animate-bounce">
+            <span className="text-xxs font-black bg-rose-500 text-white px-2 py-0.5 rounded-full animate-bounce">
               {immediateAction.length}
             </span>
           </CardHeader>
@@ -201,7 +201,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               <Activity className="w-4 h-4 text-cyan-500" />
               Fila Clínica
             </CardTitle>
-            <span className="text-[10px] font-black bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">
+            <span className="text-xxs font-black bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">
               {clinicalQueue.length}
             </span>
           </CardHeader>
@@ -217,11 +217,11 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
       {showClinical && missingCheckin.length > 0 && (
         <Card className="bg-slate-900/20 border-slate-800/30 shadow-none overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
           <CardHeader className="border-b border-slate-800/30 bg-slate-900/10 px-6 py-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+            <CardTitle className="text-xxs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
               <Clock className="w-3 h-3" />
               Sem Check-in Hoje
             </CardTitle>
-            <span className="text-[10px] font-black bg-slate-800/50 text-slate-500 px-2 py-0.5 rounded-full">
+            <span className="text-xxs font-black bg-slate-800/50 text-slate-500 px-2 py-0.5 rounded-full">
               {missingCheckin.length}
             </span>
           </CardHeader>

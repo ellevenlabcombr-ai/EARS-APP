@@ -73,7 +73,7 @@ const FormInput = ({ error, ...props }: React.InputHTMLAttributes<HTMLInputEleme
       <motion.p 
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-[10px] font-bold text-rose-500 uppercase tracking-wider pl-1"
+        className="text-xxs font-bold text-rose-500 uppercase tracking-wider pl-1"
       >
         {error}
       </motion.p>
@@ -98,7 +98,7 @@ const FormSelect = ({ error, children, ...props }: React.SelectHTMLAttributes<HT
       <motion.p 
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-[10px] font-bold text-rose-500 uppercase tracking-wider pl-1"
+        className="text-xxs font-bold text-rose-500 uppercase tracking-wider pl-1"
       >
         {error}
       </motion.p>
@@ -684,7 +684,7 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-slate-400 text-[10px] sm:text-sm font-bold uppercase tracking-wider hidden xs:inline truncate">EARS | ELLEVEN</span>
+            <span className="text-slate-400 text-xxs sm:text-sm font-bold uppercase tracking-wider hidden xs:inline truncate">EARS | ELLEVEN</span>
             <ChevronRight size={14} className="text-slate-600 hidden xs:inline shrink-0" />
             <span className="text-xs sm:text-sm font-black text-white uppercase tracking-widest text-cyan-400 truncate">
               {initialData ? t('reg.title.edit') : t('reg.title.new')}
@@ -696,7 +696,7 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
             <button 
               onClick={() => setShowDeleteConfirm(true)}
               disabled={deleting || uploading || success}
-              className="px-3 sm:px-4 py-2 text-[10px] sm:text-sm font-bold text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
+              className="px-3 sm:px-4 py-2 text-xxs sm:text-sm font-bold text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
             >
               {deleting ? (
                 <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-rose-400/30 border-t-rose-400 rounded-full animate-spin"></div>
@@ -708,14 +708,14 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
           )}
           <button 
             onClick={onBack}
-            className="px-3 sm:px-4 py-2 text-[10px] sm:text-sm font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider hidden xs:block"
+            className="px-3 sm:px-4 py-2 text-xxs sm:text-sm font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider hidden xs:block"
           >
             {t('reg.cancel')}
           </button>
           <button 
             onClick={onInternalSave}
             disabled={uploading || success}
-            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
+            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-xxs sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
               success 
                 ? "bg-emerald-500 hover:bg-emerald-600 text-[#050B14] shadow-emerald-500/20" 
                 : "bg-cyan-500 hover:bg-cyan-400 text-[#050B14] shadow-cyan-500/20"
@@ -778,8 +778,8 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Avatar</p>
-                  <p className="text-[9px] text-slate-400">PNG, JPG até 5MB</p>
+                  <p className="text-xxs text-slate-500 uppercase tracking-widest font-bold">Avatar</p>
+                  <p className="text-xxs text-slate-400">PNG, JPG até 5MB</p>
                 </div>
               </div>
               
@@ -944,7 +944,7 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
                   <button 
                     type="button"
                     onClick={() => setHasAllergy(!hasAllergy)}
-                    className={`px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`px-6 py-1.5 rounded-full text-xxs font-black uppercase tracking-widest transition-all ${
                       hasAllergy ? "bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]" : "bg-slate-800 text-slate-400"
                     }`}
                   >
@@ -1053,7 +1053,7 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
                           setCategoria(calculateCategory(birthDate));
                         }
                       }}
-                      className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
+                      className={`px-3 py-1 rounded-full text-xxs font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
                         isProfessional 
                           ? "bg-cyan-500 text-[#050B14] shadow-[0_0_15px_rgba(6,182,212,0.4)]" 
                           : "bg-slate-800 text-slate-500 hover:text-slate-400"
@@ -1253,7 +1253,7 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
                   <Trash2 className="w-5 h-5" />
                 </Button>
               </div>
-              <div className="relative w-full h-[400px] bg-black">
+              <div className="relative w-full h-[25rem] bg-black">
                 <Cropper
                   image={imageToCrop}
                   crop={crop}
@@ -1278,10 +1278,10 @@ export function AthleteRegistration({ onBack, onSave, initialData, onDirtyChange
                   className="w-1/2 accent-cyan-500"
                 />
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={handleCropCancel} className="border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 uppercase tracking-widest text-[10px] font-bold">
+                  <Button variant="outline" onClick={handleCropCancel} className="border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 uppercase tracking-widest text-xxs font-bold">
                     Cancelar
                   </Button>
-                  <Button onClick={handleCropConfirm} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] uppercase tracking-widest text-[10px] font-black">
+                  <Button onClick={handleCropConfirm} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] uppercase tracking-widest text-xxs font-black">
                     Confirmar
                   </Button>
                 </div>

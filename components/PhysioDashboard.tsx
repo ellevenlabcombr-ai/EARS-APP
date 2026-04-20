@@ -256,7 +256,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 truncate">
                 EARS <span className="text-cyan-500">|</span> ELLEVEN
               </h1>
-              <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest truncate">
+              <p className="text-xxs sm:text-xs font-bold text-slate-400 uppercase tracking-widest truncate">
                 Portal da Fisioterapia • Dra. Cristina
               </p>
             </div>
@@ -278,7 +278,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <div className="p-3 bg-blue-500/10 rounded-2xl mb-3">
                 <Users className="w-6 h-6 text-blue-400" />
               </div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Atletas Ativos</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Atletas Ativos</p>
               <p className="text-3xl font-black text-white">{athletes.length}</p>
             </CardContent>
           </Card>
@@ -288,7 +288,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <div className="p-3 bg-emerald-500/10 rounded-2xl mb-3">
                 <Activity className="w-6 h-6 text-emerald-400" />
               </div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Média Prontidão</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Média Prontidão</p>
               <p className="text-3xl font-black text-white">
                 {athletes.filter(a => a.readiness > 0).length > 0 
                   ? Math.round(athletes.reduce((acc, curr) => acc + curr.readiness, 0) / athletes.filter(a => a.readiness > 0).length)
@@ -302,7 +302,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <div className="p-3 bg-amber-500/10 rounded-2xl mb-3">
                 <AlertCircle className="w-6 h-6 text-amber-400" />
               </div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Pendências</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Pendências</p>
               <p className="text-3xl font-black text-white">{pendenciesCount}</p>
             </CardContent>
           </Card>
@@ -312,7 +312,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <div className="p-3 bg-rose-500/20 rounded-2xl mb-3">
                 <AlertCircle className="w-6 h-6 text-rose-400" />
               </div>
-              <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Alertas Críticos</p>
+              <p className="text-xxs font-black text-rose-500 uppercase tracking-widest mb-1">Alertas Críticos</p>
               <p className="text-3xl font-black text-rose-400">{alerts.length}</p>
             </CardContent>
           </Card>
@@ -322,7 +322,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
               <div className="p-3 bg-yellow-500/10 rounded-2xl mb-3">
                 <Stethoscope className="w-6 h-6 text-yellow-400" />
               </div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Em Reabilitação</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Em Reabilitação</p>
               <p className="text-3xl font-black text-white">
                 {athletes.filter(a => a.status === "dm").length}
               </p>
@@ -338,7 +338,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                 <AlertCircle className="w-6 h-6 text-rose-500" />
                 Atenção Prioritária
               </h2>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <div className="flex items-center gap-2 text-xxs font-bold text-slate-500 uppercase tracking-widest">
                 <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                 Tempo Real
               </div>
@@ -369,7 +369,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                         </div>
                         <div>
                           <h3 className="font-black text-white text-lg uppercase tracking-tight">{athlete.name}</h3>
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg border uppercase tracking-widest ${getStatusColor(athlete.status)}`}>
+                          <span className={`text-xxs font-black px-2 py-0.5 rounded-lg border uppercase tracking-widest ${getStatusColor(athlete.status)}`}>
                             {getStatusLabel(athlete.status)}
                           </span>
                         </div>
@@ -378,7 +378,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                         <p className={`text-2xl font-black ${getReadinessColor(athlete.readiness)}`}>
                           {athlete.readiness}%
                         </p>
-                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Prontidão</span>
+                        <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Prontidão</span>
                       </div>
                     </div>
                     
@@ -386,7 +386,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                       {athlete.pain && (
                         <div className="bg-rose-500/5 border border-rose-500/10 rounded-2xl p-4">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest">Dor Relatada</span>
+                            <span className="text-xxs font-black text-rose-400 uppercase tracking-widest">Dor Relatada</span>
                             <span className={`text-xs font-black ${
                               athlete.pain.level <= 3 ? 'text-emerald-400' : 
                               athlete.pain.level <= 6 ? 'text-yellow-400' : 'text-rose-400'
@@ -398,7 +398,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
 
                       {athlete.notes && (
                         <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800/50">
-                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Observação</span>
+                          <span className="text-xxs font-black text-slate-500 uppercase tracking-widest block mb-1">Observação</span>
                           <p className="text-xs text-slate-300 italic leading-relaxed">&quot;{athlete.notes}&quot;</p>
                         </div>
                       )}
@@ -406,7 +406,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
 
                     <Button 
                       variant="ghost" 
-                      className="w-full mt-4 bg-slate-900/50 hover:bg-cyan-500 hover:text-[#050B14] text-cyan-500 border border-slate-800 hover:border-cyan-500 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                      className="w-full mt-4 bg-slate-900/50 hover:bg-cyan-500 hover:text-[#050B14] text-cyan-500 border border-slate-800 hover:border-cyan-500 rounded-xl text-xxs font-black uppercase tracking-[0.2em] transition-all"
                     >
                       Acessar Prontuário
                     </Button>
@@ -441,7 +441,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                           <p className="text-sm font-black text-white uppercase tracking-tight">{athlete.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <Clock className="w-3 h-3 text-slate-500" />
-                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{athlete.lastUpdate}</p>
+                            <p className="text-xxs text-slate-500 font-bold uppercase tracking-wider">{athlete.lastUpdate}</p>
                           </div>
                         </div>
                       </div>
@@ -449,7 +449,7 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                         <span className={`text-xl font-black ${getReadinessColor(athlete.readiness)}`}>{athlete.readiness}%</span>
                         <div className="flex items-center justify-end gap-1">
                           <div className={`w-1.5 h-1.5 rounded-full ${getReadinessColor(athlete.readiness).replace('text-', 'bg-')}`} />
-                          <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Score</span>
+                          <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Score</span>
                         </div>
                       </div>
                     </div>
@@ -477,8 +477,8 @@ export function PhysioDashboard({ onBack }: PhysioDashboardProps) {
                     <action.icon size={24} />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest block">{action.label}</span>
-                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{action.desc}</span>
+                    <span className="text-xxs font-black text-white uppercase tracking-widest block">{action.label}</span>
+                    <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{action.desc}</span>
                   </div>
                 </motion.button>
               ))}

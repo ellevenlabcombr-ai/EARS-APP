@@ -189,12 +189,12 @@ export function AgendaSettings() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="text-cyan-500 w-5 h-5" />
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Horário de Atendimento</h3>
+            <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Horário de Atendimento</h3>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Início</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Início</label>
               <input 
                 type="time" 
                 value={startTime}
@@ -203,7 +203,7 @@ export function AgendaSettings() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Término</label>
+              <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider ml-1">Término</label>
               <input 
                 type="time" 
                 value={endTime}
@@ -217,7 +217,7 @@ export function AgendaSettings() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 mb-1">
                 <Timer className="text-cyan-500 w-4 h-4" />
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duração Padrão</label>
+                <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider">Duração Padrão</label>
               </div>
               <div className="relative">
                 <input 
@@ -226,13 +226,13 @@ export function AgendaSettings() {
                   onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors pr-12"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-600 uppercase">min</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xxs font-bold text-slate-600 uppercase">min</span>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 mb-1">
                 <Timer className="text-amber-500 w-4 h-4" />
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Intervalo</label>
+                <label className="text-xxs font-bold text-slate-400 uppercase tracking-wider">Intervalo</label>
               </div>
               <div className="relative">
                 <input 
@@ -241,7 +241,7 @@ export function AgendaSettings() {
                   onChange={(e) => setBreakInterval(parseInt(e.target.value) || 0)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none transition-colors pr-12"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-600 uppercase">min</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xxs font-bold text-slate-600 uppercase">min</span>
               </div>
             </div>
           </div>
@@ -251,7 +251,7 @@ export function AgendaSettings() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <Calendar className="text-cyan-500 w-5 h-5" />
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tipos de Atendimento</h3>
+            <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Tipos de Atendimento</h3>
           </div>
 
           <div className="flex gap-2">
@@ -287,7 +287,7 @@ export function AgendaSettings() {
               </div>
             ))}
             {appointmentTypes.length === 0 && (
-              <p className="text-[10px] text-slate-600 italic">Nenhum tipo cadastrado.</p>
+              <p className="text-xxs text-slate-600 italic">Nenhum tipo cadastrado.</p>
             )}
           </div>
         </div>

@@ -66,15 +66,15 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
     <div className="space-y-6">
       {/* Top Banner: Battery & Basic Status */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-4 rounded-[40px] bg-slate-900 border border-white/5 p-8 relative overflow-hidden group">
+        <div className="md:col-span-4 rounded-[2.5rem] bg-slate-900 border border-white/5 p-8 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-700">
             <Zap className="w-48 h-48" />
           </div>
           
           <div className="relative z-10 space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estado de Prontidão</span>
-              <div className={`px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-400 uppercase tracking-widest`}>
+              <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Estado de Prontidão</span>
+              <div className={`px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xxs font-bold text-indigo-400 uppercase tracking-widest`}>
                 EARS Active
               </div>
             </div>
@@ -98,7 +98,7 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                   className={`h-full rounded-full ${getStatusBg(latest?.level || 'ready')} shadow-[0_0_15px_rgba(255,255,255,0.1)]`}
                 />
               </div>
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <div className="flex justify-between items-center text-xxs font-black uppercase tracking-widest text-slate-500">
                 <span>Risco</span>
                 <span className={getStatusColor(latest?.level || 'ready')}>
                   {latest?.level === 'ready' ? 'Condição Ideal' : latest?.level === 'attention' ? 'Em Atenção' : 'Risco Crítico'}
@@ -138,7 +138,7 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                   <m.icon className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{m.label}</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">{m.label}</p>
                   <p className="text-xl font-black text-white">{m.value}</p>
                 </div>
                 <div className="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -164,8 +164,8 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
               Evolução de Performance
             </CardTitle>
             <div className="flex gap-2">
-              <button className="px-3 py-1 rounded-full bg-indigo-500 text-[10px] font-black text-white uppercase tracking-widest">7 Dias</button>
-              <button className="px-3 py-1 rounded-full bg-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-slate-300">30 Dias</button>
+              <button className="px-3 py-1 rounded-full bg-indigo-500 text-xxs font-black text-white uppercase tracking-widest">7 Dias</button>
+              <button className="px-3 py-1 rounded-full bg-slate-800 text-xxs font-black text-slate-500 uppercase tracking-widest hover:text-slate-300">30 Dias</button>
             </div>
           </CardHeader>
           <CardContent className="h-80 w-full pt-4">
@@ -181,8 +181,8 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                 <XAxis dataKey="date" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
                 <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px', color: '#fff' }}
-                  itemStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '1rem', color: '#fff' }}
+                  itemStyle={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#fff' }}
                 />
                 <Area type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
                 <Line type="monotone" dataKey="sleep" stroke="#3b82f6" strokeWidth={2} strokeDasharray="5 5" dot={false} />
@@ -201,7 +201,7 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                 Mapa de Risco Muscular
               </div>
               {latest?.pain_map?.length > 0 && (
-                <span className="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full">
+                <span className="text-xxs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full">
                   {latest.pain_map.length} Zonas
                 </span>
               )}
@@ -229,10 +229,10 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                   <div key={idx} className="flex items-center justify-between p-3 bg-slate-950/50 border border-white/5 rounded-2xl">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${p.level >= 7 ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'bg-amber-500'}`} />
-                      <span className="text-[10px] font-black text-white uppercase tracking-tighter">{regionLabel}</span>
+                      <span className="text-xxs font-black text-white uppercase tracking-tighter">{regionLabel}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] font-black text-slate-500 uppercase">{p.type === 'muscle' ? 'Muscular' : 'Articular'}</span>
+                      <span className="text-xxs font-black text-slate-500 uppercase">{p.type === 'muscle' ? 'Muscular' : 'Articular'}</span>
                       <span className={`text-xs font-black ${p.level >= 7 ? 'text-rose-400' : 'text-amber-400'}`}>Nível {p.level}</span>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
               })}
               {(!latest?.pain_map || latest.pain_map.length === 0) && (
                 <div className="text-center py-4">
-                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest italic">Nenhuma zona de dor relatada</p>
+                  <p className="text-xxs font-bold text-slate-600 uppercase tracking-widest italic">Nenhuma zona de dor relatada</p>
                 </div>
               )}
             </div>
@@ -260,7 +260,7 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Carga de Treino (CPE)</span>
+                <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Carga de Treino (CPE)</span>
                 <span className="text-xs font-bold text-white">{performanceCorrelation?.load || 0}/100</span>
               </div>
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -270,14 +270,14 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                   className="h-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed italic">
+              <p className="text-xxs text-slate-400 leading-relaxed italic">
                 A carga atual está { (performanceCorrelation?.load || 0) > 70 ? 'acima' : 'dentro' } do esperado para manter o equilíbrio.
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Rendimento Técnico</span>
+                <span className="text-xxs font-black text-slate-500 uppercase tracking-widest">Rendimento Técnico</span>
                 <span className="text-xs font-bold text-white">{performanceCorrelation?.stats || 0}/100</span>
               </div>
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -287,16 +287,16 @@ export const AthleteEarsDashboard: React.FC<Props> = ({ athlete, history, perfor
                   className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed italic">
+              <p className="text-xxs text-slate-400 leading-relaxed italic">
                 Seu rendimento técnico tem alta correlação com a qualidade do sono relatado.
               </p>
             </div>
 
             <div className="bg-slate-950/50 rounded-2xl p-6 border border-slate-800 flex flex-col justify-center text-center">
               <Trophy className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Status de Evolução</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status de Evolução</p>
               <h4 className="text-lg font-black text-white uppercase italic">Supercompensação</h4>
-              <p className="text-[9px] text-slate-400 mt-2">Você está no caminho certo para o ápice físico.</p>
+              <p className="text-xxs text-slate-400 mt-2">Você está no caminho certo para o ápice físico.</p>
             </div>
           </div>
         </CardContent>

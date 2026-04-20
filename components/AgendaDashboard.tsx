@@ -408,7 +408,7 @@ export function AgendaDashboard({ onOpenProfile }: AgendaDashboardProps) {
             <button onClick={handlePrev} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <h2 className="text-lg font-bold text-white min-w-[150px] text-center">
+            <h2 className="text-lg font-bold text-white min-w-[9.375rem] text-center">
               {view === 'day' 
                 ? format(currentDate, "dd 'de' MMMM", { locale: ptBR })
                 : `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })}`

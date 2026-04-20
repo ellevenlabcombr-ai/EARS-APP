@@ -48,12 +48,12 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
             <Users className="w-24 h-24" />
           </div>
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Prontidão Equipe</p>
+            <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Prontidão Equipe</p>
             <div className="flex items-baseline gap-1">
               <span className={`text-4xl font-black ${avgReadiness > 70 ? 'text-emerald-400' : 'text-amber-400'}`}>{avgReadiness}</span>
               <span className="text-xs font-bold text-slate-500">%</span>
             </div>
-            <p className="text-[9px] text-slate-400 mt-2 font-medium uppercase tracking-tighter italic">Total {data.length} Atletas</p>
+            <p className="text-xxs text-slate-400 mt-2 font-medium uppercase tracking-tighter italic">Total {data.length} Atletas</p>
           </div>
           <div className={`p-4 rounded-2xl ${avgReadiness > 70 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
             <Activity className="w-8 h-8" />
@@ -67,9 +67,9 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
         ].map((stat, i) => (
           <Card key={i} className="bg-slate-900 border-slate-800 p-6 flex items-center justify-between group overflow-hidden relative">
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+              <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
               <span className={`text-4xl font-black ${stat.color}`}>{stat.value}</span>
-              <p className="text-[9px] text-slate-400 mt-2 font-medium uppercase tracking-tighter italic">Detecção Ativa</p>
+              <p className="text-xxs text-slate-400 mt-2 font-medium uppercase tracking-tighter italic">Detecção Ativa</p>
             </div>
             <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color}`}>
               <stat.icon className="w-8 h-8" />
@@ -120,13 +120,13 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-white uppercase tracking-tight">{item.athlete.nickname || item.athlete.name}</h4>
-                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{item.athlete.sport} • {item.athlete.category}</p>
+                    <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">{item.athlete.sport} • {item.athlete.category}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-8 mt-4 md:mt-0">
-                  <div className="text-center min-w-[60px]">
-                    <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1">Prontidão</p>
+                  <div className="text-center min-w-[3.75rem]">
+                    <p className="text-xxs font-black text-slate-600 uppercase tracking-widest mb-1">Prontidão</p>
                     <div className="flex items-baseline justify-center gap-1">
                       <span className={`text-xl font-black ${item.latestCheckin?.level === 'ready' ? 'text-emerald-400' : item.latestCheckin?.level === 'attention' ? 'text-amber-400' : 'text-rose-400'}`}>
                         {item.latestCheckin?.readiness_score}%
@@ -134,8 +134,8 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
                     </div>
                   </div>
 
-                  <div className="hidden lg:block text-left min-w-[120px]">
-                    <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1">Indicadores</p>
+                  <div className="hidden lg:block text-left min-w-[7.5rem]">
+                    <p className="text-xxs font-black text-slate-600 uppercase tracking-widest mb-1">Indicadores</p>
                     <div className="flex gap-1.5">
                       {item.latestCheckin?.clinical_symptoms?.length ? (
                         <div className="w-5 h-5 rounded-lg bg-rose-500/20 text-rose-500 flex items-center justify-center" title="Sintomas">
@@ -175,7 +175,7 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
               {atRisk.length === 0 ? (
                 <div className="p-8 text-center">
                   <CheckCircle2 className="w-10 h-10 text-emerald-500/20 mx-auto mb-3" />
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nenhum risco detectado</p>
+                  <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Nenhum risco detectado</p>
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
@@ -187,7 +187,7 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
                         </div>
                         <div>
                           <p className="text-xs font-black text-white uppercase">{athlete.athlete.name}</p>
-                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Queda de {athlete.trend}%</p>
+                          <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Queda de {athlete.trend}%</p>
                         </div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-slate-600" />
@@ -201,11 +201,11 @@ export const CoachEarsDashboard: React.FC<Props> = ({ data, sport = 'Toda a Equi
           <Card className="bg-slate-900 border-slate-800 p-6 space-y-4">
              <div className="flex items-center gap-3 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
                <UserPlus className="w-5 h-5 text-indigo-400" />
-               <p className="text-[10px] font-black text-indigo-200 uppercase tracking-tight">Vincular Novo Atleta</p>
+               <p className="text-xxs font-black text-indigo-200 uppercase tracking-tight">Vincular Novo Atleta</p>
              </div>
              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Relatório Sintético</p>
-                <button className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors">
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">Relatório Sintético</p>
+                <button className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white text-xxs font-black uppercase tracking-widest rounded-xl transition-colors">
                    Exportar CSV/PDF
                 </button>
              </div>

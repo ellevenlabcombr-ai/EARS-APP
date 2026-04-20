@@ -75,7 +75,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Título</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Título</label>
                   <input 
                     required
                     type="text"
@@ -88,7 +88,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Categoria</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Categoria</label>
                     <select 
                       value={formData.category}
                       onChange={e => setFormData({...formData, category: e.target.value as AgendaCategory})}
@@ -100,7 +100,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Subcategoria</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Subcategoria</label>
                     <input 
                       type="text"
                       value={formData.subcategory}
@@ -113,7 +113,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Início</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Início</label>
                     <input 
                       required
                       type="datetime-local"
@@ -123,7 +123,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Fim</label>
+                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Fim</label>
                     <input 
                       required
                       type="datetime-local"
@@ -137,7 +137,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
                 {formData.category === 'clinical' && (
                   <div className="grid grid-cols-2 gap-4 p-4 bg-cyan-500/5 border border-cyan-500/20 rounded-2xl">
                     <div>
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">ID do Atleta</label>
+                      <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">ID do Atleta</label>
                       <input 
                         type="text"
                         value={formData.athlete_id}
@@ -147,7 +147,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Score de Risco (0-10)</label>
+                      <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Score de Risco (0-10)</label>
                       <input 
                         type="number"
                         min="0"
@@ -161,7 +161,7 @@ export function CreateEventModal({ isOpen, onClose, onSave }: CreateEventModalPr
                 )}
 
                 <div>
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Descrição</label>
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Descrição</label>
                   <textarea 
                     value={formData.description}
                     onChange={e => setFormData({...formData, description: e.target.value})}

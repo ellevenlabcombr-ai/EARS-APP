@@ -154,7 +154,7 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
     return (
       <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
         <div className="flex justify-between items-end">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
           <span className={`text-lg font-black ${valueColor}`}>{value}</span>
         </div>
         <input
@@ -165,7 +165,7 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
           onChange={(e) => onChange(Number(e.target.value))}
           className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
           <span>Baixo (0)</span>
           <span>Alto ({max})</span>
         </div>
@@ -175,13 +175,13 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
 
   const SelectGroup = ({ label, value, options, onChange }: { label: string, value: string | boolean, options: {id: string | boolean, label: string}[], onChange: (v: any) => void }) => (
     <div className="space-y-3 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {options.map(opt => (
           <button
             key={String(opt.id)}
             onClick={() => onChange(opt.id)}
-            className={`py-2 px-1 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+            className={`py-2 px-1 rounded-xl text-xxs font-black uppercase tracking-widest transition-all ${
               value === opt.id 
                 ? 'bg-cyan-500 text-[#050B14] shadow-lg shadow-cyan-500/20' 
                 : 'bg-slate-900/50 text-slate-500 border border-slate-800 hover:border-slate-700'
@@ -217,7 +217,7 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
 
         <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Score Nutricional</p>
+            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score Nutricional</p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-black">{score}</span>
               <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
@@ -225,7 +225,7 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
             {alerts.length > 0 && (
               <div className="mt-3 flex flex-col gap-1.5">
                 {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
+                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
                     <AlertTriangle className="w-3 h-3" /> {alert}
                   </div>
                 ))}
@@ -239,25 +239,25 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
       {/* Indices Preview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Qualidade</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Qualidade</p>
           <p className={`text-xl font-black ${metrics.intakeScore > 70 ? 'text-emerald-400' : metrics.intakeScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.intakeScore}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Hidratação</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Hidratação</p>
           <p className={`text-xl font-black ${metrics.hydrationScore > 70 ? 'text-emerald-400' : metrics.hydrationScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.hydrationScore}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Energia</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Energia</p>
           <p className={`text-xl font-black ${metrics.energyScore > 70 ? 'text-emerald-400' : metrics.energyScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.energyScore}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Comportamento</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Comportamento</p>
           <p className={`text-xl font-black ${metrics.behaviorScore > 70 ? 'text-emerald-400' : metrics.behaviorScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.behaviorScore}%
           </p>
@@ -350,10 +350,10 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
 
       {/* Footer Actions */}
       <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
+        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest px-8">
+        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
           <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
         </Button>
       </div>

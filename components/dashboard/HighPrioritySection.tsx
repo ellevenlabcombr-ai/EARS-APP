@@ -49,11 +49,11 @@ export function HighPrioritySection({ athletes, onViewAthlete }: HighPrioritySec
               </div>
               <div className="flex items-center gap-4 mb-4">
                 <div>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">Prontidão</p>
+                  <p className="text-xxs text-slate-400 uppercase tracking-wider">Prontidão</p>
                   <p className="text-xl font-black text-white">{athlete.readiness}%</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">Dor</p>
+                  <p className="text-xxs text-slate-400 uppercase tracking-wider">Dor</p>
                   <p className="text-xl font-black text-white">{athlete.soreness}/10</p>
                 </div>
               </div>

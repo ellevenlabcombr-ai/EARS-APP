@@ -59,7 +59,7 @@ export function AlertsOverview({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">
                   {alert.label}
                 </p>
                 <h3 className={`text-3xl font-black ${alert.color}`}>

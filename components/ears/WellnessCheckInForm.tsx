@@ -156,7 +156,7 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Status Provisório</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status Provisório</p>
           <div className="flex items-baseline gap-1">
             <span className={`text-4xl font-black ${getStatusColor()}`}>{score}</span>
             <span className="text-xs font-black text-slate-500">%</span>
@@ -268,7 +268,7 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
                       key={phase.id}
                       onClick={() => handleUpdate('menstrual_cycle', phase.id)}
                       className={`
-                        flex items-center gap-4 p-5 rounded-[32px] border transition-all duration-300
+                        flex items-center gap-4 p-5 rounded-[2rem] border transition-all duration-300
                         ${isSelected 
                           ? 'bg-rose-500/10 border-rose-500 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.15)] bg-gradient-to-br from-rose-500/10 to-transparent' 
                           : 'bg-slate-900/50 border-slate-800 text-slate-500 hover:border-slate-700'}
@@ -279,7 +279,7 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
                       </div>
                       <div className="text-left">
                         <p className="text-xs font-black uppercase tracking-widest">{phase.label}</p>
-                        <p className="text-[10px] opacity-60 font-medium">{phase.desc}</p>
+                        <p className="text-xxs opacity-60 font-medium">{phase.desc}</p>
                       </div>
                     </button>
                   );
@@ -290,7 +290,7 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
 
           {step === 4 && (
             <div className="space-y-6">
-              <div className="bg-indigo-600 p-8 rounded-[40px] text-center shadow-2xl shadow-indigo-500/20 relative overflow-hidden group">
+              <div className="bg-indigo-600 p-8 rounded-[2.5rem] text-center shadow-2xl shadow-indigo-500/20 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
                   <Zap className="w-32 h-32" />
                 </div>
@@ -309,11 +309,11 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Deduções Ativas</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Deduções Ativas</p>
                   <p className="text-sm font-bold text-white uppercase">{EARSEngine.calculatePainDeduction(answers.pain_map || []) + EARSEngine.calculateSymptomsDeduction(answers.clinical_symptoms || []) + EARSEngine.calculateMultipliers(answers)}%</p>
                 </div>
                 <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Zonas de Dor</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Zonas de Dor</p>
                   <p className="text-sm font-bold text-white uppercase">{answers.pain_map?.length || 0} Regiões</p>
                 </div>
               </div>

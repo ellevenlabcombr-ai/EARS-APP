@@ -360,7 +360,7 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
 
           const { data, error: wellnessError } = await supabase
             .from('wellness_records')
-            .select('athlete_id, record_date, readiness_score, sleep_hours, sleep_quality, muscle_soreness, soreness_location, fatigue_level, stress_level, mood, nutrition, pre_training_meal, training_recovery, confidence, overall_wellbeing, comments, menstrual_cycle, menstrual_symptoms, urine_color, symptoms, hydration_perception, hydration_score')
+            .select('athlete_id, record_date, created_at, readiness_score, sleep_hours, sleep_quality, muscle_soreness, soreness_location, fatigue_level, stress_level, mood, nutrition, pre_training_meal, training_recovery, confidence, overall_wellbeing, comments, menstrual_cycle, menstrual_symptoms, urine_color, symptoms, hydration_perception, hydration_score')
             .gte('record_date', threeDaysAgoStr)
             .lte('record_date', today)
             .in('athlete_id', athleteIds)
@@ -441,6 +441,7 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
             position: athlete.category,
             photo: (athlete.avatar_url && athlete.avatar_url.trim() !== '') ? athlete.avatar_url : `https://picsum.photos/seed/${athlete.id}/100/100`,
             status: record ? 'completed' : 'pending',
+            submittedAt: record && record.created_at ? new Date(record.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : null,
             readiness: readiness,
             sleep: record ? record.sleep_hours : null,
             sleepQuality: record ? (record.sleep_quality > 3 ? 'Boa' : 'Regular') : null,
@@ -636,7 +637,7 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
               variant="outline"
               onClick={handleClearData}
               disabled={isClearing}
-              className="border-rose-500/30 text-rose-400 hover:bg-rose-500/10 font-bold uppercase text-[10px] tracking-widest"
+              className="border-rose-500/30 text-rose-400 hover:bg-rose-500/10 font-bold uppercase text-xxs tracking-widest"
             >
               {isClearing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <X className="w-4 h-4 mr-2" />}
               Limpar Dados
@@ -644,7 +645,7 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
             <Button 
               variant="outline" 
               onClick={handleNotifyAllPending}
-              className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 font-bold uppercase text-[10px] tracking-widest"
+              className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 font-bold uppercase text-xxs tracking-widest"
             >
               <WhatsAppIcon className="w-4 h-4 mr-2" />
               Notificar Pendentes
@@ -652,7 +653,7 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
             <Button 
               variant="outline" 
               onClick={() => setShowDebug(!showDebug)}
-              className={`border-slate-700 font-bold uppercase text-[10px] tracking-widest ${showDebug ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-300'}`}
+              className={`border-slate-700 font-bold uppercase text-xxs tracking-widest ${showDebug ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-300'}`}
             >
               <Info className="w-4 h-4 mr-2" />
               Debug
@@ -673,8 +674,8 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
             <CardContent className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Configuração Supabase</h3>
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[10px] font-mono space-y-1">
+                  <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Configuração Supabase</h3>
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xxs font-mono space-y-1">
                     <p><span className="text-slate-500">URL Presente:</span> <span className={supabaseDebugInfo.hasUrl ? "text-emerald-400" : "text-rose-400"}>{supabaseDebugInfo.hasUrl ? "Sim" : "Não"}</span></p>
                     <p><span className="text-slate-500">Key Presente:</span> <span className={supabaseDebugInfo.hasKey ? "text-emerald-400" : "text-rose-400"}>{supabaseDebugInfo.hasKey ? "Sim" : "Não"}</span></p>
                     <p><span className="text-slate-500">URL Válida:</span> <span className={supabaseDebugInfo.isUrlValid ? "text-emerald-400" : "text-rose-400"}>{supabaseDebugInfo.isUrlValid ? "Sim" : "Não"}</span></p>
@@ -683,8 +684,8 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Último Erro</h3>
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[10px] font-mono overflow-auto max-h-40">
+                  <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Último Erro</h3>
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xxs font-mono overflow-auto max-h-40">
                     {lastError ? (
                       <pre className="text-rose-400 whitespace-pre-wrap">
                         {JSON.stringify({
@@ -701,8 +702,8 @@ export function WellnessDashboard({ onViewAthlete }: WellnessDashboardProps) {
                 </div>
               </div>
               <div className="space-y-2">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Solução de Performance (SQL)</h3>
-                <div className="bg-slate-950 p-3 rounded-lg border border-amber-500/30 text-[10px] font-mono space-y-2">
+                <h3 className="text-xxs font-black text-slate-500 uppercase tracking-widest">Solução de Performance (SQL)</h3>
+                <div className="bg-slate-950 p-3 rounded-lg border border-amber-500/30 text-xxs font-mono space-y-2">
                   <p className="text-amber-400 font-bold">Opção 1: Apenas Otimizar (Recomendado)</p>
                   <pre className="text-slate-400 whitespace-pre-wrap bg-slate-900 p-2 rounded border border-slate-800 select-all">
 {`CREATE OR REPLACE FUNCTION public.exec_sql(sql text) RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN EXECUTE sql; END; $$;
@@ -720,7 +721,7 @@ ANALYZE check_ins;`}
                     <Button
                       onClick={autoFixDatabase}
                       disabled={isAutoFixing}
-                      className="bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase text-[10px] tracking-widest"
+                      className="bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase text-xxs tracking-widest"
                     >
                       {isAutoFixing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Activity className="w-4 h-4 mr-2" />}
                       Otimizar Banco (Auto-Fix)
@@ -729,7 +730,7 @@ ANALYZE check_ins;`}
                       variant="outline"
                       onClick={fetchWellnessData}
                       disabled={isLoading}
-                      className="border-slate-700 text-slate-300 hover:text-white font-black uppercase text-[10px] tracking-widest"
+                      className="border-slate-700 text-slate-300 hover:text-white font-black uppercase text-xxs tracking-widest"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCcw className="w-4 h-4 mr-2" />}
                       Recarregar Dados
@@ -824,14 +825,14 @@ ANALYZE check_ins;`}
                 <Button 
                   size="sm" 
                   onClick={() => fixDatabase()}
-                  className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-[10px] uppercase tracking-widest"
+                  className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xxs uppercase tracking-widest"
                 >
                   Otimizar Banco (Auto-Fix)
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={() => fetchWellnessData()}
-                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] uppercase tracking-widest"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xxs uppercase tracking-widest"
                 >
                   Tentar Novamente
                 </Button>
@@ -839,7 +840,7 @@ ANALYZE check_ins;`}
                   size="sm" 
                   variant="outline"
                   onClick={() => setShowDebug(false)}
-                  className="border-slate-700 text-slate-400 hover:text-white font-bold text-[10px] uppercase tracking-widest"
+                  className="border-slate-700 text-slate-400 hover:text-white font-bold text-xxs uppercase tracking-widest"
                 >
                   Fechar
                 </Button>
@@ -917,7 +918,7 @@ ANALYZE check_ins;`}
                 <CheckCircle2 className="w-8 h-8 text-cyan-400" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Taxa de Resposta</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Taxa de Resposta</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-3xl font-black text-white">{completionRate}%</p>
                   <p className="text-xs font-bold text-slate-400">{completedCount} de {totalCount} atletas</p>
@@ -932,7 +933,7 @@ ANALYZE check_ins;`}
                 <Activity className="w-8 h-8 text-emerald-400" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Média de Prontidão (Geral)</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Média de Prontidão (Geral)</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-3xl font-black text-emerald-400">
                     {athletes.filter(a => a.readiness !== null).length > 0
@@ -951,7 +952,7 @@ ANALYZE check_ins;`}
                 <AlertCircle className="w-8 h-8 text-rose-400" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-rose-500/70 uppercase tracking-widest mb-1">Atenção Crítica</p>
+                <p className="text-xxs font-black text-rose-500/70 uppercase tracking-widest mb-1">Atenção Crítica</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-3xl font-black text-rose-400">{criticalCount}</p>
                   <p className="text-xs font-bold text-rose-500/70">atletas em risco</p>
@@ -974,7 +975,7 @@ ANALYZE check_ins;`}
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id as any)}
-                  className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
                     filter === f.id 
                       ? 'bg-cyan-500 text-[#050B14] shadow-lg' 
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -1001,7 +1002,7 @@ ANALYZE check_ins;`}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-900/80 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <tr className="bg-slate-900/80 border-b border-slate-800 text-xxs font-black text-slate-500 uppercase tracking-widest">
                     <th className="p-4 pl-6">Atleta</th>
                     <th className="p-4 text-center hidden lg:table-cell">Status</th>
                     <th className="p-4 text-center">Prontidão</th>
@@ -1061,22 +1062,22 @@ ANALYZE check_ins;`}
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-bold text-white">{athlete.name}</p>
                               {athlete.athlete_code && (
-                                <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[10px] font-bold rounded uppercase tracking-widest border border-amber-500/20">
+                                <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-xxs font-bold rounded uppercase tracking-widest border border-amber-500/20">
                                   #{athlete.athlete_code}
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{athlete.position}</p>
+                            <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{athlete.position}</p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 text-center hidden lg:table-cell">
                         {athlete.status === 'completed' ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xxs font-black uppercase tracking-widest">
                             <CheckCircle2 className="w-3 h-3" /> OK
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-400 text-xxs font-black uppercase tracking-widest">
                             <Clock className="w-3 h-3" /> Pend
                           </span>
                         )}
@@ -1103,7 +1104,7 @@ ANALYZE check_ins;`}
                             </span>
                           ) : '-'}
                           {athlete.sorenessLocation && athlete.sorenessLocation !== 'Nenhuma' && (
-                            <span className="text-[8px] font-black text-rose-500 uppercase tracking-tighter bg-rose-500/10 px-1 rounded">Mapa</span>
+                            <span className="text-xxs font-black text-rose-500 uppercase tracking-tighter bg-rose-500/10 px-1 rounded">Mapa</span>
                           )}
                         </div>
                       </td>
@@ -1118,14 +1119,14 @@ ANALYZE check_ins;`}
                         {athlete.gender === 'F' ? (
                           <div className="flex flex-col items-center gap-1">
                             {athlete.menstrualCycle ? (
-                              <span className="px-2 py-0.5 bg-pink-500/10 text-pink-400 text-[10px] font-bold rounded uppercase tracking-widest border border-pink-500/20">
+                              <span className="px-2 py-0.5 bg-pink-500/10 text-pink-400 text-xxs font-bold rounded uppercase tracking-widest border border-pink-500/20">
                                 {athlete.menstrualCycle}
                               </span>
                             ) : (
                               <span className="text-slate-600">-</span>
                             )}
                             {athlete.isPeriodLate && (
-                              <span className="flex items-center gap-1 text-[9px] font-black text-rose-500 uppercase animate-pulse">
+                              <span className="flex items-center gap-1 text-xxs font-black text-rose-500 uppercase animate-pulse">
                                 <AlertCircle className="w-3 h-3" /> Atraso {athlete.daysLate}d
                               </span>
                             )}
@@ -1140,7 +1141,7 @@ ANALYZE check_ins;`}
                             variant="ghost" 
                             size="sm"
                             onClick={() => setSelectedAnswers(athlete)}
-                            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold uppercase text-[10px] tracking-widest"
+                            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-bold uppercase text-xxs tracking-widest"
                           >
                             Ver Respostas <ChevronRight className="w-4 h-4 ml-1" />
                           </Button>
@@ -1149,7 +1150,7 @@ ANALYZE check_ins;`}
                             variant="outline" 
                             size="sm"
                             onClick={() => handleWhatsAppNotify(athlete)}
-                            className="border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase text-[10px] tracking-widest"
+                            className="border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase text-xxs tracking-widest"
                           >
                             <WhatsAppIcon className="w-3 h-3 mr-1" /> Cobrar
                           </Button>
@@ -1191,15 +1192,15 @@ ANALYZE check_ins;`}
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-black text-white">{selectedAnswers.name}</h2>
                     {selectedAnswers.athlete_code && (
-                      <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[10px] font-bold rounded uppercase tracking-widest border border-amber-500/20">
+                      <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-xxs font-bold rounded uppercase tracking-widest border border-amber-500/20">
                         #{selectedAnswers.athlete_code}
                       </span>
                     )}
                   </div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{selectedAnswers.position}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                      <Clock className="w-3 h-3" /> Hoje, 08:15
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-400 text-xxs font-black uppercase tracking-widest">
+                      <Clock className="w-3 h-3" /> Hoje, {selectedAnswers.submittedAt || '--:--'}
                     </span>
                   </div>
                 </div>
@@ -1217,7 +1218,7 @@ ANALYZE check_ins;`}
               {/* Readiness Score */}
               <div className="flex items-center justify-between p-6 bg-slate-900/50 rounded-2xl border border-slate-800/50">
                 <div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Score de Prontidão</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Score de Prontidão</p>
                   <p className="text-sm font-medium text-slate-400">Calculado com base nas respostas diárias</p>
                 </div>
                 <div className={`flex items-center justify-center w-20 h-20 rounded-2xl border-2 font-black text-3xl ${getReadinessColor(selectedAnswers.readiness)}`}>
@@ -1275,7 +1276,7 @@ ANALYZE check_ins;`}
                     </div>
                     <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Fadiga</p>
                   </div>
-                  <div className="flex justify-between items-end h-[44px]">
+                  <div className="flex justify-between items-end h-[2.75rem]">
                     <p className="text-sm text-slate-500">Nível (1-10)</p>
                     <p className={`text-2xl font-black ${selectedAnswers.fatigue > 5 ? 'text-amber-400' : 'text-emerald-400'}`}>
                       {selectedAnswers.fatigue}
@@ -1342,7 +1343,7 @@ ANALYZE check_ins;`}
                     <div className="lg:col-span-5 space-y-8 w-full">
                       <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/50 space-y-4">
                         <div className="flex justify-between items-end">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
+                          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
                           <p className={`text-2xl font-black ${Math.max(selectedAnswers.soreness || 0, ...Object.values(getPainMap(selectedAnswers)).map(p => p.level)) > 4 ? 'text-rose-400' : 'text-emerald-400'}`}>
                             {Math.max(selectedAnswers.soreness || 0, ...Object.values(getPainMap(selectedAnswers)).map(p => p.level))}/10
                           </p>
@@ -1359,7 +1360,7 @@ ANALYZE check_ins;`}
                       </div>
 
                       <div className="space-y-4">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Locais Detalhados</p>
+                        <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Locais Detalhados</p>
                         <div className="grid grid-cols-1 gap-2">
                           {selectedAnswers.sorenessLocation && selectedAnswers.sorenessLocation !== 'Nenhuma' ? (
                             (() => {
@@ -1375,7 +1376,7 @@ ANALYZE check_ins;`}
                                         {getPainLocationLabel(item.region)}
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
+                                        <span className="text-xxs font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
                                           Nível {item.intensity || item.level || 5}
                                         </span>
                                       </div>
@@ -1391,7 +1392,7 @@ ANALYZE check_ins;`}
                                         {getPainLocationLabel(loc)}
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
+                                        <span className="text-xxs font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
                                           Nível {typeof data === 'object' ? data.level : data}
                                         </span>
                                       </div>
@@ -1408,7 +1409,7 @@ ANALYZE check_ins;`}
                                       {getPainLocationLabel(loc.trim())}
                                     </span>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
+                                      <span className="text-xxs font-black text-rose-400 bg-rose-500/10 px-2 py-1 rounded uppercase">
                                         Nível {selectedAnswers.soreness || 5}
                                       </span>
                                     </div>
@@ -1453,7 +1454,7 @@ ANALYZE check_ins;`}
                         return (
                           <div key={key} className="flex justify-between items-center">
                             <span className="text-xs text-slate-400">{labels[key] || key}</span>
-                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                            <span className={`text-xxs font-black uppercase px-2 py-0.5 rounded ${
                               (value as number) === 1 ? 'text-yellow-400 bg-yellow-400/10' :
                               (value as number) === 2 ? 'text-orange-400 bg-orange-400/10' :
                               'text-red-400 bg-red-400/10'
@@ -1477,7 +1478,7 @@ ANALYZE check_ins;`}
                     </div>
                     <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Estresse</p>
                   </div>
-                  <div className="flex justify-between items-end h-[44px]">
+                  <div className="flex justify-between items-end h-[2.75rem]">
                     <p className="text-sm text-slate-500">Nível (1-10)</p>
                     <p className={`text-2xl font-black ${selectedAnswers.stress > 5 ? 'text-purple-400' : 'text-emerald-400'}`}>
                       {selectedAnswers.stress}
@@ -1493,7 +1494,7 @@ ANALYZE check_ins;`}
                     </div>
                     <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Humor</p>
                   </div>
-                  <div className="flex justify-between items-end h-[44px]">
+                  <div className="flex justify-between items-end h-[2.75rem]">
                     <p className="text-sm text-slate-500">Nível (1-5)</p>
                     <p className={`text-2xl font-black ${selectedAnswers.mood < 3 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {selectedAnswers.mood || '-'}
@@ -1529,7 +1530,7 @@ ANALYZE check_ins;`}
                     </div>
                     <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Nutrição</p>
                   </div>
-                  <div className="flex justify-between items-end h-[44px]">
+                  <div className="flex justify-between items-end h-[2.75rem]">
                     <p className="text-sm text-slate-500">Qualidade (1-5)</p>
                     <p className={`text-2xl font-black ${selectedAnswers.nutrition < 3 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {selectedAnswers.nutrition || '-'}
@@ -1545,7 +1546,7 @@ ANALYZE check_ins;`}
                     </div>
                     <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Refeição Pré-Treino</p>
                   </div>
-                  <div className="flex justify-between items-end h-[44px]">
+                  <div className="flex justify-between items-end h-[2.75rem]">
                     <p className="text-sm text-slate-500">Qualidade (1-5)</p>
                     <p className={`text-2xl font-black ${selectedAnswers.preTrainingMeal < 3 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {selectedAnswers.preTrainingMeal || '-'}
@@ -1605,7 +1606,7 @@ ANALYZE check_ins;`}
                       {selectedAnswers.menstrualSymptoms && selectedAnswers.menstrualSymptoms.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {selectedAnswers.menstrualSymptoms.map((s: string) => (
-                            <span key={s} className="px-2 py-0.5 bg-rose-500/10 text-rose-400 text-[8px] font-black uppercase tracking-widest rounded border border-rose-500/20">
+                            <span key={s} className="px-2 py-0.5 bg-rose-500/10 text-rose-400 text-xxs font-black uppercase tracking-widest rounded border border-rose-500/20">
                               {s === 'cramps' ? 'Cólica' : 
                                s === 'headache' ? 'Dor de Cabeça' : 
                                s === 'bloating' ? 'Inchaço' : 
@@ -1638,7 +1639,7 @@ ANALYZE check_ins;`}
               <Button 
                 variant="ghost" 
                 onClick={() => setSelectedAnswers(null)}
-                className="text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase text-[10px] tracking-widest"
+                className="text-slate-400 hover:text-white hover:bg-slate-800 font-bold uppercase text-xxs tracking-widest"
               >
                 Fechar
               </Button>
@@ -1647,7 +1648,7 @@ ANALYZE check_ins;`}
                   setSelectedAnswers(null);
                   onViewAthlete(selectedAnswers);
                 }}
-                className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-[10px] tracking-widest"
+                className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest"
               >
                 Abrir Prontuário Clínico <ChevronRight className="w-4 h-4 ml-2" />
               </Button>

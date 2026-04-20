@@ -72,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <div className="bg-slate-950 p-4 rounded-xl text-left overflow-auto max-h-40 border border-slate-800">
                 <p className="text-rose-400 font-mono text-xs mb-2">{this.state.error.toString()}</p>
                 {this.state.errorInfo && (
-                  <pre className="text-slate-500 font-mono text-[10px] leading-tight">
+                  <pre className="text-slate-500 font-mono text-xxs leading-tight">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}
@@ -96,7 +96,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
             
-            <p className="text-[10px] text-slate-600 font-medium uppercase tracking-[0.2em]">
+            <p className="text-xxs text-slate-600 font-medium uppercase tracking-[0.2em]">
               ERR_CODE: CLIENT_RENDER_EXCEPTION
             </p>
           </div>

@@ -19,16 +19,16 @@ export function EventCard({ event, onClick }: EventCardProps) {
       onClick={() => onClick(event)}
       className={`p-2 rounded-lg border text-left cursor-pointer transition-all hover:brightness-110 active:scale-95 ${colorClass} h-full overflow-hidden`}
     >
-      <p className="text-[8px] font-black uppercase tracking-tighter opacity-70">
+      <p className="text-xxs font-black uppercase tracking-tighter opacity-70">
         {format(startTime, "HH:mm")}
       </p>
-      <h4 className="text-[10px] font-black leading-tight truncate">
+      <h4 className="text-xxs font-black leading-tight truncate">
         {event.title}
       </h4>
       {event.category === 'clinical' && event.risk_score !== null && (
         <div className="mt-1 flex items-center gap-1">
           <div className="w-1 h-1 rounded-full bg-current" />
-          <span className="text-[8px] font-bold uppercase">Risco: {event.risk_score}</span>
+          <span className="text-xxs font-bold uppercase">Risco: {event.risk_score}</span>
         </div>
       )}
     </div>

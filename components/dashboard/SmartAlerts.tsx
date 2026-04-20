@@ -57,13 +57,13 @@ export function SmartAlerts({ alerts, onRefresh }: SmartAlertsProps) {
         <div className="flex bg-slate-800/50 p-1 rounded-lg">
           <button 
             onClick={() => setView('active')}
-            className={`px-2 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${view === 'active' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-2 py-1 text-xxs font-bold uppercase rounded-md transition-all ${view === 'active' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
           >
             Ativos
           </button>
           <button 
             onClick={() => setView('resolved')}
-            className={`px-2 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${view === 'resolved' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-2 py-1 text-xxs font-bold uppercase rounded-md transition-all ${view === 'resolved' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
           >
             Histórico
           </button>
@@ -96,7 +96,7 @@ export function SmartAlerts({ alerts, onRefresh }: SmartAlertsProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start gap-2">
                     <h4 className="text-sm font-bold text-white truncate">{(alert as any).athlete?.name || 'Atleta'}</h4>
-                    <span className="text-[9px] font-black uppercase text-slate-500 whitespace-nowrap">
+                    <span className="text-xxs font-black uppercase text-slate-500 whitespace-nowrap">
                       {new Date(alert.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -109,7 +109,7 @@ export function SmartAlerts({ alerts, onRefresh }: SmartAlertsProps) {
                         variant="outline"
                         disabled={resolvingId === alert.id}
                         onClick={() => handleResolve(alert.id)}
-                        className="h-7 px-3 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-white"
+                        className="h-7 px-3 text-xxs font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-white"
                       >
                         {resolvingId === alert.id ? (
                           <Loader2 className="w-3 h-3 animate-spin mr-1" />
@@ -122,7 +122,7 @@ export function SmartAlerts({ alerts, onRefresh }: SmartAlertsProps) {
                   )}
 
                   {view === 'resolved' && alert.resolved_at && (
-                    <p className="text-[9px] font-bold text-emerald-500/60 uppercase mt-2 flex items-center gap-1">
+                    <p className="text-xxs font-bold text-emerald-500/60 uppercase mt-2 flex items-center gap-1">
                       <CheckCircle2 className="w-2.5 h-2.5" />
                       Resolvido em {new Date(alert.resolved_at).toLocaleDateString()}
                     </p>

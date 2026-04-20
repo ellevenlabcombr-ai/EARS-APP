@@ -57,10 +57,10 @@ export function AttachmentPreviewModal({
                     {attachment.document_name || attachment.file_name || 'Documento'}
                   </h3>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest bg-cyan-500/10 px-2 py-0.5 rounded-md">
+                    <span className="text-xxs font-black text-cyan-500 uppercase tracking-widest bg-cyan-500/10 px-2 py-0.5 rounded-md">
                       {attachment.category}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">
                       v{attachment.version_number || 1} • {new Date(attachment.created_at).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
@@ -93,7 +93,7 @@ export function AttachmentPreviewModal({
               )}
 
               {isImage ? (
-                <div className="relative w-full h-full min-h-[400px]">
+                <div className="relative w-full h-full min-h-[25rem]">
                   <Image
                     src={attachment.file_url}
                     alt={attachment.document_name}
@@ -117,13 +117,13 @@ export function AttachmentPreviewModal({
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white uppercase tracking-widest">Pré-visualização não disponível</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Este tipo de arquivo não pode ser exibido diretamente no navegador.</p>
+                    <p className="text-xxs text-slate-500 uppercase tracking-widest mt-1">Este tipo de arquivo não pode ser exibido diretamente no navegador.</p>
                   </div>
                   <a 
                     href={attachment.file_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-[10px] font-black uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-slate-800 hover:bg-slate-700 text-white h-10 px-4 py-2"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xxs font-black uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-slate-800 hover:bg-slate-700 text-white h-10 px-4 py-2"
                   >
                     <ExternalLink size={14} className="mr-2" />
                     Abrir em nova aba

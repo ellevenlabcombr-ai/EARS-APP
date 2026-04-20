@@ -120,8 +120,12 @@ const CLINICAL_SIGNS = [
   { id: "Lesão Pele", label_pt: "Lesão de Pele / Arranhão", label_en: "Skin Lesion", emoji: "🩹" },
   { id: "Bolhas", label_pt: "Bolhas", label_en: "Blisters", emoji: "🦶" },
   { id: "Unha Encravada", label_pt: "Unha Encravada", label_en: "Ingrown Toenail", emoji: "🩸" },
-  { id: "Cólica", label_pt: "Cólica / Dor Abdominal", label_en: "Cramps", emoji: "😣" },
-  { id: "Inchaço", label_pt: "Inchaço / Retenção", label_en: "Bloating", emoji: "🎈" },
+  { id: "Cólica", label_pt: "Cólica / Dor Abdominal", label_en: "Cramps", emoji: "😣", menstrual: true },
+  { id: "Inchaço", label_pt: "Inchaço / Retenção", label_en: "Bloating", emoji: "🎈", menstrual: true },
+  { id: "Sensibilidade Seios", label_pt: "Sensibilidade nos Seios", label_en: "Breast Sensitivity", emoji: "👙", menstrual: true },
+  { id: "Humor", label_pt: "Mudança de Humor / TPM", label_en: "Mood Swings / PMS", emoji: "🌪️", menstrual: true },
+  { id: "Acne", label_pt: "Pico de Acne", label_en: "Acne Breakout", emoji: "🫧", menstrual: true },
+  { id: "Desejo Doce", label_pt: "Desejo por Doces", label_en: "Cravings", emoji: "🍫", menstrual: true },
 ];
 
 const getPainLocationLabel = (id: string): string => {
@@ -495,6 +499,7 @@ export function AthleteDashboard({
   const [painMap, setPainMap] = useState<Record<string, { level: number; type: string }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     if (athleteId) {
@@ -506,7 +511,7 @@ export function AthleteDashboard({
   const latestCheckIn = checkins[0];
   const hasCheckedInToday =
     latestCheckIn &&
-    parseDateString(latestCheckIn.record_date || latestCheckIn.created_at).toDateString() ===
+    parseDateString(latestCheckIn.created_at || latestCheckIn.record_date).toDateString() ===
       new Date().toDateString();
   const currentReadiness = latestCheckIn?.readiness_score ?? 0;
 
@@ -693,9 +698,12 @@ export function AthleteDashboard({
   useEffect(() => {
     if (!athleteId || !supabase) return;
 
-    // 1. Check if responded today
+    // 1. Check if responded today (only if it has a readiness score)
     const today = getLocalDateString();
-    const todayRecord = checkins.find(r => r.record_date === today);
+    const todayRecord = checkins.find(r => {
+      const rDate = r.created_at || r.record_date;
+      return rDate.startsWith(today) && r.readiness_score !== undefined && r.readiness_score !== null;
+    });
     if (todayRecord) {
       setRespondedToday(true);
       setTodaySummary(todayRecord);
@@ -844,7 +852,7 @@ export function AthleteDashboard({
           </div>
           <h2 className="text-xl font-black text-white uppercase tracking-widest text-[#FFF]">Atleta Não Identificado</h2>
           <p className="text-slate-400">Não foi possível carregar os dados deste atleta. ID faltando no contexto.</p>
-          <Button onClick={onBack} variant="outline" className="border-slate-800 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Voltar para Home</Button>
+          <Button onClick={onBack} variant="outline" className="border-slate-800 text-slate-400 font-bold uppercase tracking-widest text-xxs">Voltar para Home</Button>
         </div>
       </div>
     );
@@ -979,7 +987,7 @@ export function AthleteDashboard({
     let currentDate = new Date(today);
 
     const hasToday = checkins.some((record) => {
-      const recordDate = parseDateString(record.record_date || record.created_at);
+      const recordDate = parseDateString(record.created_at || record.record_date);
       recordDate.setHours(0, 0, 0, 0);
       return recordDate.getTime() === today.getTime();
     });
@@ -990,7 +998,7 @@ export function AthleteDashboard({
 
     for (let i = 0; i < 30; i++) {
       const found = checkins.some((record) => {
-        const recordDate = parseDateString(record.record_date || record.created_at);
+        const recordDate = parseDateString(record.created_at || record.record_date);
         recordDate.setHours(0, 0, 0, 0);
         return recordDate.getTime() === currentDate.getTime();
       });
@@ -1141,7 +1149,11 @@ export function AthleteDashboard({
     }
 
     setIsSubmitting(false);
-    setView("summary");
+    setShowCelebration(true);
+    setTimeout(() => {
+      setShowCelebration(false);
+      setView("summary");
+    }, 2500);
   };
 
   const resetForm = () => {
@@ -1213,7 +1225,7 @@ export function AthleteDashboard({
                    value={setupLastPeriod}
                    onChange={(e) => setSetupLastPeriod(e.target.value)}
                  />
-                 <p className="text-[10px] text-slate-500 text-center uppercase tracking-wider italic">* O primeiro dia do seu último período menstrual.</p>
+                 <p className="text-xxs text-slate-500 text-center uppercase tracking-wider italic">* O primeiro dia do seu último período menstrual.</p>
               </div>
 
               <div className="space-y-6 pt-4 border-t border-slate-800/50">
@@ -1229,7 +1241,7 @@ export function AthleteDashboard({
                    </Button>
                    <div className="text-center">
                      <span className="text-5xl font-black text-white">{setupCycleLength}</span>
-                     <p className="text-[10px] text-slate-500 mt-1 font-bold uppercase tracking-widest">Dias</p>
+                     <p className="text-xxs text-slate-500 mt-1 font-bold uppercase tracking-widest">Dias</p>
                    </div>
                    <Button 
                      variant="outline" 
@@ -1240,7 +1252,7 @@ export function AthleteDashboard({
                      <Plus className="w-6 h-6" />
                    </Button>
                  </div>
-                 <p className="text-[10px] text-slate-500 text-center uppercase tracking-widest">O padrão é 28 dias.</p>
+                 <p className="text-xxs text-slate-500 text-center uppercase tracking-widest">O padrão é 28 dias.</p>
               </div>
 
               <Button 
@@ -1278,7 +1290,7 @@ export function AthleteDashboard({
               <Button 
                 variant="outline" 
                 onClick={() => setView("cycle_setup")}
-                className="border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 h-8"
+                className="border-slate-800 text-slate-400 text-xxs font-black uppercase tracking-widest px-3 h-8"
               >
                 Configurar <Settings className="w-3 h-3 ml-2" />
               </Button>
@@ -1305,7 +1317,7 @@ export function AthleteDashboard({
                 <div className="pt-2">
                   <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/30`}>
                     <TrendingUp className={`w-3 h-3 text-rose-400`} />
-                    <span className={`text-[10px] font-black uppercase tracking-widest text-rose-400`}>
+                    <span className={`text-xxs font-black uppercase tracking-widest text-rose-400`}>
                       Intensidade Recomendada: {phaseData.intensity}
                     </span>
                   </div>
@@ -1338,13 +1350,13 @@ export function AthleteDashboard({
                   <div className="space-y-3">
                     <div className="bg-blue-500/5 p-3 rounded-xl border border-blue-500/10">
                       <p className="text-xs text-blue-200/90 leading-relaxed">
-                        <span className="font-bold text-blue-400 uppercase tracking-widest text-[9px] block mb-1">Hidratação:</span>
+                        <span className="font-bold text-blue-400 uppercase tracking-widest text-xxs block mb-1">Hidratação:</span>
                         {phaseData.hydration}
                       </p>
                     </div>
                     <div className="bg-purple-500/5 p-3 rounded-xl border border-purple-500/10">
                       <p className="text-xs text-purple-200/90 leading-relaxed">
-                        <span className="font-bold text-purple-400 uppercase tracking-widest text-[9px] block mb-1">Treino:</span>
+                        <span className="font-bold text-purple-400 uppercase tracking-widest text-xxs block mb-1">Treino:</span>
                         {phaseData.training}
                       </p>
                     </div>
@@ -1392,7 +1404,7 @@ export function AthleteDashboard({
       .slice(0, 15)
       .reverse()
       .map((record) => ({
-        date: parseDateString(record.record_date || record.created_at).toLocaleDateString(
+        date: parseDateString(record.created_at || record.record_date).toLocaleDateString(
           lang === "pt" ? "pt-BR" : "en-US",
           { day: "2-digit", month: "2-digit" },
         ),
@@ -1406,7 +1418,7 @@ export function AthleteDashboard({
       .slice(0, 15)
       .reverse()
       .map((record) => ({
-        date: parseDateString(record.record_date || record.created_at).toLocaleDateString(
+        date: parseDateString(record.created_at || record.record_date).toLocaleDateString(
           lang === "pt" ? "pt-BR" : "en-US",
           { day: "2-digit", month: "2-digit" },
         ),
@@ -1415,6 +1427,12 @@ export function AthleteDashboard({
 
 
     const WellnessWidget = () => {
+      const summaryMetrics = [
+        { label: lang === "pt" ? "Sono" : "Sleep", value: todaySummary?.sleep_quality || 0, icon: Moon, color: "text-blue-400" },
+        { label: lang === "pt" ? "Fadiga" : "Fatigue", value: todaySummary?.fatigue_level || 0, icon: Battery, color: "text-amber-400" },
+        { label: lang === "pt" ? "Dor" : "Pain", value: Math.max(0, ...Object.values(latestPainMap).map(p => p.level)), icon: Activity, color: "text-rose-400" },
+      ];
+
       if (!respondedToday) {
         return (
           <Card className="bg-[#0A1120] border-amber-500/30 overflow-hidden relative group">
@@ -1442,53 +1460,47 @@ export function AthleteDashboard({
         );
       }
 
-      const summaryMetrics = [
-        { label: lang === "pt" ? "Sono" : "Sleep", value: todaySummary?.sleep_quality || 0, icon: Moon, color: "text-blue-400" },
-        { label: lang === "pt" ? "Fadiga" : "Fatigue", value: todaySummary?.fatigue_level || 0, icon: Battery, color: "text-amber-400" },
-        { label: lang === "pt" ? "Dor" : "Pain", value: Math.max(0, ...Object.values(latestPainMap).map(p => p.level)), icon: Activity, color: "text-rose-400" },
-      ];
-
       return (
         <Card className="bg-[#0A1120] border-emerald-500/30 overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent pointer-events-none" />
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                  <CheckCircle className="w-8 h-8 text-emerald-400" />
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-emerald-500/20 rounded-3xl border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] text-emerald-400 flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8" />
                 </div>
-                <div className="text-left">
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">Check-in Concluído</h3>
-                  <p className="text-slate-400 text-sm">Dados sincronizados com sucesso. Veja seu resumo abaixo.</p>
+                <div className="text-left space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter leading-none">Status: Concluído</h3>
+                    <div className="px-2 py-0.5 bg-emerald-500/20 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                      <Zap className="w-3 h-3 text-emerald-400" />
+                      <span className="text-xxs font-black text-emerald-400 uppercase tracking-widest">{streak}d</span>
+                    </div>
+                  </div>
+                  <p className="text-slate-400 text-sm font-medium">Sua prontidão diária foi registrada. Bom trabalho!</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 w-full md:w-auto">
+              <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
                 {summaryMetrics.map((m, i) => (
-                  <div key={i} className="flex-1 md:flex-none bg-slate-900/50 border border-slate-800 p-3 rounded-xl text-center min-w-[80px]">
-                    <m.icon className={`w-5 h-5 mx-auto mb-1 ${m.color}`} />
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{m.label}</p>
-                    <p className="text-lg font-black text-white">{m.value}{m.label === "Dor" ? "/10" : "/5"}</p>
+                  <div key={i} className="flex-1 md:flex-none bg-slate-950/80 border border-emerald-500/10 p-4 rounded-2xl text-center min-w-[5.625rem] shadow-lg">
+                    <m.icon className={`w-5 h-5 mx-auto mb-2 ${m.color}`} />
+                    <p className="text-xxs text-slate-500 font-black uppercase tracking-[0.2em] mb-1">{m.label}</p>
+                    <p className="text-xl font-black text-white leading-none">
+                      {m.value}
+                      <span className="text-xxs text-slate-600 ml-1 font-bold">/{m.label === "Dor" ? "10" : "5"}</span>
+                    </p>
                   </div>
                 ))}
               </div>
 
-              <div className="flex gap-2 w-full md:w-auto">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSelectedRecord(todaySummary)}
-                  className="flex-1 md:flex-none border-slate-800 text-slate-300 hover:bg-slate-800"
-                >
-                  Detalhes
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setView("questionnaire")}
-                  className="flex-1 md:flex-none border-slate-800 text-slate-300 hover:bg-slate-800"
-                >
-                  Editar
-                </Button>
-              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => setSelectedRecord(todaySummary)}
+                className="w-full md:w-auto border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/10"
+              >
+                Ver Detalhes
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -1501,7 +1513,7 @@ export function AthleteDashboard({
       d.setDate(d.getDate() - (6 - i));
       const dateStr = d.toDateString();
       const hasRecord = checkins.some(
-        (record) => parseDateString(record.record_date || record.created_at).toDateString() === dateStr,
+        (record) => parseDateString(record.created_at || record.record_date).toDateString() === dateStr,
       );
       return {
         dayName: d.toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
@@ -1532,30 +1544,21 @@ export function AthleteDashboard({
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar w-full sm:w-auto justify-center sm:justify-end py-1">
             <div className={`flex items-center gap-2 ${theme.bgAlpha} px-2.5 py-1 rounded-full border ${theme.border} shrink-0`}>
               <Trophy className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${theme.text}`} />
-              <span className={`text-[10px] sm:text-xs font-bold ${theme.icon}`}>
+              <span className={`text-xxs sm:text-xs font-bold ${theme.icon}`}>
                 Lvl {athleteLevel}
               </span>
             </div>
             <div className="flex items-center gap-2 bg-yellow-500/20 px-2.5 py-1 rounded-full border border-yellow-500/30 shrink-0">
               <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
-              <span className="text-[10px] sm:text-xs font-bold text-yellow-300">
+              <span className="text-xxs sm:text-xs font-bold text-yellow-300">
                 {currentCoins}
               </span>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setView("squad")}
-              className="text-slate-400 hover:text-white shrink-0 text-[10px] sm:text-xs h-8 px-2"
-            >
-              <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-              {lang === "pt" ? "Squad" : "Squad"}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={toggleLang}
-              className="text-slate-400 hover:text-white shrink-0 text-[10px] sm:text-xs h-8 px-2"
+              className="text-slate-400 hover:text-white shrink-0 text-xxs sm:text-xs h-8 px-2"
             >
               <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
               {lang === "pt" ? "EN" : "PT"}
@@ -1586,7 +1589,7 @@ export function AthleteDashboard({
               {/* Readiness Badge next to photo */}
               <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1.5 rounded-full border-2 border-slate-800 shadow-xl z-20">
                 <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center border ${currentReadiness >= 80 ? 'border-emerald-500/50 bg-emerald-500/10' : currentReadiness >= 50 ? 'border-amber-500/50 bg-amber-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
-                  <span className={`text-[11px] sm:text-sm font-black ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                  <span className={`text-xs sm:text-sm font-black ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                     {currentReadiness}%
                   </span>
                 </div>
@@ -1597,7 +1600,7 @@ export function AthleteDashboard({
                 {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
               </h2>
               {athleteCode && (
-                <span className={`px-3 py-1 ${theme.bgAlpha} ${theme.text} text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-widest border ${theme.borderAlpha} shadow-lg`}>
+                <span className={`px-3 py-1 ${theme.bgAlpha} ${theme.text} text-xxs sm:text-xs font-bold rounded-full uppercase tracking-widest border ${theme.borderAlpha} shadow-lg`}>
                   #{athleteCode}
                 </span>
               )}
@@ -1606,7 +1609,7 @@ export function AthleteDashboard({
         </div>
 
         {/* Motivational Quote */}
-        <div className={`bg-slate-900/40 p-6 rounded-2xl border ${theme.borderAlpha} relative ${theme.shadowStrong} overflow-hidden max-w-md mx-auto`}>
+        <div className={`bg-slate-900/40 p-6 rounded-2xl border ${theme.borderAlpha} relative ${theme.shadowStrong} overflow-hidden max-w-sm mx-auto`}>
           <Quote className={`absolute top-4 left-4 w-6 h-6 ${theme.bgAlpha}`} />
           <p className="text-sm text-slate-300 font-medium italic relative z-10 leading-relaxed pt-2 px-4">
             &quot;{motivationalQuote.text}&quot;
@@ -1615,6 +1618,58 @@ export function AthleteDashboard({
             — {motivationalQuote.author}
           </p>
         </div>
+
+        {/* Cycle Intelligence Module - Dashboard Integration */}
+        {athleteGender === 'F' && (
+          <div className="max-w-md mx-auto w-full">
+            {cycleInfo ? (
+              <Card 
+                className="bg-rose-500/5 border-rose-500/20 overflow-hidden border-dashed p-1"
+              >
+                <div className="p-5 space-y-5">
+                  <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setView("cycle_details")}>
+                    <div className="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20 group-hover:scale-110 transition-transform">
+                      <Droplets className="w-7 h-7 text-rose-500" />
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-xs font-black text-rose-500/70 uppercase tracking-[0.2em] mb-1">
+                        Fase {cycleInfo.phase} • Dia {cycleInfo.currentDay}
+                      </p>
+                      <h3 className="text-xl font-black text-white uppercase tracking-tight">
+                        Ciclo Menstrual
+                      </h3>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-rose-500 transition-colors" />
+                  </div>
+                  
+                  <Button 
+                    size="lg"
+                    onClick={handleToggleMenstruating}
+                    className={`w-full ${athleteData?.is_menstruating ? 'bg-rose-600 text-white' : 'bg-rose-600/10 text-rose-400 hover:bg-rose-600 hover:text-white'} border border-rose-600/30 text-xs font-black uppercase tracking-[0.2em] h-12 transition-all active:scale-95 shadow-lg`}
+                  >
+                    {athleteData?.is_menstruating 
+                      ? (lang === 'pt' ? "Estou Menstruando" : "Currently Menstruating") 
+                      : (lang === 'pt' ? "Ciclo Iniciou Hoje" : "Cycle Started Today")}
+                  </Button>
+                </div>
+              </Card>
+            ) : !loadingAthlete && (
+              <Card className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-6 flex flex-col items-center text-center gap-4 shadow-lg cursor-pointer hover:bg-rose-500/20 transition-colors" onClick={() => setView("cycle_setup")}>
+                <div className="p-3 bg-rose-500/20 rounded-full">
+                  <CalendarDays className="w-6 h-6 text-rose-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-white uppercase tracking-wider mb-1">
+                    Configurar Ciclo Menstrual
+                  </h4>
+                  <p className="text-xs text-rose-200/60 leading-relaxed">
+                    Habilite a inteligência hormonal para otimizar seus treinos.
+                  </p>
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
 
         <WellnessWidget />
 
@@ -1637,7 +1692,7 @@ export function AthleteDashboard({
                       <XAxis dataKey="date" stroke="#475569" fontSize={10} tickMargin={10} />
                       <YAxis stroke="#475569" fontSize={10} domain={[0, 100]} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "12px" }}
+                        contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: '0.75rem' }}
                         itemStyle={{ fontWeight: "bold" }}
                       />
                       <Line type="monotone" dataKey="score" name="Prontidão" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
@@ -1664,7 +1719,7 @@ export function AthleteDashboard({
                         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                         <XAxis dataKey="date" stroke="#475569" fontSize={10} tickMargin={10} />
                         <YAxis stroke="#475569" fontSize={10} domain={[0, 10]} />
-                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "12px" }} />
+                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: '0.75rem' }} />
                         <Line type="stepAfter" dataKey="level" name="Dor" stroke="#f43f5e" strokeWidth={3} dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -1695,7 +1750,7 @@ export function AthleteDashboard({
                     <div className="flex-1 space-y-6 w-full">
                       <div className="space-y-2">
                         <div className="flex justify-between items-end">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
+                          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
                           <p className={`text-xl font-black ${latestCheckIn?.muscle_soreness && latestCheckIn.muscle_soreness > 4 ? 'text-rose-400' : 'text-emerald-400'}`}>
                             {latestCheckIn?.muscle_soreness || 0}/10
                           </p>
@@ -1711,22 +1766,22 @@ export function AthleteDashboard({
                         </div>
                       </div>
                       <div className="flex flex-col gap-3">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Locais Detalhados</p>
+                        <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Locais Detalhados</p>
                         <div className="flex flex-wrap gap-2">
                           {Object.keys(finalPainMap).length > 0 ? (
                             Object.entries(finalPainMap).map(([part, data]) => (
                               <span 
                                 key={part}
-                                className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 group hover:bg-rose-500/20 transition-all"
+                                className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 group hover:bg-rose-500/20 transition-all"
                               >
                                 {getPainLocationLabel(part)}
-                                <span className="text-[9px] opacity-70 bg-rose-500/20 px-1.5 py-0.5 rounded">Nível {data.level}</span>
+                                <span className="text-xxs opacity-70 bg-rose-500/20 px-1.5 py-0.5 rounded">Nível {data.level}</span>
                               </span>
                             ))
                           ) : (
                             <div className="w-full text-center py-8 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800/50">
                               <CheckCircle2 className="w-8 h-8 text-emerald-500/20 mx-auto mb-2" />
-                              <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+                              <p className="text-slate-500 font-bold uppercase tracking-widest text-xxs">
                                 {lang === "pt" ? "Nenhuma dor relatada" : "No pain reported"}
                               </p>
                             </div>
@@ -1764,7 +1819,7 @@ export function AthleteDashboard({
                         {day.hasRecord ? (
                           <CheckCircle2 className="w-4 h-4" />
                         ) : (
-                          <span className="text-[10px] font-bold">
+                          <span className="text-xxs font-bold">
                             {day.dayName.charAt(0)}
                           </span>
                         )}
@@ -1776,12 +1831,12 @@ export function AthleteDashboard({
                   <div className="flex items-center gap-2">
                     <Flame className="w-5 h-5 text-orange-500" />
                     <span className="text-2xl font-black text-white">{streak}</span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Dias</span>
+                    <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Dias</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-amber-500" />
                     <span className="text-2xl font-black text-white">{athleteLevel}</span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nível</span>
+                    <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Nível</span>
                   </div>
                 </div>
               </div>
@@ -1831,7 +1886,7 @@ export function AthleteDashboard({
             <div className="space-y-6">
               <div className="grid gap-4">
                 {checkins.map((record) => {
-                  const date = parseDateString(record.record_date || record.created_at);
+                  const date = parseDateString(record.created_at || record.record_date);
                   const isGood = record.readiness_score >= 75;
                   const isWarning =
                     record.readiness_score >= 50 && record.readiness_score < 75;
@@ -1868,7 +1923,7 @@ export function AthleteDashboard({
                           </div>
                           <div className="flex items-center gap-4">
                             <div className="text-right">
-                              <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
+                              <p className="text-xxs text-slate-500 uppercase tracking-widest font-bold mb-1">
                                 {t[lang].battery}
                               </p>
                               <div className="flex items-center gap-2">
@@ -1910,13 +1965,13 @@ export function AthleteDashboard({
               <div className="flex justify-between items-center p-6 border-b border-slate-800">
                 <div>
                   <h3 className="text-xl font-black text-white uppercase tracking-tight">
-                    {parseDateString(selectedRecord.record_date || selectedRecord.created_at).toLocaleDateString(
+                    {parseDateString(selectedRecord.created_at || selectedRecord.record_date).toLocaleDateString(
                       lang === "pt" ? "pt-BR" : "en-US",
                       { weekday: 'long', day: '2-digit', month: 'long' }
                     )}
                   </h3>
                   <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">
-                    Check-in realizado às {parseDateString(selectedRecord.record_date || selectedRecord.created_at).toLocaleTimeString(lang === "pt" ? "pt-BR" : "en-US", { hour: '2-digit', minute: '2-digit' })}
+                    Check-in realizado às {parseDateString(selectedRecord.created_at || selectedRecord.record_date).toLocaleTimeString(lang === "pt" ? "pt-BR" : "en-US", { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <Button
@@ -1982,7 +2037,7 @@ export function AthleteDashboard({
                     return (
                       <div key={m.id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800/50 flex flex-col items-center text-center">
                         <m.icon className={`w-5 h-5 ${theme.text} mb-2`} />
-                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">{m.label}</span>
+                        <span className="text-xxs text-slate-500 uppercase font-black tracking-widest mb-1">{m.label}</span>
                         <span className="text-base">{opt.emoji} <span className="text-sm text-white font-bold ml-1">{opt.label}</span></span>
                       </div>
                     );
@@ -2029,13 +2084,13 @@ export function AthleteDashboard({
                       </div>
                       <div className="flex-1 space-y-6 w-full">
                         <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/50 space-y-3">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
+                          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Intensidade Geral</p>
                           <p className={`text-2xl font-black ${selectedRecord.muscle_soreness > 4 ? 'text-rose-400' : 'text-emerald-400'}`}>
                             {selectedRecord.muscle_soreness}/10
                           </p>
                         </div>
                         <div className="space-y-3">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Locais</p>
+                          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Locais</p>
                           <div className="flex flex-wrap gap-2">
                             {(() => {
                               const loc = selectedRecord.soreness_location || selectedRecord.wellness_records?.[0]?.soreness_location;
@@ -2044,14 +2099,14 @@ export function AthleteDashboard({
                                 const parsed = JSON.parse(loc);
                                 if (Array.isArray(parsed)) {
                                   return parsed.map(item => (
-                                    <span key={item.region} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-slate-700">
+                                    <span key={item.region} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xxs font-bold uppercase tracking-widest border border-slate-700">
                                       {getPainLocationLabel(item.region)} {item.type ? `(${getPainTypeLabel(item.type, lang)})` : ''}
                                     </span>
                                   ));
                                 }
                               } catch (e) {
                                 return loc.split(',').map((l: string) => (
-                                  <span key={l} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-slate-700">
+                                  <span key={l} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xxs font-bold uppercase tracking-widest border border-slate-700">
                                     {getPainLocationLabel(l.trim())}
                                   </span>
                                 ));
@@ -2067,7 +2122,7 @@ export function AthleteDashboard({
                 {/* Notes */}
                 {selectedRecord.notes && (
                   <div className="space-y-3 pt-4 border-t border-slate-800/50">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Observações</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Observações</p>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-slate-800/50">
                       <p className="text-sm text-slate-300 italic">&quot;{selectedRecord.notes}&quot;</p>
                     </div>
@@ -2160,7 +2215,7 @@ export function AthleteDashboard({
                     className="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50 flex flex-col items-center text-center"
                   >
                     <m.icon className={`w-5 h-5 ${theme.text} mb-2`} />
-                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
+                    <span className="text-xxs text-slate-400 uppercase font-bold tracking-wider mb-1">
                       {m.label}
                     </span>
                     <span className="text-lg">
@@ -2195,9 +2250,69 @@ export function AthleteDashboard({
   // Questionnaire View
   return (
     <PageContainer maxWidth="3xl" className="pt-safe">
-      <div className="space-y-8 pb-12">
-        <SupabaseStatus />
-      <div className="flex justify-between items-center mb-6">
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#050B14]/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.5, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-[#0A1120] border border-emerald-500/30 p-8 rounded-[2.5rem] shadow-[0_0_50px_rgba(16,185,129,0.3)] text-center space-y-6 max-w-sm w-full"
+            >
+              <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
+                <CheckCircle className="w-12 h-12 text-emerald-400" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Sincronizado!</h2>
+                <p className="text-slate-400 text-sm">Seu bem-estar foi registrado com sucesso. Bom treino!</p>
+              </div>
+              <div className="flex justify-center gap-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + (i * 0.1) }}
+                    className="w-2 h-2 rounded-full bg-emerald-500"
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {(view === "questionnaire" && respondedToday) ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-8"
+        >
+          <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">
+            <CheckCircle className="w-12 h-12 text-emerald-400" />
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Check-in de hoje concluído</h2>
+            <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
+              Você já enviou suas respostas hoje! Suas métricas já estão com a comissão técnica.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setView("history")}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-widest px-8 py-6 rounded-2xl border border-slate-800 shadow-xl transition-all active:scale-95"
+          >
+            Ver Dashboard
+          </Button>
+        </motion.div>
+      ) : (
+        <>
+          <div className="space-y-8 pb-12">
+          <SupabaseStatus />
+        <div className="flex justify-between items-center mb-6">
         <Button
           variant="ghost"
           onClick={() => setView("history")}
@@ -2218,87 +2333,16 @@ export function AthleteDashboard({
         </Button>
       </div>
 
-        {/* Cycle Intelligence Module - Integrated directly into Wellness Questionnaire Header */}
-        {athleteGender === 'F' && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-2xl mx-auto space-y-4"
-          >
-            {cycleInfo ? (
-              <Card 
-                className="bg-rose-500/5 border-rose-500/20 overflow-hidden border-dashed"
-              >
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setView("cycle_details")}>
-                    <div className="p-3 bg-rose-500/10 rounded-2xl border border-rose-500/20 group-hover:scale-110 transition-transform">
-                      <Droplets className="w-6 h-6 text-rose-500" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[10px] font-black text-rose-500/70 uppercase tracking-[0.2em] mb-0.5">
-                        Fase {cycleInfo.phase} • Dia {cycleInfo.currentDay}
-                      </p>
-                      <h3 className="text-sm font-black text-white uppercase tracking-tight">
-                        Inteligência do Ciclo
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      size="sm"
-                      onClick={handleToggleMenstruating}
-                      className={`${athleteData?.is_menstruating ? 'bg-rose-600 text-white' : 'bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white'} border border-rose-600/30 text-[10px] font-black uppercase tracking-widest h-8 transition-all`}
-                    >
-                      {athleteData?.is_menstruating 
-                        ? (lang === 'pt' ? "Menstruando" : "Menstruating") 
-                        : (lang === 'pt' ? "Iniciou Hoje" : "Started Today")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setView("cycle_details")}
-                      className="text-slate-500 hover:text-rose-400"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="bg-rose-500/10 px-4 py-2 flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-rose-300 uppercase tracking-widest truncate">
-                    {CYCLE_PHASES[cycleInfo.phaseKey]?.description || ""} • Toque para calendário, nutrição e treino
-                  </span>
-                </div>
-              </Card>
-            ) : !loadingAthlete && (
-              <Card className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-6 flex flex-col items-center text-center gap-4 shadow-lg">
-                <div className="p-3 bg-rose-500/20 rounded-full">
-                  <CalendarDays className="w-8 h-8 text-rose-400" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-black text-white uppercase tracking-wider mb-2">
-                    Configurar Ciclo
-                  </h4>
-                  <p className="text-xs text-rose-200/80 leading-relaxed mb-4">
-                    Ative o monitoramento e receba orientações nutricionais e de treino baseadas no seu ciclo.
-                  </p>
-                  <Button 
-                    onClick={() => setView("cycle_setup")}
-                    className="w-full bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-widest h-10 rounded-xl"
-                  >
-                    Configurar Agora
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </motion.div>
-        )}
-
         {/* Clinical Summary Badge (Visual identity) */}
-        <div className="flex justify-center">
-          <div className="px-4 py-1.5 bg-slate-900 rounded-full border border-slate-800 flex items-center gap-2 shadow-lg">
-            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Protocolo Wellness Elleven</span>
-          </div>
+        <div className="flex justify-center mb-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-6 py-2 bg-[#050B14]/60 backdrop-blur-xl rounded-full border border-slate-800/50 flex items-center gap-3 shadow-2xl"
+          >
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+            <span className="text-xs font-black text-white/80 uppercase tracking-[0.3em]">Protocolo Wellness Elite</span>
+          </motion.div>
         </div>
       </div>
 
@@ -2324,7 +2368,7 @@ export function AthleteDashboard({
                 >
                   <div className="flex items-center gap-4">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-800" />
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] whitespace-nowrap">
+                    <h3 className="text-xxs font-black text-slate-500 uppercase tracking-[0.3em] whitespace-nowrap">
                       {groupLabels[(metric as any).group]?.[lang]}
                     </h3>
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-800" />
@@ -2369,7 +2413,7 @@ export function AthleteDashboard({
                             <span className="text-2xl sm:text-3xl mb-2 drop-shadow-md">
                               {option.emoji}
                             </span>
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
+                            <span className="text-xxs sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
                               {option.label}
                             </span>
                           </button>
@@ -2413,7 +2457,7 @@ export function AthleteDashboard({
                   <div className="bg-slate-950/50 p-5 rounded-2xl border border-cyan-500/10 space-y-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                      <p className="text-[10px] font-black text-cyan-500/70 uppercase tracking-widest">Status do Scanner</p>
+                      <p className="text-xxs font-black text-cyan-500/70 uppercase tracking-widest">Status do Scanner</p>
                     </div>
                     <div className="flex justify-between items-end">
                       <p className="text-sm font-bold text-slate-400 uppercase tracking-tight">Áreas Detectadas</p>
@@ -2428,25 +2472,25 @@ export function AthleteDashboard({
                   </div>
 
                   <div className="space-y-3">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Legenda de Cores</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest px-1">Legenda de Cores</p>
                     <div className="grid grid-cols-1 gap-2">
                       <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-900/50 border border-slate-800/50">
                         <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">0-3: Leve / Normal</span>
+                        <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">0-3: Leve / Normal</span>
                       </div>
                       <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-900/50 border border-slate-800/50">
                         <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">4-6: Moderado / Atenção</span>
+                        <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">4-6: Moderado / Atenção</span>
                       </div>
                       <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-900/50 border border-slate-800/50">
                         <div className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">7-10: Intenso / Crítico</span>
+                        <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest">7-10: Intenso / Crítico</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="p-4 bg-cyan-500/5 border border-cyan-500/10 rounded-xl">
-                    <p className="text-[10px] text-cyan-400/70 font-medium leading-relaxed italic">
+                    <p className="text-xxs text-cyan-400/70 font-medium leading-relaxed italic">
                       * Toque nas áreas do corpo para registrar o nível e o tipo de dor específica.
                     </p>
                   </div>
@@ -2478,21 +2522,31 @@ export function AthleteDashboard({
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                <div className="flex flex-wrap gap-3">
-                  {CLINICAL_SIGNS.map((sign) => {
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {CLINICAL_SIGNS.filter(sign => {
+                    // Always show non-menstrual signs
+                    if (!(sign as any).menstrual) return true;
+                    
+                    // Show menstrual signs only for female athletes in relevant phases
+                    if (athleteGender !== 'F') return false;
+                    
+                    const pKey = cycleInfo?.phaseKey;
+                    // Luteal (TPM) and Menstrual phases are relevant for these symptoms
+                    return (pKey === 'menstrual' || pKey === 'luteal');
+                  }).map((sign) => {
                     const isSelected = clinicalSigns.includes(sign.id);
                     return (
                       <button
                         key={sign.id}
                         onClick={() => toggleClinicalSign(sign.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
                           isSelected 
-                            ? 'bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                            ? 'bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)] scale-[0.98]' 
                             : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                         }`}
                       >
-                        <span className="text-xl">{sign.emoji}</span>
-                        <span className="text-sm font-bold uppercase tracking-wide">
+                        <span className="text-lg">{sign.emoji}</span>
+                        <span className="text-xxs font-black uppercase tracking-tight text-left">
                           {lang === "pt" ? sign.label_pt : sign.label_en}
                         </span>
                       </button>
@@ -2566,6 +2620,8 @@ export function AthleteDashboard({
           {isSubmitting ? t[lang].syncing : t[lang].syncData}
         </Button>
         </motion.div>
+      </>
+      )}
     </PageContainer>
   );
 }
