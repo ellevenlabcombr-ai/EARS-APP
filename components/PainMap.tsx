@@ -24,7 +24,7 @@ type BodyPart = {
   transform?: string;
 };
 
-const bodyParts: BodyPart[] = [
+export const bodyParts: BodyPart[] = [
   // Front
   {
     id: "head_f",

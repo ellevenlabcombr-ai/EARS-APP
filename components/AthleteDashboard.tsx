@@ -82,11 +82,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { PainMap } from "@/components/PainMap";
+import { CycleCalendar } from "./CycleCalendar";
+import { CYCLE_PHASES } from "@/lib/menstrual-content";
 import { SupabaseStatus } from "./SupabaseStatus";
 import { supabase, hasSupabaseConfig, supabaseDebugInfo } from "@/lib/supabase";
 import { t, Language } from "@/lib/i18n";
 import { Athlete, WellnessRecord } from "@/types/database";
-import { parseDateString, getLocalDateString } from "@/lib/utils";
+import { parseDateString, getLocalDateString, getLocalDateTimeString } from "@/lib/utils";
 import { PageContainer } from "./layout/AppLayout";
 import { useAthleteStore } from "@/store/useAthleteStore";
 import { DataSafety } from "@/lib/dataSafety";
@@ -105,6 +107,22 @@ const getPainTypeLabel = (type: string, lang: "pt" | "en"): string => {
   };
   return types.map(t => mapping[t.trim().toLowerCase()]?.[lang] || t).join(', ');
 };
+
+const CLINICAL_SIGNS = [
+  { id: "Febre", label_pt: "Febre", label_en: "Fever", emoji: "🤒" },
+  { id: "Enjoo", label_pt: "Náusea / Enjoo", label_en: "Nausea", emoji: "🤢" },
+  { id: "Vômito", label_pt: "Vômito", label_en: "Vomiting", emoji: "🤮" },
+  { id: "Dor de Cabeça", label_pt: "Dor de Cabeça", label_en: "Headache", emoji: "🤕" },
+  { id: "Tontura", label_pt: "Tontura / Vertigem", label_en: "Dizziness", emoji: "😵‍💫" },
+  { id: "Dor de Garganta", label_pt: "Dor de Garganta", label_en: "Sore Throat", emoji: "🗣️" },
+  { id: "Diarreia", label_pt: "Diarreia", label_en: "Diarrhea", emoji: "🚽" },
+  { id: "Gripe", label_pt: "Sintomas Gripais", label_en: "Flu Symptoms", emoji: "🤧" },
+  { id: "Lesão Pele", label_pt: "Lesão de Pele / Arranhão", label_en: "Skin Lesion", emoji: "🩹" },
+  { id: "Bolhas", label_pt: "Bolhas", label_en: "Blisters", emoji: "🦶" },
+  { id: "Unha Encravada", label_pt: "Unha Encravada", label_en: "Ingrown Toenail", emoji: "🩸" },
+  { id: "Cólica", label_pt: "Cólica / Dor Abdominal", label_en: "Cramps", emoji: "😣" },
+  { id: "Inchaço", label_pt: "Inchaço / Retenção", label_en: "Bloating", emoji: "🎈" },
+];
 
 const getPainLocationLabel = (id: string): string => {
   const mapping: Record<string, string> = {
@@ -176,7 +194,7 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
   const defaultOptions = [
     { value: 1, label: opts.veryBad, color: "bg-red-500", emoji: "😫" },
     { value: 2, label: opts.bad, color: "bg-orange-500", emoji: "🙁" },
-    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "😐" },
+    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "👍" },
     { value: 4, label: opts.good, color: "bg-lime-500", emoji: "🙂" },
     { value: 5, label: opts.veryGood, color: "bg-emerald-500", emoji: "🤩" },
   ];
@@ -200,7 +218,7 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
   const stressOptions = [
     { value: 1, label: opts.high, color: "bg-red-500", emoji: "🤬" },
     { value: 2, label: opts.medium, color: "bg-orange-500", emoji: "😠" },
-    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "😐" },
+    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "👍" },
     { value: 4, label: opts.low, color: "bg-lime-500", emoji: "🙂" },
     { value: 5, label: opts.zero, color: "bg-emerald-500", emoji: "😌" },
   ];
@@ -240,7 +258,7 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
   const confidenceOptions = [
     { value: 1, label: opts.veryLow, color: "bg-red-500", emoji: "📉" },
     { value: 2, label: opts.lowConf, color: "bg-orange-500", emoji: "😟" },
-    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "😐" },
+    { value: 3, label: opts.ok, color: "bg-yellow-500", emoji: "👍" },
     { value: 4, label: opts.highConf, color: "bg-lime-500", emoji: "😎" },
     { value: 5, label: opts.veryHigh, color: "bg-emerald-500", emoji: "🚀" },
   ];
@@ -248,7 +266,7 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
   const legHeavinessOptions = [
     { value: 1, label: opts.veryHeavy, color: "bg-red-500", emoji: "🧱" },
     { value: 2, label: opts.heavy, color: "bg-orange-500", emoji: "🏋️" },
-    { value: 3, label: opts.normal, color: "bg-yellow-500", emoji: "😐" },
+    { value: 3, label: opts.normal, color: "bg-yellow-500", emoji: "👍" },
     { value: 4, label: opts.light, color: "bg-lime-500", emoji: "🏃" },
     { value: 5, label: opts.veryLight, color: "bg-emerald-500", emoji: "🪶" },
   ];
@@ -293,75 +311,90 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
 const getMetrics = (lang: Language, gender: "M" | "F" = "M") => {
   const m = t[lang].metrics;
   const baseMetrics = [
+    // Morning Section
     {
       id: "sleep",
+      group: "morning",
       label: m.sleep.label,
       icon: Moon,
       description: m.sleep.desc,
     },
     {
       id: "sleep_hours",
+      group: "morning",
       label: m.sleep_hours.label,
       icon: Clock,
       description: m.sleep_hours.desc,
     },
     {
       id: "energy",
+      group: "morning",
       label: m.energy.label,
       icon: Battery,
       description: m.energy.desc,
     },
-    { id: "mood", label: m.mood.label, icon: Smile, description: m.mood.desc },
+    { id: "mood", group: "morning", label: m.mood.label, icon: Smile, description: m.mood.desc },
     {
       id: "stress",
+      group: "morning",
       label: m.stress.label,
       icon: Activity,
       description: m.stress.desc,
     },
+    // Daily/Habits Section
     {
       id: "hydration",
+      group: "habits",
       label: m.hydration.label,
       icon: Droplets,
       description: m.hydration.desc,
     },
     {
       id: "urine_color",
+      group: "habits",
       label: lang === "pt" ? "Qual a cor da sua urina hoje?" : "What is the color of your urine today?",
       icon: Droplets,
       description: lang === "pt" ? "Indica o nível de hidratação." : "Indicates hydration level.",
     },
     {
       id: "nutrition",
+      group: "habits",
       label: m.nutrition.label,
       icon: Apple,
       description: m.nutrition.desc,
     },
     {
       id: "pre_training_meal",
+      group: "habits",
       label: m.pre_training_meal.label,
       icon: Utensils,
       description: m.pre_training_meal.desc,
     },
+    // Evening/Performance Section
     {
       id: "training_recovery",
+      group: "evening",
       label: m.training_recovery.label,
       icon: RefreshCcw,
       description: m.training_recovery.desc,
     },
     {
       id: "confidence",
+      group: "evening",
       label: m.confidence.label,
       icon: Target,
       description: m.confidence.desc,
     },
     {
       id: "leg_heaviness",
+      group: "evening",
       label: m.leg_heaviness.label,
       icon: Dumbbell,
       description: m.leg_heaviness.desc,
     },
     {
       id: "overall_wellbeing",
+      group: "overall",
       label: m.overall_wellbeing.label,
       icon: Heart,
       description: m.overall_wellbeing.desc,
@@ -414,7 +447,7 @@ const motivationalQuotes = [
   },
 ];
 
-type ViewState = "history" | "questionnaire" | "summary";
+type ViewState = "history" | "questionnaire" | "summary" | "cycle_setup" | "cycle_details" | "squad";
 
 interface AthleteDashboardProps {
   onBack: () => void;
@@ -458,6 +491,7 @@ export function AthleteDashboard({
   // Questionnaires & Setup
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [notes, setNotes] = useState("");
+  const [clinicalSigns, setClinicalSigns] = useState<string[]>([]);
   const [painMap, setPainMap] = useState<Record<string, { level: number; type: string }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -704,39 +738,33 @@ export function AthleteDashboard({
   };
 
   const handleSaveCycleSetup = async () => {
-    if (!supabase) return;
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('athletes')
-        .update({
-          last_period_date: setupLastPeriod,
-          cycle_length: setupCycleLength,
-          is_menstruating: false
-        })
-        .eq('id', athleteId);
-      
-      if (error) {
-        console.error("Supabase error saving cycle setup:", error);
-        throw error;
-      }
-      
-      // Refresh data
-      await fetchData();
+    if (!supabase || !athleteId || !setupLastPeriod) return;
+    
+    const { error } = await supabase
+      .from("athletes")
+      .update({ 
+        last_period_date: setupLastPeriod,
+        cycle_length: setupCycleLength,
+        is_menstruating: false // Resetting if they are setting up a new cycle
+      })
+      .eq("id", athleteId);
+    
+    if (!error) {
+      setAthleteData(prev => prev ? { ...prev, last_period_date: setupLastPeriod, cycle_length: setupCycleLength } : null);
       setView("history");
-    } catch (err: any) {
-      console.error("Error saving cycle setup:", err);
-      alert(lang === "pt" 
-        ? `Erro ao salvar configuração: ${err.message || "Verifique se as colunas existem no banco de dados."}`
-        : `Error saving setup: ${err.message || "Check if columns exist in the database."}`
-      );
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      console.error("Error saving cycle setup:", error);
     }
   };
 
-  const metrics = getMetrics(lang, athleteGender).filter(m => m.id !== 'menstrual_cycle');
+  const metrics = getMetrics(lang, athleteGender);
   const isComplete = metrics.every((m) => answers[m.id] !== undefined);
+
+  const toggleClinicalSign = (id: string) => {
+    setClinicalSigns((prev) => 
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  };
 
   // Menstrual Cycle Helpers
   const cycleInfo = useMemo(() => {
@@ -822,32 +850,46 @@ export function AthleteDashboard({
     );
   }
 
-  const handleStartCycle = async () => {
+  const handleToggleMenstruating = async () => {
     if (!supabase || !athleteId) return;
     
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const today = `${year}-${month}-${day}`;
+    const isCurrentlyMenstruating = !!athleteData?.is_menstruating;
+    const today = getLocalDateString();
+    const now = getLocalDateTimeString();
+    
+    const updateData: any = { 
+      is_menstruating: !isCurrentlyMenstruating 
+    };
+    
+    // If starting a new cycle, update last_period_date
+    if (!isCurrentlyMenstruating) {
+      updateData.last_period_date = today;
+    }
     
     const { error } = await supabase
       .from("athletes")
-      .update({ 
-        last_period_date: today,
-        is_menstruating: true 
-      })
+      .update(updateData)
       .eq("id", athleteId);
     
     if (!error) {
-      setAthleteData({ ...athleteData, last_period_date: today, is_menstruating: true });
-      // Also save a record of this
+      setAthleteData(prev => prev ? { ...prev, ...updateData } : null);
+      
+      const commentPt = !isCurrentlyMenstruating 
+        ? "Início do ciclo menstrual relatado no Wellness."
+        : "Término da fase menstrual relatado no Wellness.";
+      const commentEn = !isCurrentlyMenstruating 
+        ? "Start of menstrual cycle reported in Wellness."
+        : "End of menstrual phase reported in Wellness.";
+
       await supabase.from("wellness_records").insert([{
         athlete_id: athleteId,
-        record_date: today,
-        comments: lang === "pt" ? "Início do ciclo menstrual relatado." : "Start of menstrual cycle reported.",
-        menstrual_cycle: "Menstrual"
+        record_date: now,
+        comments: lang === "pt" ? commentPt : commentEn,
+        menstrual_cycle: !isCurrentlyMenstruating ? "Menstrual" : "Follicular"
       }]);
+      
+      // Refresh local data to ensure everything is synced
+      fetchData();
     }
   };
 
@@ -863,24 +905,65 @@ export function AthleteDashboard({
     let maxScore = 0;
 
     Object.entries(answers).forEach(([key, value]) => {
+      // Exclude menstrual cycle from standard calculating out of 5
+      if (key === "menstrual_cycle") return;
+
+      let scoreValue = value;
+
       if (key === "sleep_hours") {
-        const normalized = value <= 4 ? 1 : value >= 9 ? 5 : value - 3;
-        totalScore += normalized;
-      } else {
-        totalScore += value;
+        // value ranges from 4 to 9+. Normalized is roughly 1 for 4h, 5 for 9+.
+        scoreValue = value <= 4 ? 1 : value >= 9 ? 5 : value - 3;
+      } else if (key === "urine_color") {
+        // Urine color 1 (Clear) is optimal (5/5 points), 5 (Dark Amber) is negative (1/5 points)
+        scoreValue = 6 - value; 
       }
+
+      totalScore += scoreValue;
       maxScore += 5;
     });
 
     const painValues = Object.values(painMap).map((p) => p.level);
     const maxPain = painValues.length > 0 ? Math.max(...painValues) : 0;
-    const painDeduction = maxPain * 2;
+    
+    // Pain deduction: Mild pain (1-3) should deduct softly. Severe pain (7-10) should deduct heavily.
+    // Curve: Level 1: 0.25%, Level 3: 2.25%, Level 5: 6.25%, Level 7: 12.25%, Level 10: 25% max deduction
+    const painDeduction = maxPain > 0 ? (maxPain * maxPain) * 0.25 : 0; 
+    
+    // Clinical Signs Deduction Nuance
+    let signsDeduction = 0;
+    
+    // Weights based on severity to prevent inflating or undervaluing based on context
+    const severeSigns = ["Febre", "Vômito", "Diarreia", "Gripe"];
+    const moderateSigns = ["Enjoo", "Tontura", "Dor de Cabeça", "Dor de Garganta"];
+    const minorSigns = ["Lesão Pele", "Bolhas", "Unha Encravada"];
 
-    if (maxScore === 0) return 100;
+    clinicalSigns.forEach(sign => {
+      if (severeSigns.includes(sign)) signsDeduction += 15;
+      else if (moderateSigns.includes(sign)) signsDeduction += 8;
+      else if (minorSigns.includes(sign)) signsDeduction += 2;
+      else signsDeduction += 5; 
+    });
 
+    // Age factor 
+    // Older athletes might take slightly longer to recover, meaning clinical/pain symptoms impact more
+    let ageMultiplier = 1.0;
+    if (athleteAge?.years) {
+      if (athleteAge.years <= 20) {
+        ageMultiplier = 0.85; // Faster recovery, symptoms impact 15% less
+      } else if (athleteAge.years >= 30) {
+        ageMultiplier = 1.15; // Slower recovery, symptoms impact 15% more
+      }
+    }
+
+    const totalDeductions = (painDeduction + signsDeduction) * ageMultiplier;
+
+    if (maxScore === 0) return Math.max(0, 100 - Math.round(totalDeductions));
+
+    let baseReadiness = (totalScore / maxScore) * 100;
+    
     return Math.max(
       0,
-      Math.round((totalScore / maxScore) * 100) - painDeduction,
+      Math.round(baseReadiness - totalDeductions)
     );
   };
 
@@ -953,16 +1036,38 @@ export function AthleteDashboard({
     }
 
     try {
+      const fullTimestamp = getLocalDateTimeString();
       const localDateStr = getLocalDateString();
+      
+      const clinicalSignsText = clinicalSigns.length > 0 
+        ? `[SINAIS CLÍNICOS: ${clinicalSigns.join(", ")}] ` 
+        : "";
+      const finalNotes = `${clinicalSignsText}${notes.trim()}`.trim() || null;
+      
+      // Calculate max pain to map to muscle_soreness
+      let maxPain = 0;
+      let compiledSorenessLocation: string | null = null;
+      
+      if (Object.keys(painMap).length > 0) {
+        maxPain = Math.max(...Object.values(painMap).map(p => p.level));
+        compiledSorenessLocation = JSON.stringify(
+          Object.entries(painMap).map(([region, data]) => ({
+            region,
+            level: data.level,
+            type: data.type
+          }))
+        );
+      }
+
       const checkInDataToInsert = {
         athlete_id: athleteId,
-        record_date: localDateStr,
+        record_date: fullTimestamp,
         sleep_quality: answers["sleep"],
         stress_level: answers["stress"],
-        muscle_soreness: answers["leg_heaviness"],
+        muscle_soreness: maxPain > 0 ? maxPain : (answers["leg_heaviness"] || 0),
         energy_level: answers["energy"],
         readiness_score: readiness,
-        notes: notes.trim() || null,
+        notes: finalNotes,
         hydration: answers["hydration"],
         nutrition: answers["nutrition"],
         mood: answers["mood"],
@@ -981,7 +1086,49 @@ export function AthleteDashboard({
 
       if (checkInError) throw checkInError;
 
-      // Simplificação extrema: apenas check_ins
+      const checkInId = checkInData[0].id;
+
+      // Insert into pain_reports
+      if (Object.keys(painMap).length > 0) {
+        const painReportsToInsert = Object.entries(painMap).map(([partId, data]) => ({
+          check_in_id: checkInId,
+          athlete_id: athleteId,
+          body_part_id: partId,
+          pain_level: data.level,
+          pain_type: data.type
+        }));
+        await supabase.from("pain_reports").insert(painReportsToInsert);
+      }
+
+      // Sync into wellness_records to make sure Dashboards get it
+      const wellnessDataToInsert = {
+        id: checkInId,
+        athlete_id: athleteId,
+        record_date: fullTimestamp,
+        sleep_hours: answers["sleep_hours"],
+        sleep_quality: answers["sleep"],
+        fatigue_level: answers["energy"],
+        muscle_soreness: maxPain > 0 ? maxPain : (answers["leg_heaviness"] || 0),
+        soreness_location: compiledSorenessLocation,
+        stress_level: answers["stress"],
+        readiness_score: readiness,
+        comments: finalNotes,
+        hydration_perception: answers["hydration"],
+        hydration_score: answers["hydration"],
+        urine_color: answers["urine_color"],
+        nutrition: answers["nutrition"],
+        mood: answers["mood"],
+        pre_training_meal: answers["pre_training_meal"],
+        training_recovery: answers["training_recovery"],
+        confidence: answers["confidence"],
+        overall_wellbeing: answers["overall_wellbeing"],
+        menstrual_cycle: cycleInfo?.phase,
+        symptoms: clinicalSigns.length > 0 ? clinicalSigns.reduce((acc, sign) => ({ ...acc, [sign]: 1 }), {}) : {}
+      };
+      
+      const { error: wellnessError } = await supabase.from("wellness_records").insert([wellnessDataToInsert]);
+      if (wellnessError) console.error("Could not sync to wellness_records:", wellnessError);
+
       console.log("Check-in enviado com sucesso");
       
       await storeFetchCheckins(athleteId, athleteData?.sport);
@@ -1030,6 +1177,215 @@ export function AthleteDashboard({
     );
   }
 
+    if (view === "cycle_setup") {
+      return (
+        <PageContainer maxWidth="3xl" className="pt-safe">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-8 pb-12"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => setView("history")}
+                className="text-slate-400 hover:text-white hover:bg-slate-800 -ml-2"
+              >
+                <ChevronLeft className="w-5 h-5 mr-1" />
+                {t[lang].back}
+              </Button>
+            </div>
+            
+            <div className="text-center space-y-4">
+               <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/30">
+                 <CalendarDays className="w-10 h-10 text-rose-500" />
+               </div>
+               <h2 className="text-3xl font-black text-white uppercase tracking-tight">Monitoramento do Ciclo</h2>
+               <p className="text-slate-400 font-medium">Informe os dados básicos para acompanharmos seu ciclo menstrual.</p>
+            </div>
+
+            <Card className="bg-[#0A1120] border-rose-500/20 shadow-2xl p-8 max-w-xl mx-auto space-y-10">
+              <div className="space-y-4">
+                 <label className="text-xs font-black text-rose-400 uppercase tracking-widest block text-center mb-3">Data da Última Menstruação</label>
+                 <input 
+                   type="date"
+                   className="bg-slate-900 border-2 border-slate-800 rounded-2xl px-6 py-5 text-white font-bold text-center w-full focus:border-rose-500/50 transition-all outline-none text-lg"
+                   value={setupLastPeriod}
+                   onChange={(e) => setSetupLastPeriod(e.target.value)}
+                 />
+                 <p className="text-[10px] text-slate-500 text-center uppercase tracking-wider italic">* O primeiro dia do seu último período menstrual.</p>
+              </div>
+
+              <div className="space-y-6 pt-4 border-t border-slate-800/50">
+                 <label className="text-xs font-black text-rose-400 uppercase tracking-widest block text-center">Duração média do ciclo (em dias)</label>
+                 <div className="flex items-center justify-center gap-8">
+                   <Button 
+                     variant="outline" 
+                     size="icon" 
+                     className="w-14 h-14 rounded-2xl border-slate-800 bg-slate-900/50 hover:bg-rose-500/20 hover:border-rose-500/30 text-rose-400"
+                     onClick={() => setSetupCycleLength(prev => Math.max(20, prev - 1))}
+                   >
+                     <Minus className="w-6 h-6" />
+                   </Button>
+                   <div className="text-center">
+                     <span className="text-5xl font-black text-white">{setupCycleLength}</span>
+                     <p className="text-[10px] text-slate-500 mt-1 font-bold uppercase tracking-widest">Dias</p>
+                   </div>
+                   <Button 
+                     variant="outline" 
+                     size="icon" 
+                     className="w-14 h-14 rounded-2xl border-slate-800 bg-slate-900/50 hover:bg-rose-500/20 hover:border-rose-500/30 text-rose-400"
+                     onClick={() => setSetupCycleLength(prev => Math.min(45, prev + 1))}
+                   >
+                     <Plus className="w-6 h-6" />
+                   </Button>
+                 </div>
+                 <p className="text-[10px] text-slate-500 text-center uppercase tracking-widest">O padrão é 28 dias.</p>
+              </div>
+
+              <Button 
+                className="w-full bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-widest py-8 rounded-2xl h-auto text-lg shadow-[0_10px_20px_rgba(225,29,72,0.3)] transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                onClick={handleSaveCycleSetup}
+                disabled={!setupLastPeriod}
+              >
+                Ativar Monitoramento
+              </Button>
+            </Card>
+          </motion.div>
+        </PageContainer>
+      );
+    }
+
+    if (view === "cycle_details" && cycleInfo && athleteGender === "F") {
+      const phaseData = CYCLE_PHASES[cycleInfo.phaseKey] || CYCLE_PHASES.menstrual;
+      
+      return (
+        <PageContainer maxWidth="3xl" className="pt-safe">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-6 pb-12"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <Button
+                variant="ghost"
+                onClick={() => setView("history")}
+                className="text-slate-400 hover:text-white hover:bg-slate-800 -ml-2"
+              >
+                <ChevronLeft className="w-5 h-5 mr-1" />
+                {t[lang].back}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setView("cycle_setup")}
+                className="border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 h-8"
+              >
+                Configurar <Settings className="w-3 h-3 ml-2" />
+              </Button>
+            </div>
+
+            <div className="space-y-2 text-center pb-4">
+              <h2 className="text-3xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-3">
+                {phaseData.emoji} {phaseData.title}
+              </h2>
+              <p className={`text-sm font-bold uppercase tracking-[0.2em] text-rose-400`}>
+                Dia {cycleInfo.currentDay} • {phaseData.description}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-[#0A1120] border-slate-800/50 p-6 space-y-4">
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  <Info className="w-4 h-4 text-cyan-400" />
+                  O que está acontecendo?
+                </h3>
+                <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                  {phaseData.whatHappens}
+                </p>
+                <div className="pt-2">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/30`}>
+                    <TrendingUp className={`w-3 h-3 text-rose-400`} />
+                    <span className={`text-[10px] font-black uppercase tracking-widest text-rose-400`}>
+                      Intensidade Recomendada: {phaseData.intensity}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              <div className="space-y-6">
+                <Card className="bg-[#0A1120] border-slate-800/50 p-6 space-y-4">
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <Apple className="w-4 h-4 text-emerald-400" />
+                    Nutrição Estratégica
+                  </h3>
+                  <div className="space-y-2">
+                    {phaseData.nutrition.map((item, i) => (
+                      <div key={i} className="flex items-start gap-2 bg-slate-900/50 p-2 rounded-lg border border-slate-800/50">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                        <span className="text-xs text-slate-300 font-medium">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="bg-[#0A1120] border-slate-800/50 p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                      <Droplets className="w-4 h-4 text-blue-400" />
+                      Hidratação & Treino
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-blue-500/5 p-3 rounded-xl border border-blue-500/10">
+                      <p className="text-xs text-blue-200/90 leading-relaxed">
+                        <span className="font-bold text-blue-400 uppercase tracking-widest text-[9px] block mb-1">Hidratação:</span>
+                        {phaseData.hydration}
+                      </p>
+                    </div>
+                    <div className="bg-purple-500/5 p-3 rounded-xl border border-purple-500/10">
+                      <p className="text-xs text-purple-200/90 leading-relaxed">
+                        <span className="font-bold text-purple-400 uppercase tracking-widest text-[9px] block mb-1">Treino:</span>
+                        {phaseData.training}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+               <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
+                 <Calendar className="w-4 h-4" />
+                 Calendário do Ciclo
+               </h3>
+               <CycleCalendar 
+                 lastPeriodDate={athleteData?.last_period_date || null}
+                 cycleLength={(athleteData as any).cycle_length || 28}
+                 currentDayInCycle={cycleInfo.currentDay}
+                 phaseKey={cycleInfo.phaseKey}
+               />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <Button 
+                onClick={handleToggleMenstruating}
+                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-widest py-6 rounded-2xl shadow-xl transition-all active:scale-95"
+              >
+                Iniciou Hoje
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setView("history")}
+                className="flex-1 border-slate-800 text-slate-400 font-black uppercase tracking-widest py-6 rounded-2xl hover:bg-slate-800 transition-all active:scale-95"
+              >
+                Voltar
+              </Button>
+            </div>
+          </motion.div>
+        </PageContainer>
+      );
+    }
+
     if (view === "history") {
       const streak = calculateStreak();
     const chartData = checkins
@@ -1067,7 +1423,7 @@ export function AthleteDashboard({
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-amber-500/20 rounded-2xl border border-amber-500/30 animate-pulse">
-                    <Zap className="w-8 h-8 text-amber-400" />
+                    <AlertCircle className="w-8 h-8 text-amber-400" />
                   </div>
                   <div className="text-left">
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">Check-in de hoje pendente</h3>
@@ -1259,73 +1615,6 @@ export function AthleteDashboard({
             — {motivationalQuote.author}
           </p>
         </div>
-
-        {/* Cycle Alert (Dynamic for Female Athletes) */}
-        {athleteGender === "F" && (
-          <>
-            {cycleInfo ? (
-              <div className={`bg-rose-500/10 border ${cycleInfo.isLate ? 'border-rose-500 animate-pulse' : 'border-rose-500/30'} rounded-2xl p-4 flex items-start gap-4 max-w-md mx-auto shadow-lg`}>
-                <div className={`p-2 ${cycleInfo.isLate ? 'bg-rose-500' : 'bg-rose-500/20'} rounded-full shrink-0`}>
-                  <Droplets className={`w-5 h-5 ${cycleInfo.isLate ? 'text-white' : 'text-rose-400'}`} />
-                </div>
-                <div>
-                  <h4 className={`text-sm font-bold ${cycleInfo.isLate ? 'text-rose-500' : 'text-rose-300'} mb-1 flex items-center gap-2`}>
-                    {cycleInfo.isLate ? (
-                      <>
-                        <AlertCircle className="w-4 h-4" />
-                        {lang === "pt" ? "Atraso Detectado" : "Delay Detected"}
-                      </>
-                    ) : (
-                      lang === "pt" ? "Status do Ciclo" : "Cycle Status"
-                    )}
-                  </h4>
-                  <p className="text-xs text-rose-200/80 leading-relaxed">
-                    {cycleInfo.isLate ? (
-                      lang === "pt" 
-                        ? `Seu ciclo está com ${cycleInfo.lateDays} dias de atraso. Por favor, informe se o ciclo iniciou ou procure a comissão.`
-                        : `Your cycle is ${cycleInfo.lateDays} days late. Please report if it started or contact the staff.`
-                    ) : (
-                      lang === "pt"
-                        ? `Você está no Dia ${cycleInfo.currentDay} (${cycleInfo.phase}). Próxima menstruação em aproximadamente ${cycleInfo.nextPeriodDays} dias.`
-                        : `You are on Day ${cycleInfo.currentDay} (${cycleInfo.phase}). Next period in approximately ${cycleInfo.nextPeriodDays} days.`
-                    )}
-                  </p>
-                  {!hasCheckedInToday && (
-                    <Button 
-                      size="sm" 
-                      onClick={handleStartCycle}
-                      className="mt-3 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest h-7 px-3 rounded-lg"
-                    >
-                      {lang === "pt" ? "Meu Ciclo Iniciou Hoje" : "My Cycle Started Today"}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ) : !loadingAthlete && (
-              <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-6 flex flex-col items-center text-center gap-4 max-w-md mx-auto shadow-lg">
-                <div className="p-3 bg-rose-500/20 rounded-full">
-                  <CalendarDays className="w-8 h-8 text-rose-400" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-black text-white uppercase tracking-wider mb-2">
-                    {lang === "pt" ? "Configurar Ciclo Menstrual" : "Setup Menstrual Cycle"}
-                  </h4>
-                  <p className="text-sm text-rose-200/80 leading-relaxed mb-4">
-                    {lang === "pt" 
-                      ? "Para automatizarmos seu acompanhamento, precisamos saber a data da sua última menstruação."
-                      : "To automate your tracking, we need to know the date of your last period."}
-                  </p>
-                  <Button 
-                    onClick={() => setView("cycle_setup")}
-                    className="w-full bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-widest py-6 rounded-xl"
-                  >
-                    {lang === "pt" ? "Configurar Agora" : "Setup Now"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
 
         <WellnessWidget />
 
@@ -1929,14 +2218,87 @@ export function AthleteDashboard({
         </Button>
       </div>
 
-      <div className="flex flex-col items-center text-center space-y-4 sm:space-y-6">
-        <div className="space-y-2 sm:space-y-3">
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-            {lang === "pt" 
-              ? `Atualize sua Bateria, ${athleteData?.nickname || athleteData?.name || ""} ⚡`
-              : `Update your Battery, ${athleteData?.nickname || athleteData?.name || ""} ⚡`}
-          </h2>
-          <p className="text-slate-400 font-medium text-sm sm:text-base">{t[lang].answerHonestly}</p>
+        {/* Cycle Intelligence Module - Integrated directly into Wellness Questionnaire Header */}
+        {athleteGender === 'F' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-2xl mx-auto space-y-4"
+          >
+            {cycleInfo ? (
+              <Card 
+                className="bg-rose-500/5 border-rose-500/20 overflow-hidden border-dashed"
+              >
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setView("cycle_details")}>
+                    <div className="p-3 bg-rose-500/10 rounded-2xl border border-rose-500/20 group-hover:scale-110 transition-transform">
+                      <Droplets className="w-6 h-6 text-rose-500" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] font-black text-rose-500/70 uppercase tracking-[0.2em] mb-0.5">
+                        Fase {cycleInfo.phase} • Dia {cycleInfo.currentDay}
+                      </p>
+                      <h3 className="text-sm font-black text-white uppercase tracking-tight">
+                        Inteligência do Ciclo
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      size="sm"
+                      onClick={handleToggleMenstruating}
+                      className={`${athleteData?.is_menstruating ? 'bg-rose-600 text-white' : 'bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white'} border border-rose-600/30 text-[10px] font-black uppercase tracking-widest h-8 transition-all`}
+                    >
+                      {athleteData?.is_menstruating 
+                        ? (lang === 'pt' ? "Menstruando" : "Menstruating") 
+                        : (lang === 'pt' ? "Iniciou Hoje" : "Started Today")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setView("cycle_details")}
+                      className="text-slate-500 hover:text-rose-400"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="bg-rose-500/10 px-4 py-2 flex items-center gap-2">
+                  <span className="text-[9px] font-bold text-rose-300 uppercase tracking-widest truncate">
+                    {CYCLE_PHASES[cycleInfo.phaseKey]?.description || ""} • Toque para calendário, nutrição e treino
+                  </span>
+                </div>
+              </Card>
+            ) : !loadingAthlete && (
+              <Card className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-6 flex flex-col items-center text-center gap-4 shadow-lg">
+                <div className="p-3 bg-rose-500/20 rounded-full">
+                  <CalendarDays className="w-8 h-8 text-rose-400" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black text-white uppercase tracking-wider mb-2">
+                    Configurar Ciclo
+                  </h4>
+                  <p className="text-xs text-rose-200/80 leading-relaxed mb-4">
+                    Ative o monitoramento e receba orientações nutricionais e de treino baseadas no seu ciclo.
+                  </p>
+                  <Button 
+                    onClick={() => setView("cycle_setup")}
+                    className="w-full bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-widest h-10 rounded-xl"
+                  >
+                    Configurar Agora
+                  </Button>
+                </div>
+              </Card>
+            )}
+          </motion.div>
+        )}
+
+        {/* Clinical Summary Badge (Visual identity) */}
+        <div className="flex justify-center">
+          <div className="px-4 py-1.5 bg-slate-900 rounded-full border border-slate-800 flex items-center gap-2 shadow-lg">
+            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Protocolo Wellness Elleven</span>
+          </div>
         </div>
       </div>
 
@@ -1944,56 +2306,80 @@ export function AthleteDashboard({
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           const currentOptions = getOptionsForMetric(metric.id, lang);
+          const showGroupHeader = index === 0 || metrics[index - 1].group !== (metric as any).group;
+          const groupLabels: Record<string, { pt: string; en: string }> = {
+            morning: { pt: "Módulo Matinal", en: "Morning Module" },
+            habits: { pt: "Hábitos e Nutrição", en: "Habits & Nutrition" },
+            evening: { pt: "Módulo de Performance", en: "Performance Module" },
+            overall: { pt: "Considerações Finais", en: "Final Thoughts" }
+          };
+
           return (
-            <motion.div
-              key={metric.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`overflow-hidden bg-[#0A1120] ${theme.borderAlpha} shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
-                <CardHeader className={`bg-gradient-to-r ${theme.gradientFrom} to-transparent pb-4 border-b ${theme.borderAlpha}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2.5 ${theme.bgAlpha} rounded-lg border ${theme.border} ${theme.shadow}`}>
-                      <Icon className={`w-6 h-6 ${theme.text}`} />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl text-white uppercase tracking-wider font-black">
-                        {metric.label}
-                      </CardTitle>
-                      <CardDescription className="text-slate-400">
-                        {metric.description}
-                      </CardDescription>
-                    </div>
+            <React.Fragment key={metric.id}>
+              {showGroupHeader && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="pt-8 pb-4"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-800" />
+                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] whitespace-nowrap">
+                      {groupLabels[(metric as any).group]?.[lang]}
+                    </h3>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-800" />
                   </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                    {currentOptions.map((option) => {
-                      const isSelected = answers[metric.id] === option.value;
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => handleSelect(metric.id, option.value)}
-                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-300 border ${
-                            isSelected
-                              ? `${option.color} text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105 border-transparent`
-                              : "bg-[#050B14] hover:bg-slate-800 border-slate-800 text-slate-400 hover:text-slate-200"
-                          }`}
-                        >
-                          <span className="text-2xl sm:text-3xl mb-2 drop-shadow-md">
-                            {option.emoji}
-                          </span>
-                          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
-                            {option.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </motion.div>
+              )}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className={`overflow-hidden bg-[#0A1120] ${theme.borderAlpha} shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
+                  <CardHeader className={`bg-gradient-to-r ${theme.gradientFrom} to-transparent pb-4 border-b ${theme.borderAlpha}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 ${theme.bgAlpha} rounded-lg border ${theme.border} ${theme.shadow}`}>
+                        <Icon className={`w-6 h-6 ${theme.text}`} />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl text-white uppercase tracking-wider font-black">
+                          {metric.label}
+                        </CardTitle>
+                        <CardDescription className="text-slate-400">
+                          {metric.description}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-5 gap-2 sm:gap-4">
+                      {currentOptions.map((option) => {
+                        const isSelected = answers[metric.id] === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => handleSelect(metric.id, option.value)}
+                            className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-300 border ${
+                              isSelected
+                                ? `${option.color} text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105 border-transparent`
+                                : "bg-[#050B14] hover:bg-slate-800 border-slate-800 text-slate-400 hover:text-slate-200"
+                            }`}
+                          >
+                            <span className="text-2xl sm:text-3xl mb-2 drop-shadow-md">
+                              {option.emoji}
+                            </span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </React.Fragment>
           );
         })}
 
@@ -2071,6 +2457,59 @@ export function AthleteDashboard({
         </motion.div>
 
         <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: (metrics.length + 1) * 0.1 }}
+          >
+            <Card className="overflow-hidden bg-[#0A1120] border-slate-700/50 shadow-lg mb-6">
+              <CardHeader className="bg-gradient-to-r from-red-500/10 to-transparent pb-4 border-b border-red-500/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/30">
+                    <Stethoscope className="w-5 h-5 text-red-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg text-white uppercase tracking-wider font-bold">
+                      {lang === "pt" ? "Sinais Clínicos" : "Clinical Signs"}
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      {lang === "pt" ? "Você apresenta algum destes sintomas hoje?" : "Are you presenting any of these symptoms today?"}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="flex flex-wrap gap-3">
+                  {CLINICAL_SIGNS.map((sign) => {
+                    const isSelected = clinicalSigns.includes(sign.id);
+                    return (
+                      <button
+                        key={sign.id}
+                        onClick={() => toggleClinicalSign(sign.id)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
+                          isSelected 
+                            ? 'bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                            : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                        }`}
+                      >
+                        <span className="text-xl">{sign.emoji}</span>
+                        <span className="text-sm font-bold uppercase tracking-wide">
+                          {lang === "pt" ? sign.label_pt : sign.label_en}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {clinicalSigns.length > 0 && (
+                  <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest rounded-lg flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    {lang === "pt" ? "ATENÇÃO: Sua bateria clínica será impactada por estes sintomas." : "ATTENTION: Your clinical battery will be impacted by these symptoms."}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: (metrics.length + 2) * 0.1 }}
@@ -2127,7 +2566,6 @@ export function AthleteDashboard({
           {isSubmitting ? t[lang].syncing : t[lang].syncData}
         </Button>
         </motion.div>
-      </div>
     </PageContainer>
   );
 }

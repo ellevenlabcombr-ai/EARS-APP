@@ -18,3 +18,7 @@ export function getLocalDateString(d: Date = new Date()): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+export function getLocalDateTimeString(d: Date = new Date()): string {
+  return d.toISOString();
+}
