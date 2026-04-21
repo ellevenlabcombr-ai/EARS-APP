@@ -282,6 +282,14 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
     { value: 4, label: opts.menstrual_lutea, color: "bg-pink-500", emoji: "🌙" },
   ];
 
+  const rpeOptions = [
+    { value: 1, label: opts.rpe_very_easy, color: "bg-emerald-500", emoji: "😄" },
+    { value: 2, label: opts.rpe_easy, color: "bg-lime-500", emoji: "🙂" },
+    { value: 3, label: opts.rpe_medium, color: "bg-yellow-500", emoji: "😐" },
+    { value: 4, label: opts.rpe_hard, color: "bg-orange-500", emoji: "😣" },
+    { value: 5, label: opts.rpe_very_hard, color: "bg-red-500", emoji: "🥵" },
+  ];
+
   switch (metricId) {
     case "sleep_hours":
       return sleepHourOptions;
@@ -301,6 +309,8 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
       return confidenceOptions;
     case "leg_heaviness":
       return legHeavinessOptions;
+    case "rpe_simple":
+      return rpeOptions;
     case "mood":
     case "training_recovery":
     case "overall_wellbeing":
@@ -395,6 +405,21 @@ const getMetrics = (lang: Language, gender: "M" | "F" = "M") => {
       label: m.leg_heaviness.label,
       icon: Dumbbell,
       description: m.leg_heaviness.desc,
+    },
+    {
+      id: "rpe_simple",
+      group: "evening",
+      label: m.rpe_simple.label,
+      icon: Zap,
+      description: m.rpe_simple.desc,
+    },
+    {
+      id: "duration_minutes",
+      group: "evening",
+      label: m.duration_minutes.label,
+      icon: Clock,
+      description: m.duration_minutes.desc,
+      type: "input"
     },
     {
       id: "overall_wellbeing",
@@ -1067,6 +1092,11 @@ export function AthleteDashboard({
         );
       }
 
+      const rpe_simple = answers["rpe_simple"] || 0;
+      const duration_minutes = answers["duration_minutes"] || 0;
+      const mapped_rpe = rpe_simple * 2;
+      const session_load = mapped_rpe * duration_minutes;
+
       const checkInDataToInsert = {
         athlete_id: athleteId,
         record_date: fullTimestamp,
@@ -1131,11 +1161,33 @@ export function AthleteDashboard({
         confidence: answers["confidence"],
         overall_wellbeing: answers["overall_wellbeing"],
         menstrual_cycle: cycleInfo?.phase,
-        symptoms: clinicalSigns.length > 0 ? clinicalSigns.reduce((acc, sign) => ({ ...acc, [sign]: 1 }), {}) : {}
+        symptoms: {
+          ...(clinicalSigns.length > 0 ? clinicalSigns.reduce((acc, sign) => ({ ...acc, [sign]: 1 }), {}) : {}),
+          leg_heaviness: answers["leg_heaviness"] || 0,
+          rpe_simple: rpe_simple,
+          mapped_rpe: mapped_rpe,
+          duration_minutes: duration_minutes,
+          session_load: session_load
+        }
       };
       
       const { error: wellnessError } = await supabase.from("wellness_records").insert([wellnessDataToInsert]);
       if (wellnessError) console.error("Could not sync to wellness_records:", wellnessError);
+
+      if (session_load > 0) {
+        const loadAssessment = {
+          athlete_id: athleteId,
+          assessment_date: fullTimestamp,
+          score: session_load,
+          classification: session_load >= 600 ? "Alto" : (session_load >= 300 ? "Baixo" : "Ideal"),
+          classification_color: session_load >= 600 ? "red" : (session_load >= 300 ? "yellow" : "green"),
+          raw_data: {
+            rpe: mapped_rpe,
+            duration: duration_minutes
+          }
+        };
+        await supabase.from("physical_load_assessments").insert([loadAssessment]);
+      }
 
       console.log("Check-in enviado com sucesso");
       
@@ -2397,29 +2449,61 @@ export function AthleteDashboard({
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                      {currentOptions.map((option) => {
-                        const isSelected = answers[metric.id] === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            onClick={() => handleSelect(metric.id, option.value)}
-                            className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-300 border ${
-                              isSelected
-                                ? `${option.color} text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105 border-transparent`
-                                : "bg-[#050B14] hover:bg-slate-800 border-slate-800 text-slate-400 hover:text-slate-200"
-                            }`}
-                          >
-                            <span className="text-2xl sm:text-3xl mb-2 drop-shadow-md">
-                              {option.emoji}
-                            </span>
-                            <span className="text-xxs sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
-                              {option.label}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                    {(metric as any).type === "input" ? (
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="1"
+                            max="180"
+                            value={answers[metric.id] || ""}
+                            onChange={(e) => handleSelect(metric.id, parseInt(e.target.value) || 0)}
+                            className="w-full bg-[#050B14] border border-slate-800 text-white text-2xl font-black p-4 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all placeholder:text-slate-700"
+                            placeholder="0"
+                          />
+                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold uppercase tracking-widest text-xs">min</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {[30, 45, 60, 90].map((val) => (
+                            <button
+                              key={val}
+                              onClick={() => handleSelect(metric.id, val)}
+                              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all border ${
+                                answers[metric.id] === val
+                                  ? "bg-cyan-500 border-transparent text-white"
+                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800"
+                              }`}
+                            >
+                              {val} min
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-5 gap-2 sm:gap-4">
+                        {currentOptions.map((option) => {
+                          const isSelected = answers[metric.id] === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              onClick={() => handleSelect(metric.id, option.value)}
+                              className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl transition-all duration-300 border ${
+                                isSelected
+                                  ? `${option.color} text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105 border-transparent`
+                                  : "bg-[#050B14] hover:bg-slate-800 border-slate-800 text-slate-400 hover:text-slate-200"
+                              }`}
+                            >
+                              <span className="text-2xl sm:text-3xl mb-2 drop-shadow-md">
+                                {option.emoji}
+                              </span>
+                              <span className="text-xxs sm:text-xs font-bold uppercase tracking-wider text-center leading-tight">
+                                {option.label}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

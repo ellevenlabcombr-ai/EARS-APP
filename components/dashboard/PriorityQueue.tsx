@@ -25,6 +25,22 @@ export interface PrioritizedAthlete {
   } | null;
   main_reason?: string;
   is_missing_checkin?: boolean;
+  clinical_insight?: {
+    riskLabel: string;
+    reason: string;
+    suggestion: string;
+    priority: 'low' | 'medium' | 'high' | 'critical';
+  };
+  risk_clusters?: {
+    id: string;
+    label: string;
+    score: number;
+    trend: 'up' | 'down' | 'stable';
+    factors: string[];
+  }[];
+  decision_mode?: 'Conservative' | 'Aggressive';
+  decision_explanation?: string;
+  interventions?: string[];
 }
 
 interface PriorityQueueProps {
@@ -99,17 +115,85 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${bgClass} ${colorClass}`}>
               {isRisk ? <AlertTriangle size={20} /> : isMissing ? <Clock size={20} /> : <AlertCircle size={20} />}
             </div>
-            <div>
-              <h4 className="text-base font-black text-white flex items-center gap-2">
-                {athlete.name}
-                {athlete.trend === 'down' && <TrendingDown size={14} className="text-rose-500" />}
-                {athlete.trend === 'up' && <TrendingUp size={14} className="text-emerald-500" />}
-              </h4>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="text-base font-black text-white flex items-center gap-2">
+                  {athlete.name}
+                  {athlete.trend === 'down' && <TrendingDown size={14} className="text-rose-500" />}
+                  {athlete.trend === 'up' && <TrendingUp size={14} className="text-emerald-500" />}
+                </h4>
+                {athlete.clinical_insight && (
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                    athlete.clinical_insight.priority === 'critical' ? 'bg-rose-500 text-white' :
+                    athlete.clinical_insight.priority === 'high' ? 'bg-orange-500 text-white' :
+                    athlete.clinical_insight.priority === 'medium' ? 'bg-amber-500 text-white' :
+                    'bg-slate-800 text-slate-400'
+                  }`}>
+                    {athlete.clinical_insight.riskLabel}
+                  </span>
+                )}
+                {athlete.decision_mode && (
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                    athlete.decision_mode === 'Conservative' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  }`}>
+                    {athlete.decision_mode === 'Conservative' ? '🛡️ Conservador' : '⚡ Agressivo'}
+                  </span>
+                )}
+              </div>
               
-              {!isMissing && athlete.main_reason && (
-                <p className={`text-xs font-bold mt-1 ${colorClass}`}>
-                  {athlete.main_reason}
-                </p>
+              {athlete.clinical_insight && (
+                <div className="mb-3 p-3 bg-slate-900/50 rounded-lg border border-slate-800/50">
+                  <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                    <span className="text-cyan-500 font-black uppercase text-[9px] block mb-0.5">Clinical Insight</span>
+                    {athlete.clinical_insight.reason}
+                  </p>
+                  <p className="mt-1.5 text-[10px] text-emerald-400/90 font-bold flex items-center gap-1">
+                    <Activity size={10} />
+                    Ação: {athlete.clinical_insight.suggestion}
+                  </p>
+                  {athlete.decision_explanation && (
+                    <div className="mt-2 pt-2 border-t border-slate-800/50">
+                      <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1">Raciocínio Clínico</p>
+                      <p className="text-[10px] text-slate-300 italic">&quot;{athlete.decision_explanation}&quot;</p>
+                    </div>
+                  )}
+                  {athlete.interventions && athlete.interventions.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-slate-800/50">
+                      <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1.5 flex items-center gap-1">
+                        <Activity size={10} className="text-emerald-500" />
+                        Intervenções Sugeridas
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {athlete.interventions.map((item, idx) => (
+                          <span key={idx} className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            • {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {athlete.risk_clusters && athlete.risk_clusters.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {athlete.risk_clusters.map((cluster) => (
+                    <div key={cluster.id} className="bg-slate-800/40 border border-slate-700/50 px-2.5 py-1 rounded flex items-center gap-3">
+                       <div className="flex flex-col">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase leading-none">{cluster.label}</span>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <div className="h-1 w-16 bg-slate-700 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full ${cluster.score > 70 ? 'bg-rose-500' : cluster.score > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                              style={{ width: `${cluster.score}%` }} 
+                            />
+                          </div>
+                          <span className="text-[9px] font-black text-slate-300">{cluster.score}%</span>
+                        </div>
+                       </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
               <div className="flex flex-wrap items-center gap-3 mt-2">
@@ -173,13 +257,13 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
 
   return (
     <div className="space-y-6">
-      {/* 1. Ação Imediata */}
+      {/* 1. Sniper Mode (Alta Prioridade) */}
       {showImmediate && immediateAction.length > 0 && (
         <Card className="bg-rose-500/5 border-rose-500/20 shadow-xl ring-1 ring-rose-500/20 overflow-hidden">
           <CardHeader className="border-b border-rose-500/10 bg-rose-500/10 px-6 py-4 flex flex-row items-center justify-between">
             <CardTitle className="text-xs font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 animate-pulse" />
-              Ação Imediata
+              Sniper Mode (Alta Prioridade)
             </CardTitle>
             <span className="text-xxs font-black bg-rose-500 text-white px-2 py-0.5 rounded-full animate-bounce">
               {immediateAction.length}
@@ -193,13 +277,13 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
         </Card>
       )}
 
-      {/* 2. Fila Clínica */}
+      {/* 2. Radar Mode (Monitoramento Contínuo) */}
       {showClinical && clinicalQueue.length > 0 && (
         <Card className="bg-slate-900/40 border-slate-800/50 shadow-xl overflow-hidden">
           <CardHeader className="border-b border-slate-800/50 bg-slate-900/20 px-6 py-4 flex flex-row items-center justify-between">
             <CardTitle className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
               <Activity className="w-4 h-4 text-cyan-500" />
-              Fila Clínica
+              Radar Mode (Monitoramento)
             </CardTitle>
             <span className="text-xxs font-black bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">
               {clinicalQueue.length}

@@ -34,6 +34,12 @@ export interface WellnessCheckIn {
   enjoyment?: number; // 1-5
   emotional_fatigue?: number; // 1-5
   
+  // Training Load Metrics
+  rpe_simple?: number; // 1-5
+  mapped_rpe?: number; // 2-10
+  duration_minutes?: number; // 1-180
+  session_load?: number; // mapped_rpe * duration
+  
   // Modules
   pain_map: BodyPain[];
   clinical_symptoms: string[];

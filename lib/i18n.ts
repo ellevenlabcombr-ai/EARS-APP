@@ -50,6 +50,8 @@ export const t = {
       leg_heaviness: { label: 'Peso nas Pernas', desc: 'Como está a sensação de peso nas pernas?' },
       overall_wellbeing: { label: 'Geral', desc: 'No geral, como você avalia seu bem-estar para o dia de hoje?' },
       menstrual_cycle: { label: 'Ciclo Menstrual', desc: 'Em qual fase do ciclo você está hoje?' },
+      rpe_simple: { label: 'Esforço (Ontem)', desc: 'Qual foi o esforço no treino de ontem?' },
+      duration_minutes: { label: 'Duração (Ontem)', desc: 'Quanto tempo durou o treino? (Minutos)' },
     },
     options: {
       veryBad: 'Muito Mal',
@@ -78,6 +80,11 @@ export const t = {
       menstrual_ovulatoria: 'Ovulatória',
       menstrual_lutea: 'Lútea',
       menstrual_menstruacao: 'Menstruação',
+      rpe_very_easy: 'Muito Fácil',
+      rpe_easy: 'Fácil',
+      rpe_medium: 'Médio',
+      rpe_hard: 'Difícil',
+      rpe_very_hard: 'Muito Difícil',
     },
     advice: {
       hydrationLow: 'Sua hidratação está baixa hoje. Tente andar com uma garrafinha!',
@@ -137,6 +144,8 @@ export const t = {
       leg_heaviness: { label: 'Leg Heaviness', desc: 'How heavy do your legs feel?' },
       overall_wellbeing: { label: 'Overall', desc: 'Overall, how do you rate your well-being today?' },
       menstrual_cycle: { label: 'Menstrual Cycle', desc: 'What phase of your cycle are you in today?' },
+      rpe_simple: { label: 'Effort (Yesterday)', desc: 'What was your effort level in yesterday\'s training?' },
+      duration_minutes: { label: 'Duration (Yesterday)', desc: 'How long was the training? (Minutes)' },
     },
     options: {
       veryBad: 'Very Bad',
@@ -165,6 +174,11 @@ export const t = {
       menstrual_ovulatoria: 'Ovulatory',
       menstrual_lutea: 'Luteal',
       menstrual_menstruacao: 'Menstruation',
+      rpe_very_easy: 'Very Easy',
+      rpe_easy: 'Easy',
+      rpe_medium: 'Medium',
+      rpe_hard: 'Hard',
+      rpe_very_hard: 'Very Hard',
     },
     advice: {
       hydrationLow: 'Your hydration is low today. Try to carry a water bottle!',

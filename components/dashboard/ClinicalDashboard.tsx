@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ClinicalAlert } from "@/types/database";
 import { fetchClinicalAlerts } from "@/lib/clinical";
 import { getLocalDateString, parseDateString } from "@/lib/utils";
+import { calculateRiskClusters } from "@/lib/clinical-engine";
 
 interface ClinicalDashboardProps {
   onViewAthlete: (id: string) => void;
@@ -68,7 +69,7 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
       fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
       const fourteenDaysAgoStr = getLocalDateString(fourteenDaysAgo);
 
-      const [athletesRes, wellnessRes, painRes, assessmentsRes, alertsRes] = await Promise.all([
+      const [athletesRes, wellnessRes, painRes, assessmentsRes, alertsRes, loadRes] = await Promise.all([
         supabase
           .from('athletes')
           .select('id, name')
@@ -98,7 +99,12 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
             athlete:athletes(id, name)
           `)
           .order('created_at', { ascending: false })
-          .limit(100)
+          .limit(100),
+        supabase
+          .from('physical_load_assessments')
+          .select('*')
+          .gte('assessment_date', sevenDaysAgoStr)
+          .limit(500)
       ]);
 
       const athletesData = athletesRes.data || [];
@@ -106,6 +112,7 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
       const painData = painRes.data || [];
       const assessmentsData = assessmentsRes.data || [];
       const alertsData = alertsRes.data || [];
+      const loadData = loadRes.data || [];
 
       setAlerts(alertsData);
 
@@ -329,6 +336,27 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
           });
         }
 
+        const athleteAlerts = alertsData.filter(a => a.athlete_id === athlete.id);
+        const athleteLoad = loadData.filter(l => l.athlete_id === athlete.id);
+
+        // Call Clinical Engine
+        const { clusters, insight, decisionMode, decisionExplanation, interventions } = calculateRiskClusters({
+          wellnessRecords: records,
+          painReports: athletePain,
+          assessments: assessmentsData.filter(a => a.athlete_id === athlete.id),
+          checkIns: athleteLoad.map(l => ({
+            intensity: l.intensity || (l.raw_data && l.raw_data.rpe) || l.rpe || 5,
+            duration_minutes: l.duration || (l.raw_data && l.raw_data.duration) || 60,
+          })),
+          alerts: athleteAlerts
+        });
+
+        if (insight && insight.priority === 'critical') {
+            riskLevel = "high";
+            isHighPriority = true;
+            mainReason = insight.riskLabel;
+        }
+
         return {
           id: athlete.id,
           name: athlete.name,
@@ -344,7 +372,12 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
             date: latestAssessment.assessment_date
           } : null,
           main_reason: mainReason,
-          is_missing_checkin: !todayRecord
+          is_missing_checkin: !todayRecord,
+          clinical_insight: insight || undefined,
+          risk_clusters: clusters,
+          decision_mode: decisionMode,
+          decision_explanation: decisionExplanation,
+          interventions: interventions
         };
       });
 
