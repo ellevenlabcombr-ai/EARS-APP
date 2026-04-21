@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { parseDateString, getLocalDateString } from "@/lib/utils";
+import { parseDateString, getLocalDateString, getTagSuggestions } from "@/lib/utils";
 import { 
   ChevronLeft, 
   Activity, 
@@ -64,7 +64,8 @@ import {
   Sparkles,
   Filter,
   Target,
-  BarChart3
+  BarChart3,
+  Tag
 } from "lucide-react";
 import { GoogleGenAI, Type } from "@google/genai";
 import { Button } from "@/components/ui/button";
@@ -2124,21 +2125,45 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     <CardHeader className="border-b border-slate-800/50">
                       <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
                         <Activity className="w-4 h-4 text-emerald-500" />
-                        Intervenções Sugeridas
+                        Ações & Protocolos Sugeridos
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-8 space-y-4">
+                      {/* Base Risk Engine Interventions */}
                       {clinicalSessionData?.interventions.map((item, i) => (
-                        <div key={i} className="flex items-center gap-4 p-5 bg-[#050B14] border border-emerald-500/20 rounded-[1.25rem] shadow-xl">
+                        <div key={`risk-${i}`} className="flex items-center gap-4 p-5 bg-[#050B14] border border-emerald-500/20 rounded-[1.25rem] shadow-xl">
                           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                             <ActivitySquare className="w-6 h-6" />
                           </div>
                           <span className="text-sm font-black text-emerald-100 uppercase tracking-tight">{item}</span>
                         </div>
                       ))}
-                      {(!clinicalSessionData?.interventions || clinicalSessionData.interventions.length === 0) && (
+                      
+                      {/* Tag-Based Protocol Overlay */}
+                      {clinicalTags.flatMap(t => getTagSuggestions(t.tag).map(sugg => ({ tag: t.tag, suggestion: sugg })))
+                        .slice(0, 5) // Display top 5 tag-based actions
+                        .map((item, i) => (
+                        <div key={`tag-sugg-${i}`} className="flex items-center gap-4 p-5 bg-[#050B14] border border-purple-500/20 rounded-[1.25rem] shadow-xl relative overflow-hidden">
+                          <div className="absolute top-0 right-0 p-3 opacity-5">
+                            <Tag className="w-12 h-12 text-purple-500" />
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0 z-10">
+                            <Tag className="w-5 h-5" />
+                          </div>
+                          <div className="flex flex-col z-10">
+                            <span className="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] mb-1">
+                              Foco: {item.tag}
+                            </span>
+                            <span className="text-sm font-black text-purple-100 uppercase tracking-tight leading-tight">
+                              {item.suggestion}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+
+                      {(!clinicalSessionData?.interventions || clinicalSessionData.interventions.length === 0) && clinicalTags.length === 0 && (
                         <div className="text-center py-8">
-                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic">Nenhuma intervenção necessária</p>
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic">Nenhuma ação necessária</p>
                         </div>
                       )}
                       

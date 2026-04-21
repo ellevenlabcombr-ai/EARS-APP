@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, User, ChevronRight, TrendingUp, TrendingDown, Minus, AlertTriangle, AlertCircle, Clock, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TrendChart } from "./TrendChart";
-import { parseDateString } from "@/lib/utils";
+import { parseDateString, getTagSuggestions } from "@/lib/utils";
 
 export type RiskLevel = "high" | "attention" | "stable" | "none";
 
@@ -165,11 +165,25 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
                   <div className="mt-3 bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
                     <p className="text-xs text-emerald-400/90 font-bold flex items-center gap-1.5">
                       <Activity size={12} />
-                      Suggested Action: {athlete.clinical_insight.suggestion}
+                      Ação Primária: {athlete.clinical_insight.suggestion}
                     </p>
                     
                     {athlete.decision_explanation && (
-                      <p className="text-[11px] text-slate-400 italic mt-1.5 ml-4 border-l-2 border-slate-700 pl-2">&quot;{athlete.decision_explanation}&quot;</p>
+                      <p className="text-[11px] text-slate-400 italic mt-1.5 ml-4 border-l-2 border-slate-700 pl-2 opacity-80">&quot;{athlete.decision_explanation}&quot;</p>
+                    )}
+
+                    {athlete.clinical_tags && athlete.clinical_tags.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-slate-700/40">
+                        <span className="text-[10px] text-purple-400/80 font-black uppercase tracking-widest block mb-1.5">Ações Secundárias (Tags)</span>
+                        <ul className="space-y-1 pl-4">
+                          {athlete.clinical_tags.flatMap(t => getTagSuggestions(t.tag)).slice(0, 3).map((sugg, i) => (
+                            <li key={`sugg-${i}`} className="text-[10px] sm:text-xs text-slate-300 flex items-center gap-2">
+                              <span className="w-1 h-1 bg-purple-500 rounded-full shrink-0" />
+                              {sugg}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                   </div>
                 </div>
