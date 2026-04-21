@@ -41,6 +41,7 @@ export interface PrioritizedAthlete {
   decision_mode?: 'Conservative' | 'Aggressive';
   decision_explanation?: string;
   interventions?: string[];
+  clinical_tags?: { tag: string, source: 'clinical' | 'field_observation', weight: number }[];
 }
 
 interface PriorityQueueProps {
@@ -109,21 +110,24 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
     const hoverBgClass = isRisk ? 'hover:bg-rose-500/5' : isMissing ? 'hover:bg-slate-800/30' : 'hover:bg-amber-500/5';
 
     return (
-      <div key={athlete.id} className={`p-5 flex flex-col gap-4 border-b last:border-0 ${borderClass} ${hoverBgClass} transition-colors`}>
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${bgClass} ${colorClass}`}>
-              {isRisk ? <AlertTriangle size={20} /> : isMissing ? <Clock size={20} /> : <AlertCircle size={20} />}
+      <div key={athlete.id} className={`p-6 flex flex-col gap-4 rounded-2xl border shadow-sm ${borderClass} ${bgClass} ${hoverBgClass} transition-all relative overflow-hidden group`}>
+        {/* Subtle accent border on left */}
+        <div className={`absolute top-0 left-0 w-1 h-full ${isRisk ? 'bg-rose-500/50' : isMissing ? 'bg-slate-700/50' : 'bg-amber-500/50'}`}></div>
+        
+        <div className="flex flex-col gap-6 relative z-10 pl-2">
+          <div className="flex items-start gap-4 w-full">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${bgClass} ${colorClass}`}>
+              {isRisk ? <AlertTriangle size={24} /> : isMissing ? <Clock size={24} /> : <AlertCircle size={24} />}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="text-base font-black text-white flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <h4 className="text-lg font-black text-white flex items-center gap-2">
                   {athlete.name}
-                  {athlete.trend === 'down' && <TrendingDown size={14} className="text-rose-500" />}
-                  {athlete.trend === 'up' && <TrendingUp size={14} className="text-emerald-500" />}
+                  {athlete.trend === 'down' && <TrendingDown size={16} className="text-rose-500" />}
+                  {athlete.trend === 'up' && <TrendingUp size={16} className="text-emerald-500" />}
                 </h4>
                 {athlete.clinical_insight && (
-                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${
                     athlete.clinical_insight.priority === 'critical' ? 'bg-rose-500 text-white' :
                     athlete.clinical_insight.priority === 'high' ? 'bg-orange-500 text-white' :
                     athlete.clinical_insight.priority === 'medium' ? 'bg-amber-500 text-white' :
@@ -133,7 +137,7 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
                   </span>
                 )}
                 {athlete.decision_mode && (
-                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${
                     athlete.decision_mode === 'Conservative' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                   }`}>
                     {athlete.decision_mode === 'Conservative' ? '🛡️ Conservador' : '⚡ Agressivo'}
@@ -142,53 +146,49 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               </div>
               
               {athlete.clinical_insight && (
-                <div className="mb-3 p-3 bg-slate-900/50 rounded-lg border border-slate-800/50">
-                  <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                    <span className="text-cyan-500 font-black uppercase text-[9px] block mb-0.5">Clinical Insight</span>
+                <div className="mb-4 p-4 bg-slate-900/60 rounded-xl border border-slate-800/60 shadow-inner">
+                  <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                    <span className="text-cyan-500 font-black uppercase text-[10px] tracking-widest block mb-1">Clinical Context & Insight</span>
                     {athlete.clinical_insight.reason}
                   </p>
-                  <p className="mt-1.5 text-[10px] text-emerald-400/90 font-bold flex items-center gap-1">
-                    <Activity size={10} />
-                    Ação: {athlete.clinical_insight.suggestion}
-                  </p>
-                  {athlete.decision_explanation && (
-                    <div className="mt-2 pt-2 border-t border-slate-800/50">
-                      <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1">Raciocínio Clínico</p>
-                      <p className="text-[10px] text-slate-300 italic">&quot;{athlete.decision_explanation}&quot;</p>
+                  
+                  {athlete.clinical_tags && athlete.clinical_tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {athlete.clinical_tags.map((tag, idx) => (
+                        <span key={idx} className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${tag.source === 'field_observation' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
+                          {tag.tag}
+                        </span>
+                      ))}
                     </div>
                   )}
-                  {athlete.interventions && athlete.interventions.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-slate-800/50">
-                      <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1.5 flex items-center gap-1">
-                        <Activity size={10} className="text-emerald-500" />
-                        Intervenções Sugeridas
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {athlete.interventions.map((item, idx) => (
-                          <span key={idx} className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                            • {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
+                  <div className="mt-3 bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                    <p className="text-xs text-emerald-400/90 font-bold flex items-center gap-1.5">
+                      <Activity size={12} />
+                      Suggested Action: {athlete.clinical_insight.suggestion}
+                    </p>
+                    
+                    {athlete.decision_explanation && (
+                      <p className="text-[11px] text-slate-400 italic mt-1.5 ml-4 border-l-2 border-slate-700 pl-2">&quot;{athlete.decision_explanation}&quot;</p>
+                    )}
+                  </div>
                 </div>
               )}
 
               {athlete.risk_clusters && athlete.risk_clusters.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-2.5 mb-4">
                   {athlete.risk_clusters.map((cluster) => (
-                    <div key={cluster.id} className="bg-slate-800/40 border border-slate-700/50 px-2.5 py-1 rounded flex items-center gap-3">
+                    <div key={cluster.id} className="bg-slate-800/50 border border-slate-700/60 px-3 py-1.5 rounded-lg flex items-center gap-3">
                        <div className="flex flex-col">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase leading-none">{cluster.label}</span>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <div className="h-1 w-16 bg-slate-700 rounded-full overflow-hidden">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase leading-none">{cluster.label}</span>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <div className="h-1.5 w-20 bg-slate-700 rounded-full overflow-hidden">
                             <div 
                               className={`h-full ${cluster.score > 70 ? 'bg-rose-500' : cluster.score > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
                               style={{ width: `${cluster.score}%` }} 
                             />
                           </div>
-                          <span className="text-[9px] font-black text-slate-300">{cluster.score}%</span>
+                          <span className="text-[10px] font-black text-slate-300">{cluster.score}%</span>
                         </div>
                        </div>
                     </div>
@@ -196,24 +196,25 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
                 </div>
               )}
 
-              <div className="flex flex-wrap items-center gap-3 mt-2">
-                <span className="text-xxs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg">
                   Prontidão: <span className={athlete.readiness_score && athlete.readiness_score < 50 ? 'text-rose-400' : 'text-white'}>{athlete.readiness_score ?? '--'}%</span>
                 </span>
-                <span className="text-xxs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-2 py-1 rounded">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg">
                   Dor: <span className={athlete.muscle_soreness && athlete.muscle_soreness >= 7 ? 'text-rose-400' : 'text-white'}>{athlete.muscle_soreness ?? '--'}</span>
                 </span>
-                <span className="text-xxs font-black uppercase tracking-widest text-slate-500">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                  <Clock size={12} />
                   Check-in: {getTimeSince(athlete.last_checkin)}
                 </span>
               </div>
 
               {athlete.latest_assessment && (
-                <div className="flex items-center gap-2 mt-3 text-xxs font-bold text-slate-400 bg-slate-800/30 px-3 py-1.5 rounded-lg border border-slate-800">
-                  <ClipboardList size={12} className="text-cyan-500" />
-                  <span className="uppercase tracking-wider">{athlete.latest_assessment.type}</span>
+                <div className="flex items-center gap-2.5 mt-3 text-xs font-bold text-slate-400 bg-slate-800/30 px-3.5 py-2 rounded-xl border border-slate-700/50 w-max">
+                  <ClipboardList size={14} className="text-cyan-500" />
+                  <span className="uppercase tracking-widest">{athlete.latest_assessment.type}</span>
                   <span className="text-slate-600">•</span>
-                  <span className={athlete.latest_assessment.classification === 'Alto Risco' || athlete.latest_assessment.classification === 'high' ? 'text-rose-400' : 'text-slate-300'}>
+                  <span className={athlete.latest_assessment.classification === 'Alto Risco' || athlete.latest_assessment.classification === 'high' ? 'text-rose-400 font-black' : 'text-slate-300'}>
                     {athlete.latest_assessment.classification}
                   </span>
                   <span className="text-slate-600">•</span>
@@ -223,32 +224,14 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
             </div>
           </div>
 
-          <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="flex items-center justify-end w-full pt-4 border-t border-slate-800/50 relative z-20">
             <Button 
-              size="sm" 
-              className={`flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest ${isRisk ? 'bg-rose-500 hover:bg-rose-600 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-[#050B14]'}`}
+              size="lg" 
+              className={`w-full sm:w-48 h-10 text-xs font-black uppercase tracking-widest shadow-lg ${isRisk ? 'bg-rose-500 hover:bg-rose-400 text-white shadow-rose-500/20' : 'bg-cyan-500 hover:bg-cyan-400 text-[#050B14] shadow-cyan-500/20'}`}
               onClick={() => onViewAthlete(athlete.id)}
             >
-              Avaliar Agora
+              Ver Atleta <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
-              onClick={() => onViewAthlete(athlete.id)}
-            >
-              Ver Atleta
-            </Button>
-            {athlete.latest_assessment && (
-              <Button 
-                size="sm" 
-                variant="ghost"
-                className="flex-1 sm:flex-none w-full sm:w-32 h-8 text-xxs font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 hover:bg-cyan-500/10"
-                onClick={() => onViewAthlete(athlete.id)}
-              >
-                Ver Avaliação
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -269,8 +252,8 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               {immediateAction.length}
             </span>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="flex flex-col">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4">
               {immediateAction.map(athlete => renderAthleteCard(athlete, 'risk'))}
             </div>
           </CardContent>
@@ -289,8 +272,8 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               {clinicalQueue.length}
             </span>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="flex flex-col">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4">
               {clinicalQueue.map(athlete => renderAthleteCard(athlete, 'attention'))}
             </div>
           </CardContent>
@@ -309,8 +292,8 @@ export function PriorityQueue({ athletes, onViewAthlete, section = 'all' }: Prio
               {missingCheckin.length}
             </span>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="flex flex-col">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4">
               {missingCheckin.map(athlete => renderAthleteCard(athlete, 'missing'))}
             </div>
           </CardContent>

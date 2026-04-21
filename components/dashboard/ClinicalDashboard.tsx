@@ -339,16 +339,33 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
         const athleteAlerts = alertsData.filter(a => a.athlete_id === athlete.id);
         const athleteLoad = loadData.filter(l => l.athlete_id === athlete.id);
 
-        // Call Clinical Engine
-        const { clusters, insight, decisionMode, decisionExplanation, interventions } = calculateRiskClusters({
-          wellnessRecords: records,
+        // Mocking dynamic clinical tags for the architecture demonstration
+        // Normally this would be a fetched table `clinical_tags`
+        const mockTags = [
+          ...(Math.random() > 0.7 ? [{ id: '1', tag: 'Posterior chain vulnerability', created_at: new Date().toISOString(), weight: 1.5, source: 'clinical' as const }] : []),
+          ...(Math.random() > 0.85 ? [{ id: '2', tag: 'Load intolerance', created_at: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(), weight: 2.0, source: 'field_observation' as const }] : []),
+          ...(Math.random() > 0.85 ? [{ id: '3', tag: 'Ankle stiffness', created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(), weight: 1.0, source: 'clinical' as const }] : []),
+        ];
+
+        const clinicalInputs = {
+          wellnessHistory: records,
           painReports: athletePain,
-          assessments: assessmentsData.filter(a => a.athlete_id === athlete.id),
-          checkIns: athleteLoad.map(l => ({
+          clinicalAssessments: assessmentsData.filter(a => a.athlete_id === athlete.id),
+          loadData: athleteLoad.map(l => ({
             intensity: l.intensity || (l.raw_data && l.raw_data.rpe) || l.rpe || 5,
             duration_minutes: l.duration || (l.raw_data && l.raw_data.duration) || 60,
           })),
-          alerts: athleteAlerts
+          tags: mockTags
+        };
+
+        // Call Clinical Engine
+        const { clusters, insight, decisionMode, decisionExplanation, interventions } = calculateRiskClusters({
+          wellnessRecords: clinicalInputs.wellnessHistory,
+          painReports: clinicalInputs.painReports,
+          assessments: clinicalInputs.clinicalAssessments,
+          checkIns: clinicalInputs.loadData,
+          alerts: athleteAlerts,
+          clinicalTags: clinicalInputs.tags
         });
 
         if (insight && insight.priority === 'critical') {
@@ -377,7 +394,8 @@ export function ClinicalDashboard({ onViewAthlete }: ClinicalDashboardProps) {
           risk_clusters: clusters,
           decision_mode: decisionMode,
           decision_explanation: decisionExplanation,
-          interventions: interventions
+          interventions: interventions,
+          clinical_tags: mockTags
         };
       });
 

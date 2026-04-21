@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -62,7 +62,9 @@ import {
   Download,
   Code,
   Sparkles,
-  Filter
+  Filter,
+  Target,
+  BarChart3
 } from "lucide-react";
 import { GoogleGenAI, Type } from "@google/genai";
 import { Button } from "@/components/ui/button";
@@ -91,6 +93,7 @@ import { AttachmentPreviewModal } from "./AttachmentPreviewModal";
 import { AttachmentVersionHistory } from "./AttachmentVersionHistory";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ClinicalAlert } from "@/types/database";
+import { calculateRiskClusters, ClinicalTag } from "@/lib/clinical-engine";
 import { 
   LineChart, 
   Line, 
@@ -109,6 +112,80 @@ import {
 } from "recharts";
 import { SafeRender } from "@/components/SafeRender";
 import { QRCodeSVG } from "qrcode.react";
+
+// --- Custom Clinical Tags UI ---
+function ClinicalTagsManager({ tags, setTags }: { tags: ClinicalTag[], setTags: React.Dispatch<React.SetStateAction<ClinicalTag[]>> }) {
+  const [newTagText, setNewTagText] = useState("");
+  const [newTagSource, setNewTagSource] = useState<'clinical' | 'field_observation'>('clinical');
+
+  const handleAdd = () => {
+    if (!newTagText.trim()) return;
+    const newTag: ClinicalTag = {
+      id: Math.random().toString(36).substr(2, 9),
+      tag: newTagText.trim(),
+      created_at: new Date().toISOString(),
+      weight: newTagSource === 'clinical' ? 1.5 : 1.0, 
+      source: newTagSource
+    };
+    setTags(prev => [...prev, newTag]);
+    setNewTagText("");
+  };
+
+  const handleRemove = (id: string) => {
+    setTags(prev => prev.filter(t => t.id !== id));
+  };
+
+  return (
+    <Card className="bg-slate-900/40 border-slate-800 shadow-2xl relative overflow-hidden h-full">
+      <CardHeader className="border-b border-slate-800/50 flex flex-row items-center justify-between pb-4">
+        <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+          <Info className="w-4 h-4 text-purple-500" />
+          Tags Clínicas
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 flex flex-col h-[calc(100%-4rem)] justify-between">
+        <div className="flex flex-wrap gap-2 mb-6 overflow-y-auto custom-scrollbar max-h-32">
+          {tags.map((tag) => (
+            <div key={tag.id} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border shadow-sm ${tag.source === 'field_observation' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
+              <span className="text-[10px] font-black uppercase tracking-widest">{tag.tag}</span>
+              <button onClick={() => handleRemove(tag.id)} className="hover:text-rose-400 hover:bg-rose-500/10 p-1 rounded transition-colors ml-1 focus:outline-none">
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+          {tags.length === 0 && (
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic py-2">
+              Nenhuma tag ativa
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 mt-auto">
+          <input 
+            type="text" 
+            placeholder="Nova Tag..." 
+            className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-purple-500/50 transition-colors"
+            value={newTagText}
+            onChange={(e) => setNewTagText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+          />
+          <div className="flex items-center gap-2">
+            <select 
+              value={newTagSource} 
+              onChange={(e) => setNewTagSource(e.target.value as any)}
+              className="flex-1 bg-slate-950/50 border border-slate-800 rounded-lg px-2 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none"
+            >
+              <option value="clinical">Clínico</option>
+              <option value="field_observation">Campo</option>
+            </select>
+            <Button onClick={handleAdd} className="bg-purple-500 hover:bg-purple-400 text-white rounded-lg h-8 w-8 p-0 shrink-0">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 interface Athlete {
   id: string;
@@ -416,6 +493,69 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
   const athleteAge = calculateAge(athlete.birth_date || athlete.birthDate);
 
+  const [wellnessHistory, setWellnessHistory] = useState<any[]>([]);
+  const [prontuarioNotes, setProntuarioNotes] = useState<any[]>([]);
+  const [attachments, setAttachments] = useState<any[]>([]);
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const [isDeletingAttachment, setIsDeletingAttachment] = useState<string | null>(null);
+  const [showEditAttachmentModal, setShowEditAttachmentModal] = useState(false);
+  const [editingAttachment, setEditingAttachment] = useState<any>(null);
+  const [isUpdatingAttachment, setIsUpdatingAttachment] = useState(false);
+  const [clinicalAssessments, setClinicalAssessments] = useState<any[]>([]);
+  const [loadData, setLoadData] = useState<any[]>([]);
+  const [painReports, setPainReports] = useState<any[]>([]);
+  const [athleteAlerts, setAthleteAlerts] = useState<ClinicalAlert[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [clinicalTags, setClinicalTags] = useState<ClinicalTag[]>([
+    { id: '1', tag: 'Posterior chain vulnerability', created_at: new Date().toISOString(), weight: 1.5, source: 'clinical' },
+    { id: '2', tag: 'Load intolerance', created_at: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(), weight: 2.0, source: 'field_observation' }
+  ]); // Simulated default state from DB
+
+  // Grouped Inputs for stability and single truth consistency
+  const clinicalInputs = useMemo(() => {
+    return {
+      wellnessHistory,
+      painReports,
+      clinicalAssessments,
+      loadData,
+      tags: clinicalTags
+    };
+  }, [wellnessHistory, painReports, clinicalAssessments, loadData, clinicalTags]);
+
+  const [isSessionMode, setIsSessionMode] = useState(false);
+  const clinicalSessionData = useMemo(() => {
+    if (!clinicalInputs.wellnessHistory.length) return null;
+    
+    // Normalize format for engine
+    const normalizedWellness = clinicalInputs.wellnessHistory.map(w => ({
+      id: w.id || '',
+      athlete_id: athlete.id,
+      readiness_score: w.readiness_score || 0,
+      fatigue_level: w.fatigue_level || 0,
+      muscle_soreness: w.muscle_soreness || 0,
+      sleep_hours: w.sleep_hours || 0,
+      sleep_quality: w.sleep_quality || 0,
+      stress_level: w.stress_level || 0,
+      record_date: w.record_date,
+      created_at: w.record_date, // fallback
+      symptoms: w.symptoms || []
+    }));
+
+    const normalizedLoad = clinicalInputs.loadData.map(l => ({
+      intensity: l.intensity || (l.raw_data && l.raw_data.rpe) || l.rpe || 5,
+      duration_minutes: l.duration || (l.raw_data && l.raw_data.duration) || 60,
+    }));
+
+    return calculateRiskClusters({
+      wellnessRecords: normalizedWellness,
+      painReports: clinicalInputs.painReports,
+      assessments: clinicalInputs.clinicalAssessments,
+      checkIns: normalizedLoad,
+      alerts: athleteAlerts,
+      clinicalTags: clinicalInputs.tags
+    });
+  }, [clinicalInputs, athleteAlerts, athlete.id]);
+
   const [activeTab, setActiveTab] = useState<'overview' | 'ficha' | 'clinical' | 'prontuario' | 'history' | 'attachments'>('overview');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [athletePhoto, setAthletePhoto] = useState<string | null>(athlete.photo || null);
@@ -667,18 +807,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     }
   };
 
-  const [wellnessHistory, setWellnessHistory] = useState<any[]>([]);
-  const [prontuarioNotes, setProntuarioNotes] = useState<any[]>([]);
-  const [attachments, setAttachments] = useState<any[]>([]);
-  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
-  const [isDeletingAttachment, setIsDeletingAttachment] = useState<string | null>(null);
-  const [showEditAttachmentModal, setShowEditAttachmentModal] = useState(false);
-  const [editingAttachment, setEditingAttachment] = useState<any>(null);
-  const [isUpdatingAttachment, setIsUpdatingAttachment] = useState(false);
-  const [clinicalAssessments, setClinicalAssessments] = useState<any[]>([]);
-  const [athleteAlerts, setAthleteAlerts] = useState<ClinicalAlert[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
-
   const fetchAllAssessmentsData = useCallback(async (athleteId: string) => {
     if (!supabase) return [];
     
@@ -718,10 +846,10 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         console.log(`Fetching data for athlete: ${athlete.name} (ID: ${athlete.id})`);
 
         // Fetch all data in parallel
-        const [wellnessRes, notesRes, assessmentsRes, alertsRes] = await Promise.all([
+        const [wellnessRes, notesRes, assessmentsRes, alertsRes, painRes, loadRes] = await Promise.all([
           supabase
             .from('wellness_records')
-            .select('record_date, readiness_score, sleep_quality, sleep_hours, stress_level, fatigue_level, muscle_soreness, soreness_location, menstrual_cycle, menstrual_symptoms, hydration_perception, hydration_score, urine_color, symptoms, comments')
+            .select('record_date, readiness_score, fatigue_level, muscle_soreness, sleep_hours, sleep_quality, stress_level, fatigue_level, muscle_soreness, soreness_location, menstrual_cycle, menstrual_symptoms, hydration_perception, hydration_score, urine_color, symptoms, comments')
             .eq('athlete_id', athlete.id)
             .order('record_date', { ascending: false })
             .limit(14),
@@ -737,11 +865,31 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             .select('*')
             .eq('athlete_id', athlete.id)
             .order('created_at', { ascending: false })
-            .limit(50)
+            .limit(50),
+          supabase
+            .from('pain_reports')
+            .select('*')
+            .eq('athlete_id', athlete.id)
+            .order('created_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('physical_load_assessments')
+            .select('*')
+            .eq('athlete_id', athlete.id)
+            .order('assessment_date', { ascending: false })
+            .limit(14)
         ]);
 
         if (alertsRes.data) {
           setAthleteAlerts(alertsRes.data);
+        }
+
+        if (painRes.data) {
+          setPainReports(painRes.data);
+        }
+
+        if (loadRes.data) {
+          setLoadData(loadRes.data);
         }
         
         // Fetch attachments from database with fallback
@@ -1818,9 +1966,195 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 space-y-10">
         {activeTab === 'overview' && (
-          <>
-            {/* 2. Decision cards row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          <div className="space-y-10 pb-32">
+            {/* Session Mode Toggle Container */}
+            <div className="flex items-center justify-between bg-slate-900/40 border border-slate-800/50 p-6 rounded-[2rem] backdrop-blur-md shadow-2xl overflow-hidden relative group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <BrainCircuit className="w-24 h-24 text-cyan-500" />
+              </div>
+              <div className="flex items-center gap-6 relative z-10">
+                <div className={`p-4 rounded-2xl transition-all duration-500 ${isSessionMode ? 'bg-cyan-500 text-[#020617] shadow-[0_0_30px_rgba(6,182,212,0.4)] scale-110' : 'bg-slate-800 text-slate-500'}`}>
+                  <Zap className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                    Modo Sessão Inteligente
+                    {isSessionMode && <span className="flex h-3 w-3 rounded-full bg-cyan-400 animate-pulse" />}
+                  </h3>
+                  <p className="text-sm text-slate-400 font-medium">Adaptação dinâmica baseada em IA para a sessão de hoje</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsSessionMode(!isSessionMode)}
+                className={`relative inline-flex h-10 w-20 items-center rounded-full transition-all duration-500 focus:outline-none ${isSessionMode ? 'bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.3)]' : 'bg-slate-800'}`}
+              >
+                <div className={`inline-block h-8 w-8 transform rounded-full bg-white transition-all duration-500 shadow-xl ${isSessionMode ? 'translate-x-11' : 'translate-x-1'} flex items-center justify-center`}>
+                  {isSessionMode ? <Check className="w-5 h-5 text-cyan-600" /> : <X className="w-5 h-5 text-slate-400" />}
+                </div>
+              </button>
+            </div>
+
+            {/* Clinical Tags Manager */}
+            <div className="w-full relative z-10 transition-all duration-300">
+               <ClinicalTagsManager tags={clinicalTags} setTags={setClinicalTags} />
+            </div>
+
+            {isSessionMode ? (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-8"
+              >
+                {/* 1. Session Context & Objective */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Context Card */}
+                  <Card className="bg-slate-900/60 border-slate-700 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-6 opacity-5">
+                      <BarChart3 className="w-32 h-32" />
+                    </div>
+                    <CardHeader className="border-b border-slate-800/50 flex flex-row items-center justify-between">
+                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Info className="w-4 h-4 text-cyan-500" />
+                        Contexto da Sessão
+                      </CardTitle>
+                      {clinicalSessionData?.insight && (
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                          clinicalSessionData.insight.priority === 'critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                          clinicalSessionData.insight.priority === 'high' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        }`}>
+                          {clinicalSessionData.insight.riskLabel}
+                        </span>
+                      )}
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-6">
+                      <p className="text-xl font-bold text-white leading-relaxed">
+                        {clinicalSessionData?.insight?.reason || "Nenhum alerta crítico detectado. Sinais vitais em zona de estabilidade."}
+                      </p>
+                      
+                      {/* Trend Indicator */}
+                      <div className="flex gap-4">
+                        {clinicalSessionData?.clusters.map((cluster, i) => (
+                          <div key={i} className="flex-1 p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
+                            <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{cluster.label}</p>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xl font-black ${cluster.score >= 75 ? 'text-rose-500' : 'text-amber-500'}`}>{cluster.score}%</span>
+                              {cluster.trend === 'up' && <TrendingUp className="w-4 h-4 text-rose-400" />}
+                              {cluster.trend === 'down' && <TrendingDown className="w-4 h-4 text-emerald-400" />}
+                            </div>
+                          </div>
+                        ))}
+                        {(!clinicalSessionData?.clusters || clinicalSessionData.clusters.length === 0) && (
+                          <div className="flex-1 p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
+                            <CheckCircle className="text-emerald-500" />
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Estabilidade Cinética</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Objective Card */}
+                  <Card className={`border-2 shadow-2xl relative overflow-hidden transition-all duration-500 ${
+                    clinicalSessionData?.decisionMode === 'Conservative' 
+                      ? 'bg-amber-500/5 border-amber-500/30' 
+                      : 'bg-emerald-500/5 border-emerald-500/30'
+                  }`}>
+                    <div className="absolute top-0 right-0 p-6 opacity-10">
+                      {clinicalSessionData?.decisionMode === 'Conservative' ? <ShieldAlert className="w-32 h-32" /> : <Trophy className="w-32 h-32" />}
+                    </div>
+                    <CardHeader className="border-b border-slate-800/50">
+                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Target className="w-4 h-4 text-amber-500" />
+                        Objetivo da Sessão
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8 flex flex-col justify-between h-full">
+                      <div className="space-y-4">
+                        <h3 className={`text-4xl font-black uppercase tracking-tighter ${
+                          clinicalSessionData?.decisionMode === 'Conservative' ? 'text-amber-400' : 'text-emerald-400'
+                        }`}>
+                          {clinicalSessionData?.decisionMode === 'Conservative' ? 'Cuidado Moderado' : 'Performance Total'}
+                        </h3>
+                        <p className="text-lg font-bold text-slate-300">
+                          {clinicalSessionData?.decisionExplanation || "Manter intensidade planejada para ganho de performance."}
+                        </p>
+                      </div>
+                      
+                      <div className="mt-8 flex items-center gap-4">
+                         <div className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-[0.15em] border ${
+                           clinicalSessionData?.decisionMode === 'Conservative' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                         }`}>
+                           Modo {clinicalSessionData?.decisionMode === 'Conservative' ? 'Conservador' : 'Agressivo'}
+                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* 2. Dynamic Checklist */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 shadow-2xl">
+                    <CardHeader className="border-b border-slate-800/50">
+                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                        <ClipboardList className="w-4 h-4 text-cyan-500" />
+                        Checklist Clinico-Tático
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {(clinicalSessionData?.clusters.flatMap(c => c.factors) || []).concat(
+                          clinicalSessionData?.decisionMode === 'Conservative' 
+                            ? ["Reavaliar dor após aquecimento", "Confirmar protocolos de recovery pós", "Garantir hidratação extra"]
+                            : ["Monitorar RPE da sessão", "Confirmar qualidade do sono", "Prontidão total validada"]
+                        ).slice(0, 6).map((item, i) => (
+                          <div key={i} className="flex items-center gap-4 p-4 bg-slate-950/40 border border-slate-800 rounded-2xl group hover:border-cyan-500/30 transition-all cursor-pointer">
+                            <div className="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center group-hover:bg-cyan-500 group-hover:border-cyan-500 transition-all">
+                              <Check className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                            </div>
+                            <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Suggested Interventions */}
+                  <Card className="bg-slate-900/40 border-slate-800 shadow-2xl relative overflow-hidden">
+                    <CardHeader className="border-b border-slate-800/50">
+                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-emerald-500" />
+                        Intervenções Sugeridas
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-4">
+                      {clinicalSessionData?.interventions.map((item, i) => (
+                        <div key={i} className="flex items-center gap-4 p-5 bg-[#050B14] border border-emerald-500/20 rounded-[1.25rem] shadow-xl">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                            <ActivitySquare className="w-6 h-6" />
+                          </div>
+                          <span className="text-sm font-black text-emerald-100 uppercase tracking-tight">{item}</span>
+                        </div>
+                      ))}
+                      {(!clinicalSessionData?.interventions || clinicalSessionData.interventions.length === 0) && (
+                        <div className="text-center py-8">
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic">Nenhuma intervenção necessária</p>
+                        </div>
+                      )}
+                      
+                      <div className="mt-8 pt-8 border-t border-slate-800/50">
+                        <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#020617] font-black uppercase tracking-widest rounded-2xl h-12 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                          Aplicar Protocolo <ChevronRight className="ml-2" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </motion.div>
+            ) : (
+              <>
+                {/* 2. Decision cards row */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
             { 
               label: 'Prontidão', 
@@ -2519,6 +2853,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         </Card>
       </>
     )}
+  </div>
+)}
 
     {activeTab === 'ficha' && (
           <div className="space-y-6">
@@ -4109,7 +4445,32 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     onClick={() => {
                       const regionsText = noteForm.regions.length > 0 ? noteForm.regions.join(', ') : 'regiões não especificadas';
                       const treatmentsText = noteForm.treatments.length > 0 ? noteForm.treatments.join(', ') : 'condutas não especificadas';
-                      const text = `Paciente compareceu à sessão fisioterapêutica relatando estar se sentindo ${noteForm.feeling.toLowerCase()}, apresentando quadro álgico de intensidade ${noteForm.pain}/10 na Escala Visual Analógica (EVA).\n\nO atendimento foi direcionado para as seguintes regiões: ${regionsText}.\n\nForam realizadas as seguintes condutas terapêuticas: ${treatmentsText}.\n\n${noteForm.obs ? `Observações clínicas adicionais: ${noteForm.obs}` : 'Sem observações adicionais para a presente sessão.'}`;
+                      
+                      const riskContext = clinicalSessionData?.insight?.riskLabel ? `inserido em um contexto de risco clínico [${clinicalSessionData.insight.riskLabel.toUpperCase()}]` : 'com estabilidade clínica';
+                      const objectiveContext = clinicalSessionData?.decisionMode === 'Conservative' ? 'Cuidado Moderado (foco em recuperação e prevenção)' : 'Performance Total (foco em manutenção de carga e progressão)';
+
+                      const clustersContext = clinicalSessionData?.clusters && clinicalSessionData.clusters.length > 0 
+                        ? `\nOs principais clusters de risco identificados no momento: ${clinicalSessionData.clusters.map(c => c.label).join(', ')}.` 
+                        : '';
+
+                      let treatmentsReasoning = '';
+                      if (noteForm.treatments.length > 0) {
+                        treatmentsReasoning = `Estas intervenções foram escolhidas com o objetivo de ${clinicalSessionData?.decisionMode === 'Conservative' ? 'mitigar os riscos agudos, controlar o quadro álgico e promover recuperação tecidual' : 'manter a prontidão muscular, tolerância à carga e otimização biomecânica'}, alinhando-se diretamente ao objetivo principal da sessão de ${objectiveContext}.`;
+                      }
+
+                      const text = `🎯 CONTEXTO CLÍNICO & OBJETIVO:
+Paciente ${riskContext}. O objetivo da sessão é ${objectiveContext}.${clustersContext}
+
+📊 SUBJETIVO / RESPOSTA DO PACIENTE:
+Paciente compareceu à sessão fisioterapêutica relatando estar se sentindo ${noteForm.feeling.toLowerCase()}, apresentando quadro álgico de intensidade ${noteForm.pain}/10 na Escala Visual Analógica (EVA).
+
+🛠️ CONDUTAS & RACIOCÍNIO CLÍNICO:
+- Regiões Alvo: ${regionsText}.
+- Intervenções Aplicadas: ${treatmentsText}.
+${treatmentsReasoning}
+
+${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:\n${noteForm.obs}` : ''}`;
+                      
                       setGeneratedNote(text);
                       setShowSignatureStep(true);
                     }}
