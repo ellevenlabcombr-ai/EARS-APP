@@ -1290,10 +1290,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
   // Fast Clinical Note State
   const [noteForm, setNoteForm] = useState({
     pain: 2,
-    feeling: 'Melhor',
+    feeling: 'Igual',
     regions: [] as string[],
     treatments: [] as string[],
-    obs: ''
+    obs: '',
+    suggestionMatch: 'Yes' as 'Yes' | 'Partially' | 'No',
+    tagAdjustments: [] as { id: string, action: 'reinforce' | 'remove' | 'keep' }[],
+    newTags: [] as string[]
   });
   
   const [isListening, setIsListening] = useState(false);
@@ -3727,7 +3730,20 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 <FileText className="w-5 h-5 text-cyan-500" />
                 Prontuário Eletrônico
               </h2>
-              <Button onClick={() => { setShowSignatureStep(false); setShowClinicalNoteModal(true); }} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest">
+                <Button onClick={() => { 
+                  setShowSignatureStep(false); 
+                  setNoteForm({
+                    pain: 2,
+                    feeling: 'Igual',
+                    regions: [] as string[],
+                    treatments: [] as string[],
+                    obs: '',
+                    suggestionMatch: 'Yes',
+                    tagAdjustments: clinicalTags.map(t => ({ id: t.id, action: 'keep' as const })),
+                    newTags: []
+                  });
+                  setShowClinicalNoteModal(true); 
+                }} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest">
                 <Plus className="w-4 h-4 mr-2" /> Nova Evolução
               </Button>
             </div>
@@ -4276,27 +4292,109 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="p-6 overflow-y-auto custom-scrollbar space-y-8">
                 {!showSignatureStep ? (
                   <>
-                    {/* Status Section */}
+                    {/* 1. AUTO-CONTEXT: Clinical Summary */}
+                    <div className="p-4 bg-slate-900/60 border border-slate-800/80 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                          <Activity className="w-3.5 h-3.5 text-cyan-500" /> Contexto da Sessão
+                        </h4>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${
+                          riskCfg.color.replace('text-', 'bg-').replace('400', '500/20')
+                        } ${riskCfg.color}`}>
+                          Risco: {athlete.riskLevel || 'Baixo'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Top Risk Cluster</p>
+                          <p className="text-xs font-bold text-slate-300">
+                            {clinicalSessionData?.clusters?.[0]?.label || 'Estável'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Objetivo IA</p>
+                          <p className="text-xs font-bold text-slate-300">
+                            {clinicalSessionData?.decisionMode === 'Conservative' ? 'Conservador (🛡️ Proteção)' : 'Agressivo (⚡ Performance)'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Tags Ativas</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {clinicalTags.length > 0 ? clinicalTags.map((t, i) => (
+                              <span key={i} className="text-[8px] font-black bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                                {t.tag}
+                              </span>
+                            )) : (
+                              <span className="text-[9px] text-slate-600 italic">Sem tags ativas</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="pt-1">
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Sugestões Aplicadas</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {clinicalSessionData?.interventions && clinicalSessionData.interventions.length > 0 ? clinicalSessionData.interventions.slice(0, 3).map((inv, idx) => (
+                              <span key={idx} className="text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">
+                                {inv}
+                              </span>
+                            )) : (
+                              <span className="text-[9px] text-slate-600 italic">Nenhuma sugestão gerada</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. SYSTEM VALIDATION */}
                     <div className="space-y-4">
                       <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <Activity className="w-3 h-3" /> Status do Paciente Hoje
+                        <Brain className="w-3 h-3 text-purple-500" /> Validação da Sugestão
+                      </h4>
+                      <div className="bg-slate-900/50 p-1 rounded-xl border border-slate-800/50 flex">
+                        {[
+                          { val: 'Yes', label: 'Sim', color: 'bg-emerald-500' },
+                          { val: 'Partially', label: 'Parcialmente', color: 'bg-amber-500' },
+                          { val: 'No', label: 'Não', color: 'bg-rose-500' }
+                        ].map(opt => (
+                          <button
+                            key={opt.val}
+                            onClick={() => setNoteForm({...noteForm, suggestionMatch: opt.val as any})}
+                            className={`flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                              noteForm.suggestionMatch === opt.val 
+                                ? `${opt.color} text-slate-950 shadow-lg` 
+                                : 'text-slate-500 hover:text-slate-300'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 3. RESPONSE BLOCK & Pain */}
+                    <div className="space-y-4">
+                      <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <History className="w-3 h-3 text-cyan-500" /> Resposta Imediata
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Feeling */}
                         <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-800/50">
-                          {['Pior', 'Igual', 'Melhor'].map(status => (
+                          {[
+                            { val: 'Pior', color: 'bg-rose-500' },
+                            { val: 'Igual', color: 'bg-slate-500' },
+                            { val: 'Melhor', color: 'bg-emerald-500' }
+                          ].map(opt => (
                             <button
-                              key={status}
-                              onClick={() => setNoteForm({...noteForm, feeling: status})}
+                              key={opt.val}
+                              onClick={() => setNoteForm({...noteForm, feeling: opt.val})}
                               className={`flex-1 py-3 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                                noteForm.feeling === status 
-                                  ? status === 'Melhor' ? 'bg-emerald-500 text-[#050B14] shadow-lg' 
-                                    : status === 'Pior' ? 'bg-rose-500 text-[#050B14] shadow-lg'
-                                    : 'bg-slate-500 text-[#050B14] shadow-lg'
+                                noteForm.feeling === opt.val 
+                                  ? `${opt.color} text-[#050B14] shadow-lg` 
                                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
                               }`}
                             >
-                              {status}
+                              {opt.val}
                             </button>
                           ))}
                         </div>
@@ -4320,6 +4418,88 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                             <span>10 (Máxima)</span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* 4. TAG ADJUSTMENT Section */}
+                    <div className="space-y-3">
+                      <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <Tag className="w-3 h-3 text-purple-400" /> Ajuste de Tags Clínicas
+                      </h4>
+                      <div className="bg-slate-950/40 border border-slate-800/50 rounded-xl p-4 space-y-4">
+                        <div className="flex flex-wrap gap-2">
+                          {clinicalTags.map(tag => {
+                            const adj = noteForm.tagAdjustments.find(a => a.id === tag.id);
+                            const action = adj?.action || 'keep';
+                            return (
+                              <div key={tag.id} className="flex items-center gap-1">
+                                <span className={`px-2.5 py-1.5 rounded-l-lg text-[10px] font-black uppercase tracking-widest border-y border-l transition-all ${
+                                  action === 'remove' 
+                                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-500 opacity-50 line-through' 
+                                    : action === 'reinforce'
+                                      ? 'bg-purple-500/20 border-purple-500/50 text-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.2)]'
+                                      : 'bg-slate-800/50 border-slate-700 text-slate-400'
+                                }`}>
+                                  {tag.tag}
+                                </span>
+                                <div className="flex border-y border-r border-slate-700 rounded-r-lg overflow-hidden h-full">
+                                  <button
+                                    onClick={() => setNoteForm(prev => ({
+                                      ...prev,
+                                      tagAdjustments: prev.tagAdjustments.map(a => 
+                                        a.id === tag.id ? { ...a, action: a.action === 'reinforce' ? 'keep' : 'reinforce' } : a
+                                      )
+                                    }))}
+                                    className={`p-1.5 hover:bg-purple-500/20 transition-all ${action === 'reinforce' ? 'bg-purple-500 text-white' : 'text-slate-500'}`}
+                                    title="Reforçar"
+                                  >
+                                    <TrendingUp className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    onClick={() => setNoteForm(prev => ({
+                                      ...prev,
+                                      tagAdjustments: prev.tagAdjustments.map(a => 
+                                        a.id === tag.id ? { ...a, action: a.action === 'remove' ? 'keep' : 'remove' } : a
+                                      )
+                                    }))}
+                                    className={`p-1.5 hover:bg-rose-500/20 transition-all ${action === 'remove' ? 'bg-rose-500 text-white' : 'text-slate-500'}`}
+                                    title="Remover"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            placeholder="Adicionar nova tag..."
+                            className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/30 transition-all"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const val = e.currentTarget.value.trim();
+                                if (val && !noteForm.newTags.includes(val)) {
+                                  setNoteForm(prev => ({ ...prev, newTags: [...prev.newTags, val] }));
+                                  e.currentTarget.value = '';
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                        {noteForm.newTags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {noteForm.newTags.map(tag => (
+                              <span key={tag} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                                {tag}
+                                <button onClick={() => setNoteForm(prev => ({ ...prev, newTags: prev.newTags.filter(t => t !== tag) }))}>
+                                  <X className="w-3 h-3 hover:text-white" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -4473,6 +4653,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       
                       const riskContext = clinicalSessionData?.insight?.riskLabel ? `inserido em um contexto de risco clínico [${clinicalSessionData.insight.riskLabel.toUpperCase()}]` : 'com estabilidade clínica';
                       const objectiveContext = clinicalSessionData?.decisionMode === 'Conservative' ? 'Cuidado Moderado (foco em recuperação e prevenção)' : 'Performance Total (foco em manutenção de carga e progressão)';
+                      const validationContext = noteForm.suggestionMatch === 'Yes' ? 'total adesão à realidade clínica' : noteForm.suggestionMatch === 'Partially' ? 'ajustes pontuais necessários' : 'divergência observada na prática';
 
                       const clustersContext = clinicalSessionData?.clusters && clinicalSessionData.clusters.length > 0 
                         ? `\nOs principais clusters de risco identificados no momento: ${clinicalSessionData.clusters.map(c => c.label).join(', ')}.` 
@@ -4483,8 +4664,14 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         treatmentsReasoning = `Estas intervenções foram escolhidas com o objetivo de ${clinicalSessionData?.decisionMode === 'Conservative' ? 'mitigar os riscos agudos, controlar o quadro álgico e promover recuperação tecidual' : 'manter a prontidão muscular, tolerância à carga e otimização biomecânica'}, alinhando-se diretamente ao objetivo principal da sessão de ${objectiveContext}.`;
                       }
 
+                      const adjustments = noteForm.tagAdjustments.filter(a => a.action !== 'keep');
+                      const tagContext = adjustments.length > 0 || noteForm.newTags.length > 0
+                        ? `\n📍 ATUALIZAÇÃO DE TAGS:\n${adjustments.map(a => `${a.action === 'remove' ? '[-] Remover' : '[+] Reforçar'} "${clinicalTags.find(t => t.id === a.id)?.tag}"`).join('; ')}${noteForm.newTags.length > 0 ? `; [+] Adicionar: ${noteForm.newTags.join(', ')}` : ''}`
+                        : '';
+
                       const text = `🎯 CONTEXTO CLÍNICO & OBJETIVO:
 Paciente ${riskContext}. O objetivo da sessão é ${objectiveContext}.${clustersContext}
+✅ VALIDAÇÃO DO SISTEMA: Sugestão da IA apresentou ${validationContext}.
 
 📊 SUBJETIVO / RESPOSTA DO PACIENTE:
 Paciente compareceu à sessão fisioterapêutica relatando estar se sentindo ${noteForm.feeling.toLowerCase()}, apresentando quadro álgico de intensidade ${noteForm.pain}/10 na Escala Visual Analógica (EVA).
@@ -4492,7 +4679,7 @@ Paciente compareceu à sessão fisioterapêutica relatando estar se sentindo ${n
 🛠️ CONDUTAS & RACIOCÍNIO CLÍNICO:
 - Regiões Alvo: ${regionsText}.
 - Intervenções Aplicadas: ${treatmentsText}.
-${treatmentsReasoning}
+${treatmentsReasoning}${tagContext}
 
 ${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:\n${noteForm.obs}` : ''}`;
                       
@@ -4551,6 +4738,28 @@ ${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:\n${noteForm.obs}` : ''}`;
                               .select();
                               
                             if (error) throw error;
+
+                            // Update clinicalTags based on adjustments
+                            const updatedTags = [...clinicalTags];
+                            noteForm.tagAdjustments.forEach(adj => {
+                              if (adj.action === 'remove') {
+                                const idx = updatedTags.findIndex(t => t.id === adj.id);
+                                if (idx !== -1) updatedTags.splice(idx, 1);
+                              } else if (adj.action === 'reinforce') {
+                                const tag = updatedTags.find(t => t.id === adj.id);
+                                if (tag) tag.weight = (tag.weight || 1) + 0.2;
+                              }
+                            });
+                            noteForm.newTags.forEach(tagName => {
+                              updatedTags.push({
+                                id: Math.random().toString(36).substr(2, 9),
+                                tag: tagName,
+                                created_at: new Date().toISOString(),
+                                weight: 1.0,
+                                source: 'clinical'
+                              });
+                            });
+                            setClinicalTags(updatedTags);
                             
                             if (data && data.length > 0) {
                               const newNote = {
