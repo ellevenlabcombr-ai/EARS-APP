@@ -12,6 +12,21 @@ interface MaturationAssessmentProps {
   onSave: (data: any) => void;
 }
 
+const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
+  <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
+    <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+    <div className="relative">
+      <input
+        type="number"
+        value={value || ''}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
+      />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
+    </div>
+  </div>
+);
+
 export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: MaturationAssessmentProps) {
   // Inputs
   const [data, setData] = useState({
@@ -20,6 +35,7 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     sittingHeight: 85,
     weight: 55
   });
+
 
   // Derived State
   const [score, setScore] = useState(100);
@@ -120,21 +136,6 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     };
     return map[color] || map.cyan;
   };
-
-  const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
-    <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
-      <div className="relative">
-        <input
-          type="number"
-          value={value || ''}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
-      </div>
-    </div>
-  );
 
   return (
     <motion.div 

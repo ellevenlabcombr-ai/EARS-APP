@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Accessibility,
   CheckCircle2, 
@@ -21,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { TestInfoModal } from '@/components/TestInfoModal';
 import { 
   Radar, 
   RadarChart, 
@@ -49,7 +49,6 @@ interface ClearingTest {
 }
 
 export default function FunctionalScreening({ athleteId, onCancel, onSave }: FunctionalScreeningProps) {
-  const { t } = useLanguage();
   const [scores, setScores] = useState<Record<string, TestScore>>({
     deep_squat: { score: 3, compensations: [] },
     hurdle_step: { left: 3, right: 3, score: 3, compensations: [] },
@@ -155,95 +154,137 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     const stability = (processedScores.hurdle_step.score + processedScores.inline_lunge.score) / 2;
     const control = (processedScores.deep_squat.score + processedScores.trunk_stability_push_up.score + processedScores.rotary_stability.score) / 3;
 
-    let focus = t('func.focus.control');
-    if (mobility <= stability && mobility <= control) focus = t('func.focus.mobility');
-    else if (stability <= mobility && stability <= control) focus = t('func.focus.stability');
+    let focus = 'Controle Motor';
+    if (mobility <= stability && mobility <= control) focus = 'Mobilidade';
+    else if (stability <= mobility && stability <= control) focus = 'Estabilidade';
 
     return { mobility, stability, control, focus };
-  }, [processedScores, t]);
+  }, [processedScores]);
 
   const radarData = useMemo(() => [
-    { subject: t('func.focus.mobility'), A: categories.mobility, fullMark: 3 },
-    { subject: t('func.focus.stability'), A: categories.stability, fullMark: 3 },
-    { subject: t('func.focus.control'), A: categories.control, fullMark: 3 },
-  ], [categories, t]);
+    { subject: 'Mobilidade', A: categories.mobility, fullMark: 3 },
+    { subject: 'Estabilidade', A: categories.stability, fullMark: 3 },
+    { subject: 'Controle', A: categories.control, fullMark: 3 },
+  ], [categories]);
 
   const tests = [
     { 
       id: 'deep_squat', 
-      label: t('func.tests.deep_squat'), 
+      label: 'Agachamento Profundo', 
       asymmetric: false,
+      info: {
+        indication: "Avalia mobilidade bilateral dos quadris, joelhos e tornozelos, e estabilidade do core.",
+        application: "Descer o máximo possível com calcanhares no chão e bastão estendido acima da cabeça.",
+        positiveIndicators: ["Tronco paralelo à tíbia", "Fêmur abaixo da horizontal", "Calcanhares no chão"],
+        negativeIndicators: ["Valgo dinâmico", "Calcanhar eleva", "Flexão excessiva do tronco"]
+      },
       compensations: [
-        t('func.comp.knee_valgus'),
-        t('func.comp.heel_lift'),
-        t('func.comp.trunk_forward'),
-        t('func.comp.arms_fall')
+        'Valgo nos Joelhos',
+        'Calcanhar levanta',
+        'Flexão Excessiva do Tronco',
+        'Braços caem à frente'
       ]
     },
     { 
       id: 'hurdle_step', 
-      label: t('func.tests.hurdle_step'), 
+      label: 'Passo sobre Barreira', 
       asymmetric: true,
+      info: {
+        indication: "Avalia controle motor, mobilidade e estabilidade em passada assimétrica.",
+        application: "Perna passa sobre barreira mantendo alinhamento corporal da perna de apoio.",
+        positiveIndicators: ["Alinhamento tornozelo-joelho-quadril", "Lombar neutra", "Bastão paralelo à barreira"],
+        negativeIndicators: ["Contato com elástico", "Perda de equilíbrio", "Rotação externa excessiva"]
+      },
       compensations: [
-        t('func.comp.loss_balance'),
-        t('func.comp.hurdle_contact'),
-        t('func.comp.lateral_lean'),
-        t('func.comp.external_rotation')
+        'Perda de Equilíbrio',
+        'Contato com a Barreira',
+        'Inclinação Lateral do Tronco',
+        'Rotação Externa da Perna'
       ]
     },
     { 
       id: 'inline_lunge', 
-      label: t('func.tests.inline_lunge'), 
+      label: 'Avanço em Linha', 
       asymmetric: true,
+      info: {
+        indication: "Simula rotação, flexão e movimento assimétrico lateral.",
+        application: "Posição de afundo com pés na mesma linha, descer até joelho tocar a linha atrás do calcanhar.",
+        positiveIndicators: ["Descida reta", "Tronco vertical sem rotação", "Ausência de perda de equilíbrio"],
+        negativeIndicators: ["Afastamento da linha", "Curvatura do tronco", "Incapacidade de retornar"]
+      },
       compensations: [
-        t('func.comp.loss_balance'),
-        t('func.comp.knee_not_touching'),
-        t('func.comp.trunk_forward'),
-        t('func.comp.feet_not_aligned')
+        'Perda de Equilíbrio',
+        'Joelho não toca a linha alinhada',
+        'Inclinação do Tronco',
+        'Pés não permanecem alinhados'
       ]
     },
     { 
       id: 'shoulder_mobility', 
-      label: t('func.tests.shoulder_mobility'), 
+      label: 'Mobilidade de Ombros', 
       asymmetric: true,
       clearing: 'shoulder',
+      info: {
+        indication: "Testa amplitude combinada de rotação interna/extensão e externa/flexão.",
+        application: "Tocar as duas mãos nas costas (uma por cima, uma por baixo).",
+        positiveIndicators: ["Distância entre punhos menor que uma mão"],
+        negativeIndicators: ["Distância maior que uma mão e meia", "Dor ao movimento"]
+      },
       compensations: [
-        t('func.comp.distance_gt_1_5'),
-        t('func.comp.pain_clearing'),
-        t('func.comp.winging_scapula')
+        'Distância > 1.5 mãos',
+        'Dor no teste de verificação',
+        'Escápula alada'
       ]
     },
     { 
       id: 'active_straight_leg_raise', 
-      label: t('func.tests.active_straight_leg_raise'), 
+      label: 'Elevação Ativa da Perna', 
       asymmetric: true,
+      info: {
+        indication: "Testa flexibilidade dos isquiotibiais e estabilidade pélvica.",
+        application: "Deitado, elevar uma perna reta o máximo possível mantendo a oposta colada ao solo.",
+        positiveIndicators: ["Maléolo ultrapassa o marco no meio da coxa", "Perna de baixo imóvel"],
+        negativeIndicators: ["Perna de apoio flexiona", "Pelve rotaciona para facilitar"]
+      },
       compensations: [
-        t('func.comp.support_leg_flexes'),
-        t('func.comp.raised_leg_flexes'),
-        t('func.comp.pelvic_rotation'),
-        t('func.comp.support_foot_external')
+        'Perna de apoio flexiona',
+        'Perna levantada flexiona',
+        'Rotação / Báscula Pélvica',
+        'Rotação Externa intensa da perna de suporte'
       ]
     },
     { 
       id: 'trunk_stability_push_up', 
-      label: t('func.tests.trunk_stability_push_up'), 
+      label: 'Flexão para Estabilidade do Tronco', 
       asymmetric: false,
       clearing: 'spine_extension',
+      info: {
+        indication: "Avalia estabilidade do core no plano sagital e controle da extensão.",
+        application: "Realizar uma flexão a partir do solo mantendo o corpo como uma prancha rígida.",
+        positiveIndicators: ["Corpo sobe em um único bloco sem 'lag' lombar"],
+        negativeIndicators: ["Quadril fica para trás", "Hiperextensão lombar (lag)"]
+      },
       compensations: [
-        t('func.comp.hip_lag'),
-        t('func.comp.lumbar_extension'),
-        t('func.comp.unable_lift_unit')
+        'Atraso Quadril (Lag lombar)',
+        'Extensão Lombar pronunciada',
+        'Não consegue subir os segmentos unidos'
       ]
     },
     { 
       id: 'rotary_stability', 
-      label: t('func.tests.rotary_stability'), 
+      label: 'Estabilidade Rotacional', 
       asymmetric: true,
       clearing: 'spine_flexion',
+      info: {
+        indication: "Ação neuromuscular multiponto, exigindo restrição de rotação durante movimento.",
+        application: "4 apoios, tocar cotovelo no joelho do mesmo lado e estender ambos.",
+        positiveIndicators: ["Execução ipsilateral (mesmo lado) suave e limpa", "Coluna plana paralela ao solo"],
+        negativeIndicators: ["Queda iminente", "Falha de controle", "Realiza apenas na diagonal (compensação)"]
+      },
       compensations: [
-        t('func.comp.loss_balance'),
-        t('func.comp.unable_touch_elbow_knee'),
-        t('func.comp.excessive_compensation')
+        'Perda de Equilíbrio massivo',
+        'Não consegue tocar cotovelo no joelho ipsilateral',
+        'Torção de coluna compensatória'
       ]
     }
   ];
@@ -283,8 +324,8 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
             <Accessibility className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('func.title')}</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">{t('func.subtitle')}</p>
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">Triagem Funcional</h2>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Baseado no FMS</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
@@ -302,9 +343,17 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   {/* Test Info & Scoring */}
                   <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-black text-white uppercase tracking-widest">{test.label}</h3>
+                      <TestInfoModal 
+                        title={test.label} 
+                        indication={test.info?.indication || ""} 
+                        application={test.info?.application || ""}
+                        positiveIndicators={test.info?.positiveIndicators || []}
+                        negativeIndicators={test.info?.negativeIndicators || []}
+                      >
+                        <h3 className="text-xs font-black text-white uppercase tracking-widest">{test.label}</h3>
+                      </TestInfoModal>
                       <div className="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xxs font-bold uppercase flex items-center gap-2">
-                        <span className={getScoreColor(processedScores[test.id].score)}>{t('func.score_final')}: {processedScores[test.id].score}</span>
+                        <span className={getScoreColor(processedScores[test.id].score)}>Score: {processedScores[test.id].score}</span>
                         {processedScores[test.id].score === 0 && <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />}
                       </div>
                     </div>
@@ -314,7 +363,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                         {['left', 'right'].map((side) => (
                           <div key={side} className="space-y-2">
                             <div className="flex items-center justify-center gap-2">
-                              <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? t('func.side_left') : t('func.side_right')}</p>
+                              <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? 'Esquerda' : 'Direita'}</p>
                               {test.asymmetric && side === 'right' && Math.abs((scores[test.id].left ?? 0) - (scores[test.id].right ?? 0)) >= 2 && (
                                 <AlertCircle className="w-3 h-3 text-amber-400" />
                               )}
@@ -360,20 +409,20 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                       <div className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${clearingTests[test.clearing!].pain ? 'bg-rose-500/10 border-rose-500/50' : 'bg-slate-950 border-slate-800'}`}>
                         <div className="flex items-center gap-2">
                           <Activity className={`w-3 h-3 ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`} />
-                          <span className={`text-xxs font-bold uppercase ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>{t('func.clearing_prompt')}</span>
+                          <span className={`text-xxs font-bold uppercase ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>Teste de Dor Auxiliar</span>
                         </div>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => handleClearingTest(test.clearing!, false)}
                             className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${!clearingTests[test.clearing!].pain ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500'}`}
                           >
-                            {t('func.no_pain')}
+                            Sem Dor
                           </button>
                           <button 
                             onClick={() => handleClearingTest(test.clearing!, true)}
                             className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${clearingTests[test.clearing!].pain ? 'bg-rose-500 text-white' : 'text-slate-500'}`}
                           >
-                            {t('func.with_pain')}
+                            Com Dor
                           </button>
                         </div>
                       </div>
@@ -382,7 +431,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
 
                   {/* Compensations Checklist */}
                   <div className="w-full md:w-64 space-y-3">
-                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{t('func.compensations')}</p>
+                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Compensações Notadas</p>
                     <div className="space-y-1">
                       {test.compensations.map((comp) => (
                         <button
@@ -412,9 +461,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
             <div className={`h-1 ${riskBg} w-full`} />
             <CardContent className="p-6">
               <div className="text-center mb-6">
-                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">{t('func.score_label')}</p>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">Score Total de Triagem</p>
                 <div className={`text-7xl font-black mb-1 ${riskColor}`}>{totalScore}</div>
-                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">{t('func.score_max')}</p>
+                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Máximo: 21</p>
               </div>
 
               {/* Radar Chart */}
@@ -437,18 +486,18 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xxs font-black text-white uppercase tracking-widest">{t('func.risk_analysis')}</h4>
+                    <h4 className="text-xxs font-black text-white uppercase tracking-widest">Análise de Risco</h4>
                     <ShieldCheck className={`w-4 h-4 ${riskColor}`} />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xxs font-bold text-slate-500 uppercase">{t('func.risk_status')}</span>
+                      <span className="text-xxs font-bold text-slate-500 uppercase">Status de Risco</span>
                       <span className={`text-xxs font-black uppercase ${riskColor}`}>
-                        {alerts.risk === 'high' ? t('func.risk_high') : alerts.risk === 'moderate' ? t('func.risk_moderate') : t('func.risk_low')}
+                        {alerts.risk === 'high' ? 'Alto Risco' : alerts.risk === 'moderate' ? 'Risco Moderado' : 'Baixo Risco'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xxs font-bold text-slate-500 uppercase">{t('func.corrective_focus')}</span>
+                      <span className="text-xxs font-bold text-slate-500 uppercase">Foco Corretivo Base</span>
                       <span className="text-xxs font-black text-cyan-400 uppercase">{categories.focus}</span>
                     </div>
                   </div>
@@ -458,22 +507,22 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                 {(alerts.pain_override || alerts.asymmetry_alert || alerts.severe_dysfunction) && (
                   <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-2">
                     <h4 className="text-xxs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
-                      <AlertCircle className="w-3 h-3" /> {t('func.clinical_alerts')}
+                      <AlertCircle className="w-3 h-3" /> Fatores Críticos Localizados
                     </h4>
                     <div className="space-y-1">
                       {alerts.pain_override && (
                         <div className="flex items-center gap-2 text-xxs font-bold text-rose-400 uppercase">
-                          <Zap className="w-3 h-3" /> {t('func.alerts.pain')}
+                          <Zap className="w-3 h-3" /> Dor Reportada
                         </div>
                       )}
                       {alerts.asymmetry_alert && (
                         <div className="flex items-center gap-2 text-xxs font-bold text-amber-400 uppercase">
-                          <AlertTriangle className="w-3 h-3" /> {t('func.alerts.asymmetry')}
+                          <AlertTriangle className="w-3 h-3" /> Assimetria Grosseira Crítica
                         </div>
                       )}
                       {alerts.severe_dysfunction && (
                         <div className="flex items-center gap-2 text-xxs font-bold text-rose-500 uppercase">
-                          <AlertCircle className="w-3 h-3" /> {t('func.alerts.dysfunction')}
+                          <AlertCircle className="w-3 h-3" /> Incapacidade / Pontuação 0
                         </div>
                       )}
                     </div>
@@ -482,21 +531,21 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
 
                 <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
                   <h4 className="text-xxs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <Target className="w-3 h-3" /> {t('func.suggestion_label')}
+                    <Target className="w-3 h-3" /> Sugestões de Mitigação
                   </h4>
                   <p className="text-xxs text-slate-400 leading-relaxed font-medium">
                     {alerts.risk === 'high' 
-                      ? t('func.suggestions.high')
+                      ? 'Requerem foco em reabilitação. Controle motor bloqueado.'
                       : alerts.risk === 'moderate'
-                      ? t('func.suggestions.moderate')
-                      : t('func.suggestions.low')}
+                      ? 'Exercícios de mobilidade corretiva recomendados.'
+                      : 'Boa funcionalidade. Treinamento normal autorizado.'}
                   </p>
                 </div>
 
                 <textarea 
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder={t('func.notes_placeholder')}
+                  placeholder="Observações complementares..."
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[5rem] resize-none text-xxs font-medium"
                 />
 
@@ -504,7 +553,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   onClick={handleSave}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
                 >
-                  <Save className="w-4 h-4 mr-2" /> {t('func.save_btn')}
+                  <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
                 </Button>
               </div>
             </CardContent>

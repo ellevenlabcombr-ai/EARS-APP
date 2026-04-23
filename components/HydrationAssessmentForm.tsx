@@ -12,8 +12,64 @@ interface HydrationAssessmentProps {
   onSave: (data: any) => void;
 }
 
+const Slider = ({ label, value, onChange, invertColor = false, min = 0, max = 10, step = 1 }: { label: string, value: number, onChange: (v: number) => void, invertColor?: boolean, min?: number, max?: number, step?: number }) => {
+  const isHighBad = invertColor;
+  const ratio = (value - min) / (max - min);
+  const valueColor = isHighBad 
+    ? (ratio > 0.7 ? 'text-rose-400' : ratio > 0.4 ? 'text-amber-400' : 'text-emerald-400')
+    : (ratio < 0.4 ? 'text-rose-400' : ratio < 0.7 ? 'text-amber-400' : 'text-emerald-400');
+
+  return (
+    <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
+      <div className="flex justify-between items-end">
+        <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
+        <span className={`text-lg font-black ${valueColor}`}>{value}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+      />
+      <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
+        <span>{min}</span>
+        <span>{max}</span>
+      </div>
+    </div>
+  );
+};
+
+const NumberInput = ({ label, value, unit, onChange, step = 1 }: { label: string, value: number, unit: string, onChange: (v: number) => void, step?: number }) => (
+  <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
+    <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+    <div className="relative">
+      <input
+        type="number"
+        step={step}
+        value={value === 0 ? "0" : value || ''}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
+      />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
+    </div>
+  </div>
+);
+
+const Checkbox = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (v: boolean) => void }) => (
+  <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-800/50 bg-slate-900/30 cursor-pointer hover:bg-slate-800/50 transition-colors">
+    <div className={`w-5 h-5 rounded flex items-center justify-center border ${checked ? 'bg-rose-500 border-rose-500' : 'border-slate-600'}`}>
+      {checked && <div className="w-2.5 h-2.5 bg-[#050B14] rounded-sm" />}
+    </div>
+    <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">{label}</span>
+  </label>
+);
+
 export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: HydrationAssessmentProps) {
   // Inputs
+
   const [data, setData] = useState({
     perception: 5,
     urineColor: 4, // 1-8
@@ -112,61 +168,6 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
     };
     return map[color] || map.cyan;
   };
-
-  const Slider = ({ label, value, onChange, invertColor = false, min = 0, max = 10, step = 1 }: { label: string, value: number, onChange: (v: number) => void, invertColor?: boolean, min?: number, max?: number, step?: number }) => {
-    const isHighBad = invertColor;
-    const ratio = (value - min) / (max - min);
-    const valueColor = isHighBad 
-      ? (ratio > 0.7 ? 'text-rose-400' : ratio > 0.4 ? 'text-amber-400' : 'text-emerald-400')
-      : (ratio < 0.4 ? 'text-rose-400' : ratio < 0.7 ? 'text-amber-400' : 'text-emerald-400');
-
-    return (
-      <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
-        <div className="flex justify-between items-end">
-          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
-          <span className={`text-lg font-black ${valueColor}`}>{value}</span>
-        </div>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-        />
-        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
-          <span>{min}</span>
-          <span>{max}</span>
-        </div>
-      </div>
-    );
-  };
-
-  const NumberInput = ({ label, value, unit, onChange, step = 1 }: { label: string, value: number, unit: string, onChange: (v: number) => void, step?: number }) => (
-    <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
-      <div className="relative">
-        <input
-          type="number"
-          step={step}
-          value={value === 0 ? "0" : value || ''}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
-      </div>
-    </div>
-  );
-
-  const Checkbox = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (v: boolean) => void }) => (
-    <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-800/50 bg-slate-900/30 cursor-pointer hover:bg-slate-800/50 transition-colors">
-      <div className={`w-5 h-5 rounded flex items-center justify-center border ${checked ? 'bg-rose-500 border-rose-500' : 'border-slate-600'}`}>
-        {checked && <div className="w-2.5 h-2.5 bg-[#050B14] rounded-sm" />}
-      </div>
-      <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">{label}</span>
-    </label>
-  );
 
   return (
     <motion.div 

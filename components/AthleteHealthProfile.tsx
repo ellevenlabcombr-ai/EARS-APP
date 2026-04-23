@@ -1737,9 +1737,35 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
   ];
 
   // Mock for postural photos
-  const posturalHistory: any[] = [];
+  const [posturalHistory, setPosturalHistory] = useState<any[]>([]);
 
   const [compareDates, setCompareDates] = useState<any[]>([]);
+
+  const handlePosturalUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        const newPhoto = {
+          id: Date.now().toString(),
+          url: event.target.result as string,
+          date: new Date().toLocaleDateString('pt-BR')
+        };
+        const updatedHistory = [...posturalHistory, newPhoto];
+        setPosturalHistory(updatedHistory);
+        
+        // Auto-select for comparison if we have less than 2
+        if (compareDates.length === 0) {
+          setCompareDates([newPhoto]);
+        } else if (compareDates.length === 1) {
+          setCompareDates([compareDates[0], newPhoto]);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Mock for pain evolution
   const painData = wellnessHistory.slice(-6).map(w => ({
@@ -4129,10 +4155,11 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       </div>
                     </button>
                   ))}
-                  <button className="shrink-0 w-20 h-24 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 hover:border-cyan-500/50 transition-all">
+                  <label className="shrink-0 w-20 h-24 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 hover:border-cyan-500/50 transition-all cursor-pointer">
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePosturalUpload} />
                     <Plus className="w-5 h-5" />
                     <span className="text-xxs font-black uppercase">Nova Foto</span>
-                  </button>
+                  </label>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">

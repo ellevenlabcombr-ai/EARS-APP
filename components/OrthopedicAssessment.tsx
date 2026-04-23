@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface RegionPain {
   present: boolean;
@@ -38,13 +39,13 @@ interface RegionPain {
 }
 
 const BODY_REGIONS = [
-  'Neck', 'Upper back', 'Lower back', 'Shoulder', 'Elbow', 'Wrist/Hand', 'Hip', 'Knee', 'Ankle/Foot'
+  'Pescoço/Cervical', 'Costas/Tórax', 'Lombar', 'Ombro', 'Cotovelo', 'Punho/Mão', 'Quadril/Pelve', 'Joelho', 'Tornozelo/Pé'
 ] as const;
 
 type BodyRegion = typeof BODY_REGIONS[number];
 
-const SYMPTOM_OPTIONS = ['Estalo', 'Falseio', 'Travamento', 'Edema', 'Formigamento', 'Queimação', 'Irradiação'];
-const TREATMENT_OPTIONS = ['Fisioterapia', 'Cirurgia', 'Infiltração', 'Medicação', 'Acupuntura', 'Repouso'];
+const SYMPTOM_OPTIONS = ['Estalo', 'Falseio', 'Travamento', 'Edema', 'Formigamento', 'Queimação', 'Irradiação', 'Fraqueza', 'Rigidez Matinal'];
+const TREATMENT_OPTIONS = ['Fisioterapia', 'Cirurgia', 'Infiltração', 'Medicação', 'Acupuntura', 'Repouso', 'Gelo', 'Órtese/Kinesio'];
 
 interface OrthopedicAssessmentProps {
   athleteName?: string;
@@ -128,22 +129,22 @@ export function OrthopedicAssessment({ athleteName, onBack, onSave }: Orthopedic
       (injuryHistoryScore * 0.1)
     ) * 10;
 
-    let classification = 'Low risk';
-    let interpretation = 'No relevant clinical issues detected.';
-    let action = 'Maintain current training';
+    let classification = 'Baixo risco';
+    let interpretation = 'Nenhuma alteração clínica relevante detectada.';
+    let action = 'Manter treino atual';
     let color = 'text-emerald-400';
     let bgColor = 'bg-emerald-500/10';
 
     if (score < 60 || painIntensityMax >= 7) {
-      classification = 'High risk';
-      interpretation = 'Significant pain and functional limitation detected. Increased risk of injury or worsening condition.';
-      action = 'Reduce training load, Recommend clinical evaluation, Consider temporary restriction';
+      classification = 'Alto risco';
+      interpretation = 'Dor significativa e limitação funcional detectada. Aumento do risco de agravamento.';
+      action = 'Reduzir carga, Avaliação médica, Restrição temporária';
       color = 'text-rose-400';
       bgColor = 'bg-rose-500/10';
     } else if (score < 80) {
-      classification = 'Moderate risk';
-      interpretation = 'Mild to moderate functional alterations. Monitoring and adjustments recommended.';
-      action = 'Adjust training, Monitor symptoms';
+      classification = 'Risco Moderado';
+      interpretation = 'Alterações funcionais leves a moderadas. Monitoramento recomendado.';
+      action = 'Ajustar treino, Monitorar sintomas';
       color = 'text-amber-400';
       bgColor = 'bg-amber-500/10';
     }
