@@ -140,6 +140,7 @@ export default function EarsSystem() {
             {activeTab === 'questionnaire' && (
               <WellnessCheckInForm 
                 athlete={MOCK_ATHLETE} 
+                history={history}
                 onSubmit={handleSubmitCheckin} 
               />
             )}

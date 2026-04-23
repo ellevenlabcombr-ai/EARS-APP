@@ -22,10 +22,16 @@ import { AdaptiveQuestionModule } from './AdaptiveQuestionModule';
 import { ClinicalSymptomsModule } from './ClinicalSymptomsModule';
 import { PainMap } from '../PainMap';
 import { EARSEngine } from '../../lib/ears-engine';
+import { DecayEngine } from '../../lib/decay-engine';
+import { TrendEngine } from '../../lib/trend-engine';
+import { ConfidenceEngine } from '../../lib/confidence-engine';
+import { DecisionLayer } from '../../lib/decision-layer';
+import { calculateRiskClusters } from '../../lib/clinical-engine';
 import { WellnessCheckIn, BodyPain, AthleteProfile } from '../../types/ears';
 
 interface Props {
   athlete: AthleteProfile;
+  history?: WellnessCheckIn[];
   onSubmit: (data: WellnessCheckIn) => void;
 }
 
@@ -37,7 +43,7 @@ const MENSTRUAL_PHASES = [
   { id: 'none', label: 'Contraceptivo', emoji: '💊', desc: 'Ciclo suprimido' },
 ];
 
-export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
+export const WellnessCheckInForm: React.FC<Props> = ({ athlete, history = [], onSubmit }) => {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Partial<WellnessCheckIn>>({
     sleep_quality: 3,
@@ -54,10 +60,41 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
     menstrual_cycle: 'none'
   });
 
-  // Calculate scores on the fly for feedback
-  const { score, level } = useMemo(() => {
-    return EARSEngine.calculateFinalReadiness(answers, athlete.age);
-  }, [answers, athlete.age]);
+  // PREDICTIVE ANALYSIS FLOW
+  const analysis = useMemo(() => {
+    const decayed = DecayEngine.processHistory(history);
+    const trends = TrendEngine.analyze(history);
+    const { score, level, breakdown } = EARSEngine.calculateFinalReadiness(
+      answers, 
+      athlete.age, 
+      history.slice(-3).map(h => h.sleep_hours),
+      decayed,
+      trends
+    );
+
+    const riskAnalysis = calculateRiskClusters({
+      wellnessRecords: history as any,
+      painReports: [],
+      assessments: [],
+      checkIns: [],
+      alerts: [],
+      clinicalTags: [],
+      trendScore: trends.trendScore,
+      confidenceScore: 0.8
+    });
+
+    const confidence = ConfidenceEngine.calculate(history, answers);
+    const clinicalDecision = DecisionLayer.analyze(
+      score,
+      riskAnalysis.clusters,
+      trends,
+      confidence
+    );
+
+    return { score, level, breakdown, trends, confidence, clinicalDecision };
+  }, [answers, athlete.age, history]);
+
+  const { score, level, breakdown, trends, confidence, clinicalDecision } = analysis;
 
   const handleUpdate = (field: keyof WellnessCheckIn, value: any) => {
     setAnswers(prev => ({ ...prev, [field]: value }));
@@ -294,27 +331,55 @@ export const WellnessCheckInForm: React.FC<Props> = ({ athlete, onSubmit }) => {
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
                   <Zap className="w-32 h-32" />
                 </div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">Check-in Concluído</h2>
+                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">Análise Preditiva</h2>
                 <div className="flex justify-center items-baseline gap-2 my-4">
                   <span className="text-7xl font-black text-white">{score}</span>
                   <span className="text-xl font-bold text-indigo-200">%</span>
                 </div>
-                <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-lg`}>
-                  <div className={`w-2 h-2 rounded-full bg-white animate-pulse`} />
-                  <span className="text-xs font-black text-white uppercase tracking-widest">
-                    {level === 'ready' ? 'Condição Ótima' : level === 'attention' ? 'Ponto de Atenção' : 'Risco de Lesão'}
-                  </span>
+                
+                <div className="flex flex-wrap justify-center gap-3">
+                  <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-lg`}>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1">
+                      Trend: {trends.trendScore < 0 ? '↓' : '↑'} {trends.trendScore < 0 ? 'Worsening' : 'Stable'}
+                    </span>
+                  </div>
+                  <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-lg`}>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1">
+                      Confidence: {confidence.confidenceLevel.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Action Layer Recommendation */}
+              <div className="p-6 bg-slate-900 border border-indigo-500/30 rounded-3xl shadow-xl">
+                 <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-black text-white uppercase tracking-widest">Recomendação Clínica</h3>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                      clinicalDecision.recommendation === 'full_train' ? 'bg-emerald-500/20 text-emerald-400' :
+                      clinicalDecision.recommendation === 'hold' ? 'bg-rose-500/20 text-rose-400' :
+                      'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {clinicalDecision.recommendation.replace('_', ' ')}
+                    </span>
+                 </div>
+                 <p className="text-xs text-slate-400 mb-4">Ajuste de Carga Sugerido: <span className="text-white font-bold">{(clinicalDecision.loadAdjustment * 100).toFixed(0)}%</span></p>
+                 <div className="flex flex-wrap gap-2">
+                    {clinicalDecision.focusAreas.map(area => (
+                       <span key={area} className="px-2 py-1 bg-slate-800 text-[9px] font-bold text-slate-300 rounded-lg border border-white/5">{area}</span>
+                    ))}
+                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Deduções Ativas</p>
-                  <p className="text-sm font-bold text-white uppercase">{EARSEngine.calculatePainDeduction(answers.pain_map || []) + EARSEngine.calculateSymptomsDeduction(answers.clinical_symptoms || []) + EARSEngine.calculateMultipliers(answers)}%</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Deduções Totais</p>
+                  <p className="text-sm font-bold text-white uppercase">-{Math.round(breakdown.painDeduction + breakdown.symptomDeduction + breakdown.sleepDeduction)}%</p>
+                  {breakdown.synergy && <p className="text-[10px] text-rose-400 font-black uppercase mt-1">Synergy Penalty</p>}
                 </div>
                 <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">
-                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Zonas de Dor</p>
-                  <p className="text-sm font-bold text-white uppercase">{answers.pain_map?.length || 0} Regiões</p>
+                  <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Trend Factor</p>
+                  <p className="text-sm font-bold text-white uppercase">x{breakdown.trendFactor.toFixed(2)}</p>
                 </div>
               </div>
             </div>

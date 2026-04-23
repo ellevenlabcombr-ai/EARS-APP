@@ -95,6 +95,13 @@ import { AttachmentVersionHistory } from "./AttachmentVersionHistory";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ClinicalAlert } from "@/types/database";
 import { calculateRiskClusters, ClinicalTag } from "@/lib/clinical-engine";
+import { TrendEngine } from "@/lib/trend-engine";
+import { ConfidenceEngine } from "@/lib/confidence-engine";
+import { DecisionLayer } from "@/lib/decision-layer";
+import { PriorityEngine } from "@/lib/priority-engine";
+import { EARSEngine } from "@/lib/ears-engine";
+import { DecayEngine } from "@/lib/decay-engine";
+import { SessionModePanel } from "./ears/SessionModePanel";
 import { 
   LineChart, 
   Line, 
@@ -529,16 +536,17 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     
     // Normalize format for engine
     const normalizedWellness = clinicalInputs.wellnessHistory.map(w => ({
+      ...w,
       id: w.id || '',
       athlete_id: athlete.id,
-      readiness_score: w.readiness_score || 0,
+      readiness_score: w.readiness_score || w.readiness || 0, // Handle different keys
       fatigue_level: w.fatigue_level || 0,
       muscle_soreness: w.muscle_soreness || 0,
       sleep_hours: w.sleep_hours || 0,
       sleep_quality: w.sleep_quality || 0,
       stress_level: w.stress_level || 0,
       record_date: w.record_date,
-      created_at: w.record_date, // fallback
+      created_at: w.record_date, 
       symptoms: w.symptoms || []
     }));
 
@@ -547,15 +555,57 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       duration_minutes: l.duration || (l.raw_data && l.raw_data.duration) || 60,
     }));
 
-    return calculateRiskClusters({
+    const trends = TrendEngine.analyze(normalizedWellness);
+    const confidence = ConfidenceEngine.calculate(normalizedWellness, {});
+    const decayed = DecayEngine.processHistory(normalizedWellness);
+    
+    // Calculate final predictive readiness
+    const readiness = EARSEngine.calculateFinalReadiness(
+      normalizedWellness[normalizedWellness.length-1] as any,
+      athlete.age || 25,
+      normalizedWellness.slice(-3).map(w => w.sleep_hours),
+      decayed,
+      trends
+    );
+
+    const riskClustersResult = calculateRiskClusters({
       wellnessRecords: normalizedWellness,
       painReports: clinicalInputs.painReports,
       assessments: clinicalInputs.clinicalAssessments,
       checkIns: normalizedLoad,
       alerts: athleteAlerts,
-      clinicalTags: clinicalInputs.tags
+      clinicalTags: clinicalInputs.tags,
+      trendScore: trends.trendScore,
+      confidenceScore: confidence.confidenceScore
     });
-  }, [clinicalInputs, athleteAlerts, athlete.id]);
+
+    const recommendation = DecisionLayer.analyze(
+      readiness.score,
+      riskClustersResult.clusters,
+      trends,
+      confidence
+    );
+
+    const priorityOutput = PriorityEngine.process({
+      decision: recommendation.recommendation,
+      confidence: confidence.confidenceLevel,
+      riskScore: riskClustersResult.clusters[0]?.score || 0,
+      trendScore: trends.trendScore,
+      factors: riskClustersResult.clusters.flatMap(c => c.factors),
+      actions: recommendation.focusAreas.concat(recommendation.alerts),
+      tags: clinicalInputs.tags.map(t => t.tag)
+    });
+
+    return {
+      readiness,
+      riskClustersResult,
+      recommendation,
+      priorityOutput,
+      trends,
+      confidence,
+      decayed
+    };
+  }, [clinicalInputs, athleteAlerts, athlete.id, athlete.age]);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'ficha' | 'clinical' | 'prontuario' | 'history' | 'attachments'>('overview');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -2004,181 +2054,19 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             </div>
 
             {isSessionMode ? (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-8"
-              >
-                {/* 1. Session Context & Objective */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Context Card */}
-                  <Card className="bg-slate-900/60 border-slate-700 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-6 opacity-5">
-                      <BarChart3 className="w-32 h-32" />
-                    </div>
-                    <CardHeader className="border-b border-slate-800/50 flex flex-row items-center justify-between">
-                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Info className="w-4 h-4 text-cyan-500" />
-                        Contexto da Sessão
-                      </CardTitle>
-                      {clinicalSessionData?.insight && (
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                          clinicalSessionData.insight.priority === 'critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                          clinicalSessionData.insight.priority === 'high' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        }`}>
-                          {clinicalSessionData.insight.riskLabel}
-                        </span>
-                      )}
-                    </CardHeader>
-                    <CardContent className="p-8 space-y-6">
-                      <p className="text-xl font-bold text-white leading-relaxed">
-                        {clinicalSessionData?.insight?.reason || "Nenhum alerta crítico detectado. Sinais vitais em zona de estabilidade."}
-                      </p>
-                      
-                      {/* Trend Indicator */}
-                      <div className="flex gap-4">
-                        {clinicalSessionData?.clusters.map((cluster, i) => (
-                          <div key={i} className="flex-1 p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
-                            <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{cluster.label}</p>
-                            <div className="flex items-center gap-2">
-                              <span className={`text-xl font-black ${cluster.score >= 75 ? 'text-rose-500' : 'text-amber-500'}`}>{cluster.score}%</span>
-                              {cluster.trend === 'up' && <TrendingUp className="w-4 h-4 text-rose-400" />}
-                              {cluster.trend === 'down' && <TrendingDown className="w-4 h-4 text-emerald-400" />}
-                            </div>
-                          </div>
-                        ))}
-                        {(!clinicalSessionData?.clusters || clinicalSessionData.clusters.length === 0) && (
-                          <div className="flex-1 p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
-                            <CheckCircle className="text-emerald-500" />
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Estabilidade Cinética</p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Objective Card */}
-                  <Card className={`border-2 shadow-2xl relative overflow-hidden transition-all duration-500 ${
-                    clinicalSessionData?.decisionMode === 'Conservative' 
-                      ? 'bg-amber-500/5 border-amber-500/30' 
-                      : 'bg-emerald-500/5 border-emerald-500/30'
-                  }`}>
-                    <div className="absolute top-0 right-0 p-6 opacity-10">
-                      {clinicalSessionData?.decisionMode === 'Conservative' ? <ShieldAlert className="w-32 h-32" /> : <Trophy className="w-32 h-32" />}
-                    </div>
-                    <CardHeader className="border-b border-slate-800/50">
-                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Target className="w-4 h-4 text-amber-500" />
-                        Objetivo da Sessão
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8 flex flex-col justify-between h-full">
-                      <div className="space-y-4">
-                        <h3 className={`text-4xl font-black uppercase tracking-tighter ${
-                          clinicalSessionData?.decisionMode === 'Conservative' ? 'text-amber-400' : 'text-emerald-400'
-                        }`}>
-                          {clinicalSessionData?.decisionMode === 'Conservative' ? 'Cuidado Moderado' : 'Performance Total'}
-                        </h3>
-                        <p className="text-lg font-bold text-slate-300">
-                          {clinicalSessionData?.decisionExplanation || "Manter intensidade planejada para ganho de performance."}
-                        </p>
-                      </div>
-                      
-                      <div className="mt-8 flex items-center gap-4">
-                         <div className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-[0.15em] border ${
-                           clinicalSessionData?.decisionMode === 'Conservative' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                         }`}>
-                           Modo {clinicalSessionData?.decisionMode === 'Conservative' ? 'Conservador' : 'Agressivo'}
-                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* 2. Dynamic Checklist */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 shadow-2xl">
-                    <CardHeader className="border-b border-slate-800/50">
-                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                        <ClipboardList className="w-4 h-4 text-cyan-500" />
-                        Checklist Clinico-Tático
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {(clinicalSessionData?.clusters.flatMap(c => c.factors) || []).concat(
-                          clinicalSessionData?.decisionMode === 'Conservative' 
-                            ? ["Reavaliar dor após aquecimento", "Confirmar protocolos de recovery pós", "Garantir hidratação extra"]
-                            : ["Monitorar RPE da sessão", "Confirmar qualidade do sono", "Prontidão total validada"]
-                        ).slice(0, 6).map((item, i) => (
-                          <div key={i} className="flex items-center gap-4 p-4 bg-slate-950/40 border border-slate-800 rounded-2xl group hover:border-cyan-500/30 transition-all cursor-pointer">
-                            <div className="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center group-hover:bg-cyan-500 group-hover:border-cyan-500 transition-all">
-                              <Check className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-all" />
-                            </div>
-                            <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Suggested Interventions */}
-                  <Card className="bg-slate-900/40 border-slate-800 shadow-2xl relative overflow-hidden">
-                    <CardHeader className="border-b border-slate-800/50">
-                      <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-emerald-500" />
-                        Ações & Protocolos Sugeridos
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8 space-y-4">
-                      {/* Base Risk Engine Interventions */}
-                      {clinicalSessionData?.interventions.map((item, i) => (
-                        <div key={`risk-${i}`} className="flex items-center gap-4 p-5 bg-[#050B14] border border-emerald-500/20 rounded-[1.25rem] shadow-xl">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                            <ActivitySquare className="w-6 h-6" />
-                          </div>
-                          <span className="text-sm font-black text-emerald-100 uppercase tracking-tight">{item}</span>
-                        </div>
-                      ))}
-                      
-                      {/* Tag-Based Protocol Overlay */}
-                      {clinicalTags.flatMap(t => getTagSuggestions(t.tag).map(sugg => ({ tag: t.tag, suggestion: sugg })))
-                        .slice(0, 5) // Display top 5 tag-based actions
-                        .map((item, i) => (
-                        <div key={`tag-sugg-${i}`} className="flex items-center gap-4 p-5 bg-[#050B14] border border-purple-500/20 rounded-[1.25rem] shadow-xl relative overflow-hidden">
-                          <div className="absolute top-0 right-0 p-3 opacity-5">
-                            <Tag className="w-12 h-12 text-purple-500" />
-                          </div>
-                          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0 z-10">
-                            <Tag className="w-5 h-5" />
-                          </div>
-                          <div className="flex flex-col z-10">
-                            <span className="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] mb-1">
-                              Foco: {item.tag}
-                            </span>
-                            <span className="text-sm font-black text-purple-100 uppercase tracking-tight leading-tight">
-                              {item.suggestion}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-
-                      {(!clinicalSessionData?.interventions || clinicalSessionData.interventions.length === 0) && clinicalTags.length === 0 && (
-                        <div className="text-center py-8">
-                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic">Nenhuma ação necessária</p>
-                        </div>
-                      )}
-                      
-                      <div className="mt-8 pt-8 border-t border-slate-800/50">
-                        <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#020617] font-black uppercase tracking-widest rounded-2xl h-12 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-                          Aplicar Protocolo <ChevronRight className="ml-2" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </motion.div>
+              <SessionModePanel 
+                 visibleBlocks={clinicalSessionData?.priorityOutput.visibleBlocks || []}
+                 decision={clinicalSessionData?.priorityOutput.adjustedDecision || 'full_train'}
+                 content={clinicalSessionData?.priorityOutput.content || { factors: [], actions: [], tags: [] }}
+                 metrics={{
+                    readiness: clinicalSessionData?.readiness.score || 0,
+                    trend: clinicalSessionData?.trends.trendScore || 0
+                 }}
+                 confidence={{
+                    level: clinicalSessionData?.confidence.confidenceLevel || 'low',
+                    score: clinicalSessionData?.confidence.confidenceScore || 0
+                 }}
+              />
             ) : (
               <>
                 {/* 2. Decision cards row */}
