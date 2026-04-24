@@ -36,92 +36,39 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
   const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Body Composition
-    weight: '',
-    height: '',
-    visceralFat: '',
-    fatPercentage: '', // manually entered or overwritten
-    muscleMass: '', // manually entered or overwritten
-    
-    // Skinfolds (mm)
-    sfTriceps: '',
-    sfSubscapular: '',
-    sfChest: '',
-    sfAxillary: '',
-    sfSuprailiac: '',
-    sfAbdomen: '',
-    sfThigh: '',
-
-    // Bone/Residual approx
-    boneMass: '15', // approx 15% of body weight as fallback
-
-    // Strength
+    // Step 1: Força & Potência
     squat: '',
     benchPress: '',
     deadlift: '',
-    pullUps: '',
+    cmjJump: '',
+    squatJump: '',
+    powerOutput: '',
     
-    // Power
-    verticalJump: '',
-    broadJump: '',
-    sprint30m: '',
-    
-    // Aerobic
+    // Step 2: Velocidade & Agilidade
+    speed10m: '',
+    speed30m: '',
+    tTestAgility: '',
+    illinoisAgility: '',
+    changeOfDirection: '',
+
+    // Step 3: Cap. Aeróbica & Anaeróbica
     vo2Max: '',
     beepTest: '',
+    yoyoTest: '',
     restingHeartRate: '',
+    recoveryHeartRate: '',
+
+    // Step 4: Capacidades Coordenativas
+    yBalanceAnt: '',
+    yBalancePM: '',
+    yBalancePL: '',
+    reactionTime: '5', // 1-10
+    rhythm: '5', // 1-10
+    differentiation: '5', // 1-10
+    spatialOrientation: '5', // 1-10
     
     notes: ''
   });
-
-  // Auto-calculate BF and Muscle Mass
-  const calculatedMetrics = React.useMemo(() => {
-    const w = parseFloat(formData.weight);
-    const tri = parseFloat(formData.sfTriceps) || 0;
-    const sub = parseFloat(formData.sfSubscapular) || 0;
-    const che = parseFloat(formData.sfChest) || 0;
-    const axi = parseFloat(formData.sfAxillary) || 0;
-    const sup = parseFloat(formData.sfSuprailiac) || 0;
-    const abd = parseFloat(formData.sfAbdomen) || 0;
-    const thi = parseFloat(formData.sfThigh) || 0;
-
-    const sum7 = tri + sub + che + axi + sup + abd + thi;
-
-    if (w > 0 && sum7 > 0) {
-      let bd = 1.0;
-      const age = athleteAge || 25;
-      
-      // Jackson & Pollock 7-site
-      if (athleteGender === 'female') {
-        bd = 1.0970 - (0.00046971 * sum7) + (0.00000056 * sum7 * sum7) - (0.00012828 * age);
-      } else {
-        bd = 1.112 - (0.00043499 * sum7) + (0.00000055 * sum7 * sum7) - (0.00028826 * age);
-      }
-      
-      // Siri Equation
-      let bf = (495 / bd) - 450;
-      if (bf < 2) bf = 2; 
-      if (bf > 60) bf = 60; 
-
-      const fatMass = w * (bf / 100);
-      const lbm = w - fatMass;
-      const muscleMass = lbm; 
-      
-      return {
-        fatPercentage: bf.toFixed(1),
-        muscleMass: muscleMass.toFixed(1)
-      };
-    }
-    return {
-      fatPercentage: formData.fatPercentage,
-      muscleMass: formData.muscleMass
-    };
-  }, [
-    formData.weight, formData.sfTriceps, formData.sfSubscapular, formData.sfChest, 
-    formData.sfAxillary, formData.sfSuprailiac, formData.sfAbdomen, formData.sfThigh,
-    formData.fatPercentage, formData.muscleMass,
-    athleteAge, athleteGender
-  ]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -130,19 +77,17 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
   const handleSave = () => {
     onSave({
       ...formData,
-      fatPercentage: calculatedMetrics.fatPercentage,
-      muscleMass: calculatedMetrics.muscleMass,
       athleteId,
       date: new Date().toISOString(),
-      type: 'physical'
+      type: 'physical_fitness'
     });
   };
 
   const steps = [
-    { id: 1, title: 'Composição', icon: Weight },
-    { id: 2, title: 'Dobras', icon: Calculator },
-    { id: 3, title: 'Força e Potência', icon: Zap },
-    { id: 4, title: 'Cap. Aeróbica', icon: Heart },
+    { id: 1, title: 'Força & Potência', icon: Zap },
+    { id: 2, title: 'Velocidade & Agilidade', icon: Timer },
+    { id: 3, title: 'Cardiorrespiratório', icon: Heart },
+    { id: 4, title: 'Coordenativo', icon: Target },
     { id: 5, title: 'Resumo', icon: BarChart3 },
   ];
 
@@ -150,12 +95,12 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-            <Activity className="w-6 h-6 text-emerald-400" />
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+            <Dumbbell className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
             <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Física</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Performance e Composição</p>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Capacidades Físicas & Coordenativas</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
@@ -171,13 +116,13 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
               className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
               onClick={() => setStep(s.id)}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' : 'border-slate-700 text-slate-500'}`}>
-                <s.icon className="w-5 h-5" />
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-indigo-500 bg-indigo-500/10 text-indigo-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
               </div>
-              <span className="text-xxs font-black uppercase tracking-widest text-center max-w-[4rem]">{s.title}</span>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`flex-1 h-[2px] mx-2 mb-6 ${step > s.id ? 'bg-emerald-500' : 'bg-slate-800'}`}></div>
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-indigo-500' : 'bg-slate-800'}`}></div>
             )}
           </React.Fragment>
         ))}
@@ -189,53 +134,25 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             <Card className="bg-slate-900/40 border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-emerald-400" /> Antropometria Básica
+                  <Zap className="w-4 h-4 text-indigo-400" /> Força Máxima & Potência
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Peso (kg)</label>
-                  <input 
-                    type="number" 
-                    value={formData.weight}
-                    onChange={(e) => handleChange('weight', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="00.0"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Agachamento (kg)</label>
+                  <input type="number" value={formData.squat} onChange={(e) => handleChange('squat', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="000" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Altura (cm)</label>
-                  <input 
-                    type="number" 
-                    value={formData.height}
-                    onChange={(e) => handleChange('height', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="000"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Supino (kg)</label>
+                  <input type="number" value={formData.benchPress} onChange={(e) => handleChange('benchPress', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="000" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1">
-                    Gordura Corporal (%) <Calculator className="w-3 h-3" />
-                  </label>
-                  <input 
-                    type="number" 
-                    value={calculatedMetrics.fatPercentage}
-                    onChange={(e) => handleChange('fatPercentage', e.target.value)}
-                    className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-400 font-black focus:border-emerald-500 outline-none transition-colors placeholder:text-emerald-500/30"
-                    placeholder="Auto ou Digite..."
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto CMJ (cm)</label>
+                  <input type="number" value={formData.cmjJump} onChange={(e) => handleChange('cmjJump', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00.0" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1">
-                    Massa Magra/Muscular (kg) <Calculator className="w-3 h-3" />
-                  </label>
-                  <input 
-                    type="number" 
-                    value={calculatedMetrics.muscleMass}
-                    onChange={(e) => handleChange('muscleMass', e.target.value)}
-                    className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-400 font-black focus:border-emerald-500 outline-none transition-colors placeholder:text-emerald-500/30"
-                    placeholder="Auto ou Digite..."
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto Squat (cm)</label>
+                  <input type="number" value={formData.squatJump} onChange={(e) => handleChange('squatJump', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00.0" />
                 </div>
               </CardContent>
             </Card>
@@ -247,33 +164,26 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             <Card className="bg-slate-900/40 border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <Calculator className="w-4 h-4 text-emerald-400" /> Dobras Cutâneas (mm)
+                  <Timer className="w-4 h-4 text-indigo-400" /> Velocidade e Agilidade
                 </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Preencha as dobras para calcular BF automaticamente (Protocolo Jackson & Pollock 7m).
-                </CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { id: 'sfTriceps', label: 'Tríceps' },
-                  { id: 'sfSubscapular', label: 'Subscapular' },
-                  { id: 'sfChest', label: 'Peitoral' },
-                  { id: 'sfAxillary', label: 'Axilar Média' },
-                  { id: 'sfSuprailiac', label: 'Supra-ilíaca' },
-                  { id: 'sfAbdomen', label: 'Abdominal' },
-                  { id: 'sfThigh', label: 'Coxa' }
-                ].map(sf => (
-                  <div key={sf.id} className="space-y-2">
-                    <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">{sf.label}</label>
-                    <input 
-                      type="number" 
-                      value={(formData as any)[sf.id]}
-                      onChange={(e) => handleChange(sf.id, e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                      placeholder="0.0"
-                    />
-                  </div>
-                ))}
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Velocidade 10m (s)</label>
+                  <input type="number" value={formData.speed10m} onChange={(e) => handleChange('speed10m', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="0.00" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Velocidade 30m (s)</label>
+                  <input type="number" value={formData.speed30m} onChange={(e) => handleChange('speed30m', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="0.00" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">T-Test Agilidade (s)</label>
+                  <input type="number" value={formData.tTestAgility} onChange={(e) => handleChange('tTestAgility', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00.0" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Illinois Test (s)</label>
+                  <input type="number" value={formData.illinoisAgility} onChange={(e) => handleChange('illinoisAgility', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00.0" />
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -284,79 +194,25 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             <Card className="bg-slate-900/40 border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <Dumbbell className="w-4 h-4 text-emerald-400" /> Testes de Força (1RM)
+                  <Heart className="w-4 h-4 text-indigo-400" /> Cardiorrespiratório
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Agachamento (kg)</label>
-                  <input 
-                    type="number" 
-                    value={formData.squat}
-                    onChange={(e) => handleChange('squat', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="000"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">VO2 Máx (ml/kg/min)</label>
+                  <input type="number" value={formData.vo2Max} onChange={(e) => handleChange('vo2Max', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00.0" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Supino (kg)</label>
-                  <input 
-                    type="number" 
-                    value={formData.benchPress}
-                    onChange={(e) => handleChange('benchPress', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="000"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Yo-Yo Test (Distância)</label>
+                  <input type="number" value={formData.yoyoTest} onChange={(e) => handleChange('yoyoTest', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="0000 m" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Lev. Terra (kg)</label>
-                  <input 
-                    type="number" 
-                    value={formData.deadlift}
-                    onChange={(e) => handleChange('deadlift', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="000"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-900/40 border-slate-800/50">
-              <CardHeader>
-                <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <Timer className="w-4 h-4 text-emerald-400" /> Potência e Velocidade
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto Vertical (cm)</label>
-                  <input 
-                    type="number" 
-                    value={formData.verticalJump}
-                    onChange={(e) => handleChange('verticalJump', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="00.0"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Beep Test (Nível/Estágio)</label>
+                  <input type="text" value={formData.beepTest} onChange={(e) => handleChange('beepTest', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="Ex: 12.4" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Salto Horizontal (cm)</label>
-                  <input 
-                    type="number" 
-                    value={formData.broadJump}
-                    onChange={(e) => handleChange('broadJump', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Sprint 30m (s)</label>
-                  <input 
-                    type="number" 
-                    value={formData.sprint30m}
-                    onChange={(e) => handleChange('sprint30m', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="0.00"
-                  />
+                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">FC Repouso (bpm)</label>
+                  <input type="number" value={formData.restingHeartRate} onChange={(e) => handleChange('restingHeartRate', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none transition-colors" placeholder="00" />
                 </div>
               </CardContent>
             </Card>
@@ -368,39 +224,48 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             <Card className="bg-slate-900/40 border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-emerald-400" /> Capacidade Aeróbica
+                  <Target className="w-4 h-4 text-indigo-400" /> Capacidades Coordenativas & Equilíbrio
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">VO2 Máx (ml/kg/min)</label>
-                  <input 
-                    type="number" 
-                    value={formData.vo2Max}
-                    onChange={(e) => handleChange('vo2Max', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="00.0"
-                  />
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-3 block">Equilíbrio (Y-Balance Test - mm)</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Anterior</label>
+                      <input type="number" value={formData.yBalanceAnt} onChange={(e) => handleChange('yBalanceAnt', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none" placeholder="000" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Póstero-Medial</label>
+                      <input type="number" value={formData.yBalancePM} onChange={(e) => handleChange('yBalancePM', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none" placeholder="000" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Póstero-Lateral</label>
+                      <input type="number" value={formData.yBalancePL} onChange={(e) => handleChange('yBalancePL', e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-indigo-500 outline-none" placeholder="000" />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Beep Test (Nível)</label>
-                  <input 
-                    type="text" 
-                    value={formData.beepTest}
-                    onChange={(e) => handleChange('beepTest', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="Ex: 12.4"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">Freq. Cardíaca Repouso (bpm)</label>
-                  <input 
-                    type="number" 
-                    value={formData.restingHeartRate}
-                    onChange={(e) => handleChange('restingHeartRate', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
-                    placeholder="00"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    { id: 'reactionTime', label: 'Tempo de Reação' },
+                    { id: 'rhythm', label: 'Ritmo' },
+                    { id: 'differentiation', label: 'Diferenciação Kinestésica' },
+                    { id: 'spatialOrientation', label: 'Orientação Espacial' }
+                  ].map(cap => (
+                    <div key={cap.id} className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{cap.label}</label>
+                        <span className="text-xs font-black text-indigo-400">{(formData as any)[cap.id]}/10</span>
+                      </div>
+                      <input 
+                        type="range" min="1" max="10" 
+                        value={(formData as any)[cap.id]} 
+                        onChange={(e) => handleChange(cap.id, e.target.value)}
+                        className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" 
+                      />
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -412,15 +277,15 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             <Card className="bg-slate-900/40 border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-emerald-400" /> Observações Finais
+                  <BarChart3 className="w-4 h-4 text-indigo-400" /> Observações Finais
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <textarea 
                   value={formData.notes}
                   onChange={(e) => handleChange('notes', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[9.375rem] resize-none"
-                  placeholder="Descreva observações relevantes sobre a performance física do atleta..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[150px] resize-none"
+                  placeholder="Descreva a qualidade técnica dos testes e observações relevantes..."
                 />
               </CardContent>
             </Card>
@@ -440,14 +305,14 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
         {step < 5 ? (
           <Button 
             onClick={() => setStep(step + 1)}
-            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-xxs font-black tracking-widest px-8"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white uppercase text-xxs font-black tracking-widest px-8"
           >
             Próximo <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         ) : (
           <Button 
             onClick={handleSave}
-            className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] uppercase text-xxs font-black tracking-widest px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white uppercase text-xxs font-black tracking-widest px-8 shadow-[0_0_20px_rgba(99,102,241,0.35)]"
           >
             <Save className="w-4 h-4 mr-2" /> Finalizar Avaliação
           </Button>

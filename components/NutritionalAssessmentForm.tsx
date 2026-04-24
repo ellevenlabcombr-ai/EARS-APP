@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Apple, Droplet, Battery, Heart, Utensils, AlertTriangle, Save, ArrowLeft, Activity } from "lucide-react";
+import { Apple, Heart, Utensils, AlertTriangle, Save, ArrowLeft, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface NutritionalAssessmentProps {
@@ -22,19 +22,21 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
     ultraProcessed: 5
   });
 
-  // Section 2: Hydration
-  const [hydration, setHydration] = useState({
-    waterIntake: 5,
-    urineColor: 'light_yellow', // clear, light_yellow, dark_yellow
-    trainingHydration: 'adequate' // adequate, insufficient
+  // Section 2: Restrictions & Preferences
+  const [restrictions, setRestrictions] = useState({
+    vegetarianVegan: false,
+    lactoseIntolerance: false,
+    glutenIntolerance: false,
+    otherAllergies: false,
+    restrictionImpact: 5 // 0-10 (how much it limits food options)
   });
 
-  // Section 3: Energy Availability
-  const [energy, setEnergy] = useState({
-    lowEnergy: 5,
-    trainingFatigue: 5,
-    weightLoss: false,
-    hunger: 5
+  // Section 3: Health & Diseases
+  const [health, setHealth] = useState({
+    digestiveIssues: 5, // 0-10 (gastrite, refluxo, flatulência)
+    anemiaHistory: false,
+    bloodSugarIssues: false,
+    vitaminDeficiency: false
   });
 
   // Section 4: Relationship with Food
@@ -58,8 +60,8 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
   
   const [metrics, setMetrics] = useState({
     intakeScore: 50,
-    hydrationScore: 50,
-    energyScore: 50,
+    restrictionsScore: 50,
+    healthScore: 50,
     behaviorScore: 50
   });
 
@@ -72,18 +74,17 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
     const ultraProcessedScore = ((10 - intake.ultraProcessed) / 10) * 20;
     const intakeScore = mealsScore + breakfastScore + fruitVegScore + proteinScore + ultraProcessedScore;
 
-    // 2. Hydration Score (0-100)
-    const waterScore = (hydration.waterIntake / 10) * 40;
-    const urineScore = hydration.urineColor === 'clear' ? 30 : hydration.urineColor === 'light_yellow' ? 15 : 0;
-    const trainingHydrationScore = hydration.trainingHydration === 'adequate' ? 30 : 0;
-    const hydrationScore = waterScore + urineScore + trainingHydrationScore;
+    // 2. Restrictions Score (0-100)
+    // Less impact = higher score
+    const impactScore = ((10 - restrictions.restrictionImpact) / 10) * 100;
+    const restrictionsScore = impactScore;
 
-    // 3. Energy Score (0-100)
-    const lowEnergyScore = ((10 - energy.lowEnergy) / 10) * 30;
-    const trainingFatigueScore = ((10 - energy.trainingFatigue) / 10) * 30;
-    const weightLossScore = energy.weightLoss ? 0 : 20;
-    const hungerScore = ((10 - energy.hunger) / 10) * 20;
-    const energyScore = lowEnergyScore + trainingFatigueScore + weightLossScore + hungerScore;
+    // 3. Health Score (0-100)
+    const digestiveScore = ((10 - health.digestiveIssues) / 10) * 40;
+    const anemiaScore = health.anemiaHistory ? 0 : 20;
+    const bloodSugarScore = health.bloodSugarIssues ? 0 : 20;
+    const vitaminScore = health.vitaminDeficiency ? 0 : 20;
+    const healthScore = digestiveScore + anemiaScore + bloodSugarScore + vitaminScore;
 
     // 4. Behavior Score (0-100)
     const anxietyScore = ((10 - behavior.anxiety) / 10) * 25;
@@ -93,13 +94,13 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
     const behaviorScore = anxietyScore + fearWeightGainScore + skippingMealsScore + restrictiveEatingScore;
 
     // Final Score
-    const finalScore = Math.round((intakeScore * 0.35) + (hydrationScore * 0.20) + (energyScore * 0.25) + (behaviorScore * 0.20));
+    const finalScore = Math.round((intakeScore * 0.40) + (restrictionsScore * 0.15) + (healthScore * 0.25) + (behaviorScore * 0.20));
     setScore(finalScore);
     
     setMetrics({
       intakeScore: Math.round(intakeScore),
-      hydrationScore: Math.round(hydrationScore),
-      energyScore: Math.round(energyScore),
+      restrictionsScore: Math.round(restrictionsScore),
+      healthScore: Math.round(healthScore),
       behaviorScore: Math.round(behaviorScore)
     });
 
@@ -111,13 +112,13 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
 
     // Alerts
     const newAlerts: string[] = [];
-    if (energyScore < 60) newAlerts.push("Baixa Disponibilidade de Energia");
+    if (healthScore < 60) newAlerts.push("Possível Condição de Saúde a Investigar");
     if (behaviorScore < 60) newAlerts.push("Risco de Transtorno Alimentar");
-    if (hydrationScore < 50) newAlerts.push("Risco de Desidratação");
+    if (restrictions.vegetarianVegan && health.vitaminDeficiency) newAlerts.push("Atenção: Deficiência Vitamínica em Dieta Restritiva");
     if (behavior.skippingMeals) newAlerts.push("Comportamento de Pular Refeições");
     setAlerts(newAlerts);
 
-  }, [intake, hydration, energy, behavior, recovery]);
+  }, [intake, restrictions, health, behavior, recovery]);
 
   const handleSave = () => {
     onSave({
@@ -126,11 +127,11 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
       classification: classification.label,
       classification_color: classification.color,
       intake_score: metrics.intakeScore,
-      hydration_score: metrics.hydrationScore,
-      energy_score: metrics.energyScore,
+      restrictions_score: metrics.restrictionsScore,
+      health_score: metrics.healthScore,
       behavior_score: metrics.behaviorScore,
       alerts,
-      raw_data: { intake, hydration, energy, behavior, recovery }
+      raw_data: { intake, restrictions, health, behavior, recovery }
     });
   };
 
@@ -245,15 +246,15 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Hidratação</p>
-          <p className={`text-xl font-black ${metrics.hydrationScore > 70 ? 'text-emerald-400' : metrics.hydrationScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.hydrationScore}%
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Impacto (Restrições)</p>
+          <p className={`text-xl font-black ${metrics.restrictionsScore > 70 ? 'text-emerald-400' : metrics.restrictionsScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+            {metrics.restrictionsScore}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Energia</p>
-          <p className={`text-xl font-black ${metrics.energyScore > 70 ? 'text-emerald-400' : metrics.energyScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.energyScore}%
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Saúde/Doenças</p>
+          <p className={`text-xl font-black ${metrics.healthScore > 70 ? 'text-emerald-400' : metrics.healthScore > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+            {metrics.healthScore}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
@@ -284,42 +285,64 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
           </div>
         </div>
 
-        {/* Section 2: Hydration */}
+        {/* Section 2: Restrictions & Intolerances */}
         <div className="space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Droplet className="w-4 h-4 text-cyan-500" /> Hidratação
+            <AlertTriangle className="w-4 h-4 text-cyan-500" /> Restrições e Intolerâncias
           </h3>
           <div className="space-y-3">
-            <Slider label="Percepção de Consumo de Água" value={hydration.waterIntake} onChange={(v) => setHydration({...hydration, waterIntake: v})} />
             <SelectGroup 
-              label="Cor da Urina" 
-              value={hydration.urineColor} 
-              options={[{id: 'clear', label: 'Clara'}, {id: 'light_yellow', label: 'Amarelo Claro'}, {id: 'dark_yellow', label: 'Amarelo Escuro'}]}
-              onChange={(v) => setHydration({...hydration, urineColor: v})} 
+              label="Vegetariano / Vegano" 
+              value={restrictions.vegetarianVegan} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setRestrictions({...restrictions, vegetarianVegan: v})} 
             />
             <SelectGroup 
-              label="Hidratação durante o treino" 
-              value={hydration.trainingHydration} 
-              options={[{id: 'adequate', label: 'Adequada'}, {id: 'insufficient', label: 'Insuficiente'}]}
-              onChange={(v) => setHydration({...hydration, trainingHydration: v})} 
+              label="Intolerância à Lactose" 
+              value={restrictions.lactoseIntolerance} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setRestrictions({...restrictions, lactoseIntolerance: v})} 
             />
+            <SelectGroup 
+              label="Intolerância ao Glúten / Celíaco" 
+              value={restrictions.glutenIntolerance} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setRestrictions({...restrictions, glutenIntolerance: v})} 
+            />
+            <SelectGroup 
+              label="Outras Alergias Alimentares" 
+              value={restrictions.otherAllergies} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setRestrictions({...restrictions, otherAllergies: v})} 
+            />
+            <Slider label="Impacto das restrições nas opções (0=Nenhum, 10=Muito)" value={restrictions.restrictionImpact} onChange={(v) => setRestrictions({...restrictions, restrictionImpact: v})} invertColor />
           </div>
         </div>
 
-        {/* Section 3: Energy Availability */}
+        {/* Section 3: Health & Diseases */}
         <div className="space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Battery className="w-4 h-4 text-cyan-500" /> Disponibilidade de Energia
+            <Activity className="w-4 h-4 text-cyan-500" /> Doenças e Condições Clínicas
           </h3>
           <div className="space-y-3">
-            <Slider label="Sensação de Baixa Energia (Dia)" value={energy.lowEnergy} onChange={(v) => setEnergy({...energy, lowEnergy: v})} invertColor />
-            <Slider label="Cansaço durante o treino" value={energy.trainingFatigue} onChange={(v) => setEnergy({...energy, trainingFatigue: v})} invertColor />
-            <Slider label="Fome frequente" value={energy.hunger} onChange={(v) => setEnergy({...energy, hunger: v})} invertColor />
+            <Slider label="Problemas Digestivos (Gastrite, Refluxo, Gás)" value={health.digestiveIssues} onChange={(v) => setHealth({...health, digestiveIssues: v})} invertColor />
             <SelectGroup 
-              label="Perda de peso não intencional" 
-              value={energy.weightLoss} 
+              label="Histórico de Anemia" 
+              value={health.anemiaHistory} 
               options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-              onChange={(v) => setEnergy({...energy, weightLoss: v})} 
+              onChange={(v) => setHealth({...health, anemiaHistory: v})} 
+            />
+            <SelectGroup 
+              label="Alterações de Glicemia / Diabetes" 
+              value={health.bloodSugarIssues} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setHealth({...health, bloodSugarIssues: v})} 
+            />
+            <SelectGroup 
+              label="Deficiência de Vitaminas (ex: D, B12)" 
+              value={health.vitaminDeficiency} 
+              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+              onChange={(v) => setHealth({...health, vitaminDeficiency: v})} 
             />
           </div>
         </div>

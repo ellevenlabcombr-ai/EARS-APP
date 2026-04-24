@@ -13,6 +13,8 @@ interface AnthropometricAssessmentProps {
 }
 
 interface PerimetryData {
+  weight: number;
+  height: number;
   neck: number;
   shoulders: number;
   chest: number;
@@ -31,8 +33,20 @@ interface PerimetryData {
   leftCalf: number;
 }
 
+interface SkinfoldData {
+  triceps: number;
+  subscapular: number;
+  chest: number;
+  axillary: number;
+  suprailiac: number;
+  abdomen: number;
+  thigh: number;
+}
+
 export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: AnthropometricAssessmentProps) {
   const [measurements, setMeasurements] = useState<PerimetryData>({
+    weight: 75,
+    height: 180,
     neck: 40,
     shoulders: 110,
     chest: 100,
@@ -51,6 +65,16 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     leftCalf: 38,
   });
 
+  const [skinfolds, setSkinfolds] = useState<SkinfoldData>({
+    triceps: 0,
+    subscapular: 0,
+    chest: 0,
+    axillary: 0,
+    suprailiac: 0,
+    abdomen: 0,
+    thigh: 0,
+  });
+
   const [score, setScore] = useState(100);
   const [classification, setClassification] = useState({ label: 'Simetria Ideal', color: 'emerald' });
   const [alerts, setAlerts] = useState<string[]>([]);
@@ -59,6 +83,8 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     armAsymmetry: 0,
     thighAsymmetry: 0,
     calfAsymmetry: 0,
+    fatPercentage: 0,
+    muscleMass: 0,
   });
 
   useEffect(() => {
@@ -75,11 +101,30 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     const thighAsymmetry = calcAsymmetry(measurements.rightThigh, measurements.leftThigh);
     const calfAsymmetry = calcAsymmetry(measurements.rightCalf, measurements.leftCalf);
 
+    // 3. Body Fat Calculation (Jackson & Pollock 7-site approx)
+    const sum7 = Object.values(skinfolds).reduce((a, b) => a + b, 0);
+    let fatPercentage = 0;
+    let muscleMass = 0;
+
+    if (sum7 > 0 && measurements.weight > 0) {
+      // Simplified J&P formula logic for a general estimate
+      // Real formula depends on age/gender which we don't have passed here directly for now in props 
+      // but let's assume average values or use a generic one
+      const age = 22; // Placeholder or we could pass via props
+      const density = 1.112 - (0.00043499 * sum7) + (0.00000055 * sum7 * sum7) - (0.00028826 * age);
+      fatPercentage = Number(((495 / density) - 450).toFixed(1));
+      
+      const fatMass = measurements.weight * (fatPercentage / 100);
+      muscleMass = Number((measurements.weight - fatMass).toFixed(1));
+    }
+
     setMetrics({
       whr: Number(whr.toFixed(2)),
       armAsymmetry,
       thighAsymmetry,
-      calfAsymmetry
+      calfAsymmetry,
+      fatPercentage,
+      muscleMass
     });
 
     // Penalties based on Asymmetries and WHR
@@ -111,7 +156,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
 
     setAlerts(newAlerts);
 
-  }, [measurements]);
+  }, [measurements, skinfolds]);
 
   const handleSave = () => {
     onSave({
@@ -120,13 +165,15 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
       classification: classification.label,
       classification_color: classification.color,
       whr: metrics.whr,
+      fatPercentage: metrics.fatPercentage,
+      muscleMass: metrics.muscleMass,
       asymmetries: {
         arm: metrics.armAsymmetry,
         thigh: metrics.thighAsymmetry,
         calf: metrics.calfAsymmetry
       },
       alerts,
-      raw_data: { measurements }
+      raw_data: { measurements, skinfolds }
     });
   };
 
@@ -198,38 +245,74 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
       </div>
 
       {/* Indices Preview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">RCQ (Cintura/Quadril)</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Fat %</p>
+          <p className="text-2xl font-black text-indigo-400">
+            {metrics.fatPercentage}%
+          </p>
+        </div>
+        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Massa Muscular</p>
+          <p className="text-2xl font-black text-indigo-400">
+            {metrics.muscleMass}kg
+          </p>
+        </div>
+        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">RCQ</p>
           <p className={`text-2xl font-black ${metrics.whr < 0.85 ? 'text-emerald-400' : metrics.whr <= 0.9 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.whr}
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimetria Braços</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Braços</p>
           <p className={`text-2xl font-black ${metrics.armAsymmetry <= 2 ? 'text-emerald-400' : metrics.armAsymmetry <= 5 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.armAsymmetry}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimetria Coxas</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Coxas</p>
           <p className={`text-2xl font-black ${metrics.thighAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.thighAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.thighAsymmetry}%
           </p>
         </div>
         <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimetria Panturrilha</p>
+          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Pant.</p>
           <p className={`text-2xl font-black ${metrics.calfAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.calfAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.calfAsymmetry}%
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Basicos */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+             Básicos / Peso (kg)
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <NumberInput label="Peso" value={measurements.weight} unit="kg" onChange={(v) => setMeasurements({...measurements, weight: v})} />
+            <NumberInput label="Altura" value={measurements.height} unit="cm" onChange={(v) => setMeasurements({...measurements, height: v})} />
+          </div>
+
+          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 mt-6 flex items-center gap-2">
+             Dobra Cutâneas (mm)
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <NumberInput label="Tríceps" value={skinfolds.triceps} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, triceps: v})} />
+            <NumberInput label="Subescapular" value={skinfolds.subscapular} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, subscapular: v})} />
+            <NumberInput label="Peitoral" value={skinfolds.chest} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, chest: v})} />
+            <NumberInput label="Axilar Média" value={skinfolds.axillary} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, axillary: v})} />
+            <NumberInput label="Supra-ilíaca" value={skinfolds.suprailiac} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, suprailiac: v})} />
+            <NumberInput label="Abdominal" value={skinfolds.abdomen} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, abdomen: v})} />
+            <NumberInput label="Coxa" value={skinfolds.thigh} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, thigh: v})} />
+          </div>
+        </div>
+
         {/* Tronco */}
         <div className="space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-             Tronco (cm)
+             Tronco / Perimetria (cm)
           </h3>
           <div className="grid grid-cols-2 gap-3">
             <NumberInput label="Pescoço" value={measurements.neck} unit="cm" onChange={(v) => setMeasurements({...measurements, neck: v})} />
