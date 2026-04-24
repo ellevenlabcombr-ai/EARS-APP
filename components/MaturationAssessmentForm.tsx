@@ -33,7 +33,9 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     age: 14,
     height: 165,
     sittingHeight: 85,
-    weight: 55
+    weight: 55,
+    motherHeight: 160,
+    fatherHeight: 175
   });
 
 
@@ -64,6 +66,11 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     // Adjust based on age and weight
     if (data.age < 12) maturationIndex -= 20;
     if (data.age > 16) maturationIndex += 20;
+
+    // Optional: Predictive component based on parents height
+    const midParentHeight = (data.motherHeight + data.fatherHeight) / 2;
+    // We adjust score conceptually for the mock preview
+    if (data.height > midParentHeight) maturationIndex += 5;
 
     maturationIndex = Math.max(0, Math.min(100, maturationIndex));
 
@@ -114,8 +121,12 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
 
   }, [data]);
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       type: "Maturação",
       score,
       classification: classification.label,
@@ -125,6 +136,9 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
       alerts,
       raw_data: data
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getColorClasses = (color: string) => {
@@ -213,6 +227,9 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
             <NumberInput label="Altura" value={data.height} unit="cm" onChange={(v) => setData({...data, height: v})} />
             <NumberInput label="Altura Sentado" value={data.sittingHeight} unit="cm" onChange={(v) => setData({...data, sittingHeight: v})} />
             <NumberInput label="Peso" value={data.weight} unit="kg" onChange={(v) => setData({...data, weight: v})} />
+            
+            <NumberInput label="Altura da Mãe" value={data.motherHeight} unit="cm" onChange={(v) => setData({...data, motherHeight: v})} />
+            <NumberInput label="Altura do Pai" value={data.fatherHeight} unit="cm" onChange={(v) => setData({...data, fatherHeight: v})} />
           </div>
         </div>
       </div>
@@ -222,8 +239,8 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
         <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-indigo-500 hover:bg-indigo-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+        <Button onClick={handleSave} disabled={isSaving} className="bg-indigo-500 hover:bg-indigo-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
+          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
         </Button>
       </div>
     </motion.div>

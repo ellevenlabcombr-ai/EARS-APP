@@ -146,8 +146,12 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
 
   }, [data]);
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       type: "Hidratação",
       score,
       classification: classification.label,
@@ -157,6 +161,9 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
       alerts,
       raw_data: data
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getColorClasses = (color: string) => {
@@ -267,8 +274,8 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
         <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+        <Button onClick={handleSave} disabled={isSaving} className="bg-blue-500 hover:bg-blue-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
+          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
         </Button>
       </div>
     </motion.div>

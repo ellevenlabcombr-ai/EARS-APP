@@ -90,8 +90,12 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
   }, [symptoms, memoryCorrect, balance]);
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       type: "Neurológica",
       score,
       classification: classification.label,
@@ -102,6 +106,9 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
       alerts,
       raw_data: { symptoms, memoryCorrect, balance }
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getColorClasses = (color: string) => {
@@ -294,8 +301,8 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
         <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+        <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
+          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
         </Button>
       </div>
     </motion.div>

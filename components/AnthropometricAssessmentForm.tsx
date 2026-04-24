@@ -43,6 +43,21 @@ interface SkinfoldData {
   thigh: number;
 }
 
+const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
+  <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
+    <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+    <div className="relative">
+      <input
+        type="number"
+        value={value || ''}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
+      />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
+    </div>
+  </div>
+);
+
 export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: AnthropometricAssessmentProps) {
   const [measurements, setMeasurements] = useState<PerimetryData>({
     weight: 75,
@@ -158,8 +173,12 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
 
   }, [measurements, skinfolds]);
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       type: "Antropométrica",
       score,
       classification: classification.label,
@@ -175,6 +194,9 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
       alerts,
       raw_data: { measurements, skinfolds }
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getColorClasses = (color: string) => {
@@ -186,21 +208,6 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     };
     return map[color] || map.cyan;
   };
-
-  const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
-    <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
-      <div className="relative">
-        <input
-          type="number"
-          value={value || ''}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
-      </div>
-    </div>
-  );
 
   return (
     <motion.div 
@@ -356,8 +363,8 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
         <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
           Cancelar
         </Button>
-        <Button onClick={handleSave} className="bg-indigo-500 hover:bg-indigo-400 text-white font-black uppercase text-xxs tracking-widest px-8">
-          <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+        <Button onClick={handleSave} disabled={isSaving} className="bg-indigo-500 hover:bg-indigo-400 text-white font-black uppercase text-xxs tracking-widest px-8">
+          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
         </Button>
       </div>
     </motion.div>

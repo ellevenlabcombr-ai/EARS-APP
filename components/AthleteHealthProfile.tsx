@@ -273,7 +273,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const translateKey = (key: string): string => {
+const translateKey = (key: string, lang: string): string => {
   const dict: Record<string, string> = {
     // Sleep
     duration: 'Duração',
@@ -392,7 +392,13 @@ const translateKey = (key: string): string => {
     footArch: 'Arco do Pé',
   };
 
-  if (dict[key]) return dict[key];
+  if (lang === "pt" && dict[key]) return dict[key];
+  if (lang === "en") {
+    const enDict: Record<string, string> = { 
+      trainingLoad: "Training Load", rpe: "RPE", fatigue: "Fatigue", recovery: "Recovery", score: "Score", riskLevel: "Risk Level", date: "Date", notes: "Notes", classification: "Classification", alerts: "Alerts", skinfolds: "Skinfolds", measurements: "Measurements", chest: "Chest", thigh: "Thigh", abdomen: "Abdomen", triceps: "Triceps", axillary: "Axillary", suprailiac: "Suprailiac", subscapular: "Subscapular", hip: "Hip", neck: "Neck", waist: "Waist", "LEFT CALF": "Left Calf", "LEFT THIGH": "Left Thigh", "RIGHT CALF": "Right Calf", "RIGHT THIGH": "Right Thigh", "LEFT FOREARM": "Left Forearm", "RIGHT FOREARM": "Right Forearm", shoulders: "Shoulders"
+    };
+    if (enDict[key]) return enDict[key];
+  }
   
   // Convert camelCase or snake_case to Title Case
   return key
@@ -401,10 +407,10 @@ const translateKey = (key: string): string => {
     .replace(/^./, str => str.toUpperCase());
 };
 
-const translateValue = (value: any): string => {
-  if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
+const translateValue = (value: any, lang: string): string => {
+  if (typeof value === 'boolean') return value ? (lang === 'pt' ? 'Sim' : 'Yes') : (lang === 'pt' ? 'Não' : 'No');
   if (value === null || value === undefined) return 'N/A';
-  if (Array.isArray(value)) return value.map(translateValue).join(', ');
+  if (Array.isArray(value)) return value.map(v => translateValue(v, lang)).join(', ');
   if (typeof value === 'string') {
     const dict: Record<string, string> = {
       'low': 'Baixo',
@@ -430,11 +436,11 @@ const translateValue = (value: any): string => {
   return String(value);
 };
 
-const renderDataNode = (key: string, value: any, depth = 0) => {
+const renderDataNode = (key: string, value: any, lang: string, depth = 0): React.ReactNode => {
   // Skip internal or redundant fields at root level
   if (depth === 0 && ['classification', 'classification_color', 'alerts', 'score', 'athlete_id', 'id', 'created_at', 'assessment_date', 'clinical_report', 'clinical_alerts'].includes(key)) return null;
 
-  const translatedKey = translateKey(key);
+  const translatedKey = translateKey(key, lang);
 
   if (value === null || value === undefined) return null;
 
@@ -443,7 +449,7 @@ const renderDataNode = (key: string, value: any, depth = 0) => {
       <div key={key} className={`mt-2 ${depth > 0 ? 'ml-4 border-l border-slate-700/50 pl-3' : 'p-3 rounded-xl bg-slate-900/30 border border-slate-800/30'}`}>
         <span className="text-xxs font-bold text-slate-400 uppercase tracking-tight block mb-2">{translatedKey}</span>
         <div className="space-y-2">
-          {Object.entries(value).map(([subKey, subValue]) => renderDataNode(subKey, subValue, depth + 1))}
+          {Object.entries(value).map(([subKey, subValue]) => renderDataNode(subKey, subValue, lang, depth + 1))}
         </div>
       </div>
     );
@@ -453,7 +459,7 @@ const renderDataNode = (key: string, value: any, depth = 0) => {
     <div key={key} className={`flex items-center justify-between ${depth === 0 ? 'p-3 rounded-xl bg-slate-900/30 border border-slate-800/30' : 'py-1'}`}>
       <span className="text-xxs font-bold text-slate-500 uppercase tracking-tight">{translatedKey}</span>
       <span className="text-xs font-bold text-white text-right ml-4">
-        {translateValue(value)}
+        {translateValue(value, lang)}
       </span>
     </div>
   );
@@ -722,6 +728,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
   const [isDeletingNote, setIsDeletingNote] = useState<string | null>(null);
   const [confirmDeleteNote, setConfirmDeleteNote] = useState<string | null>(null);
   const [confirmDeleteAttachment, setConfirmDeleteAttachment] = useState<{id: string, name: string} | null>(null);
+  const [confirmDeleteAssessment, setConfirmDeleteAssessment] = useState<{id: string, source_table: string} | null>(null);
+  const [isDeletingAssessment, setIsDeletingAssessment] = useState(false);
   const [showSignatureStep, setShowSignatureStep] = useState(false);
   const [showAttachmentUpload, setShowAttachmentUpload] = useState(false);
   const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
@@ -1171,7 +1179,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       setIsGeneratingReport(true);
       const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
       
-      const prompt = `
+            const prompt = `
         Você é um especialista em medicina esportiva e fisiologia do exercício de elite.
         Analise os seguintes dados de uma avaliação ${type} do atleta ${athlete.name}.
         
@@ -1188,15 +1196,15 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         - Nível de Risco Atual: ${athlete.risk_level}
         
         TAREFA:
-        1. Gere um RELATÓRIO DETALHADO (em Português) com linguagem profissional, mas acessível.
-        2. Realize um CRUZAMENTO DE DADOS entre os resultados atuais e o perfil do atleta.
-        3. Identifique ALERTAS CLÍNICOS específicos (mínimo 1, máximo 5).
+        1. Gere um RELATÓRIO CLÍNICO DIRETO E OBJETIVO (em ${language === "en" ? "Inglês" : "Português"}), com linguagem profissional e prática. Seja direto ao ponto, não escreva como um artigo científico nem use introduções genéricas. Traga conclusões práticas para o dia a dia.
+        2. Realize um CRUZAMENTO DE DADOS entre os resultados atuais e as demandas da posição e modalidade do atleta.
+        3. Identifique alertas clínicos específicos (mínimo 1, máximo 5).
         
         FORMATO DE RESPOSTA (JSON):
         {
-          "report": "Texto longo formatado em Markdown com introdução, análise técnica e conclusão.",
+          "report": "Texto formatado em Markdown, com tópicos diretos.",
           "alerts": [
-            { "type": "warning" | "danger" | "info", "message": "Descrição curta do alerta", "priority": "high" | "medium" | "low" }
+            { "type": "warning" | "danger" | "info", "message": "Descrição do alerta (no mesmo idioma do relatório)", "priority": "high" | "medium" | "low" }
           ]
         }
       `;
@@ -1238,6 +1246,30 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       return { report: "Erro ao gerar relatório clínico automático.", alerts: [] };
     } finally {
       setIsGeneratingReport(false);
+    }
+  };
+
+  const handleDeleteAssessment = async () => {
+    if (!supabase || !confirmDeleteAssessment) return;
+    setIsDeletingAssessment(true);
+    
+    try {
+      const { error } = await supabase
+        .from(confirmDeleteAssessment.source_table)
+        .delete()
+        .eq('id', confirmDeleteAssessment.id);
+        
+      if (error) throw error;
+      
+      setNotification({ message: 'Avaliação excluída com sucesso!', type: 'success' });
+      setConfirmDeleteAssessment(null);
+      const refreshedData = await fetchAllAssessmentsData(athlete.id);
+      setClinicalAssessments(refreshedData);
+    } catch (err) {
+      console.error('Error deleting assessment:', err);
+      setNotification({ message: 'Erro ao excluir avaliação.', type: 'error' });
+    } finally {
+      setIsDeletingAssessment(false);
     }
   };
 
@@ -1400,8 +1432,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     setIsUploadingAttachment(true);
     try {
       const fileExt = data.file.name.split('.').pop();
-      // Preserve spaces and accented characters for more readable filenames
-      const safeDocName = data.documentName.replace(/[^\w\sÀ-ÿ]/g, '_');
+      // Remove accents and replace spaces/special chars with underscores to prevent Invalid Key errors
+      const normalizedStr = data.documentName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const safeDocName = normalizedStr.replace(/[^\w-]/g, '_');
       // Use double underscore as a clear separator between name and random suffix
       const fileName = `${safeDocName}__${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `attachments/${athlete.id}/${fileName}`;
@@ -3113,7 +3146,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             <div className="space-y-4">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                 <BellRing className="w-5 h-5 text-amber-500" />
-                Alertas Clínicos
+                {language === "pt" ? "Alertas Clínicos" : "Clinical Alerts"}
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {athleteAlerts.filter(a => a.status === 'active').length === 0 ? (
@@ -3743,9 +3776,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <Clock className="w-5 h-5 text-cyan-500" />
-                Histórico de Avaliações
-              </h2>
+                <Clock className="w-5 h-5 text-cyan-500" />{language === "pt" ? "Histórico de Avaliações" : "Assessment History"}</h2>
               <div className="flex items-center gap-2">
                 <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Total: {clinicalAssessments.length}</span>
               </div>
@@ -3843,9 +3874,24 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-500 hover:text-white">
-                            <ArrowUpRight size={16} />
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-500 hover:text-white"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedAssessment(assessment);
+                              }}
+                            >
+                              <ArrowUpRight size={16} />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setConfirmDeleteAssessment({ id: assessment.id, source_table: assessment.source_table });
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -3873,7 +3919,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                     <ClipboardList className="w-6 h-6 text-cyan-400" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Detalhes da Avaliação</h3>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">{language === "pt" ? "Detalhes da Avaliação" : "Assessment Details"}</h3>
                     <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">
                       {new Date(selectedAssessment.assessment_date).toLocaleDateString('pt-BR')} {new Date(selectedAssessment.assessment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                     </p>
@@ -3894,9 +3940,10 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
-                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Tipo</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{language === "pt" ? "Tipo" : "Type"}</p>
                     <p className="text-sm font-bold text-white uppercase">
-                      {selectedAssessment.assessment_type === 'sleep' ? 'Sono' :
+                      {language === "pt" ? (
+                       selectedAssessment.assessment_type === 'sleep' ? 'Sono' :
                        selectedAssessment.assessment_type === 'orthopedic' ? 'Ortopédica' :
                        selectedAssessment.assessment_type === 'biomechanical' ? 'Biomecânica' :
                        selectedAssessment.assessment_type === 'physical' ? 'Física' :
@@ -3909,11 +3956,27 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                        selectedAssessment.assessment_type === 'anthropometric' ? 'Antropométrica' :
                        selectedAssessment.assessment_type === 'maturation' ? 'Maturação' :
                        selectedAssessment.assessment_type === 'menstrual' ? 'Menstrual' :
-                       selectedAssessment.assessment_type === 'hydration' ? 'Hidratação' : selectedAssessment.assessment_type}
+                       selectedAssessment.assessment_type === 'hydration' ? 'Hidratação' : selectedAssessment.assessment_type
+                      ) : (
+                       selectedAssessment.assessment_type === 'sleep' ? 'Sleep' :
+                       selectedAssessment.assessment_type === 'orthopedic' ? 'Orthopedic' :
+                       selectedAssessment.assessment_type === 'biomechanical' ? 'Biomechanical' :
+                       selectedAssessment.assessment_type === 'physical' ? 'Physical' :
+                       selectedAssessment.assessment_type === 'functional' ? 'Functional' :
+                       selectedAssessment.assessment_type === 'strength' ? 'Dynamometry' :
+                       selectedAssessment.assessment_type === 'neurological' ? 'Neurological' :
+                       selectedAssessment.assessment_type === 'psychological' ? 'Psychological' :
+                       selectedAssessment.assessment_type === 'nutritional' ? 'Nutritional' :
+                       selectedAssessment.assessment_type === 'reds' ? 'RED-S' :
+                       selectedAssessment.assessment_type === 'anthropometric' ? 'Anthropometric' :
+                       selectedAssessment.assessment_type === 'maturation' ? 'Maturation' :
+                       selectedAssessment.assessment_type === 'menstrual' ? 'Menstrual' :
+                       selectedAssessment.assessment_type === 'hydration' ? 'Hydration' : selectedAssessment.assessment_type
+                      )}
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
-                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Classificação</p>
+                    <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{language === "pt" ? "Classificação" : "Classification"}</p>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
                         selectedAssessment.classification_color === 'emerald-500' ? 'bg-emerald-500' :
@@ -3923,7 +3986,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                         selectedAssessment.classification === 'Médio' ? 'bg-amber-500' :
                         selectedAssessment.classification === 'Alto' ? 'bg-rose-500' : 'bg-slate-500'
                       }`} />
-                      <p className="text-sm font-bold text-white uppercase">{selectedAssessment.classification || 'N/A'}</p>
+                      <p className="text-sm font-bold text-white uppercase">{translateValue(selectedAssessment.classification, language) || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -3932,7 +3995,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {selectedAssessment.score !== null && (
                   <div className="p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/10 flex items-center justify-between">
                     <div>
-                      <p className="text-xxs font-black text-cyan-500 uppercase tracking-widest mb-1">Pontuação Final</p>
+                      <p className="text-xxs font-black text-cyan-500 uppercase tracking-widest mb-1">{language === "pt" ? "Pontuação Final" : "Final Score"}</p>
                       <p className="text-2xl font-black text-white">{selectedAssessment.score}</p>
                     </div>
                     <Activity className="w-8 h-8 text-cyan-500/20" />
@@ -3941,9 +4004,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                 {/* Data Details */}
                 <div className="space-y-4">
-                  <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dados Detalhados</h4>
+                  <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">{language === "pt" ? "Dados Detalhados" : "Detailed Data"}</h4>
                   <div className="grid grid-cols-1 gap-3">
-                    {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value))}
+                    {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value, language))}
                   </div>
                 </div>
 
@@ -3952,7 +4015,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   <div className="space-y-4">
                     <h4 className="text-xxs font-black text-cyan-400 uppercase tracking-widest border-b border-cyan-900/30 pb-2 flex items-center gap-2">
                       <Sparkles className="w-3 h-3" />
-                      Relatório Clínico (IA)
+                      {language === "pt" ? "Relatório Clínico" : "Clinical Report"}
                     </h4>
                     <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800/50 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-medium">
                       {selectedAssessment.clinical_report}
@@ -3965,7 +4028,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                   <div className="space-y-3">
                     <h4 className="text-xxs font-black text-amber-400 uppercase tracking-widest border-b border-amber-900/30 pb-2 flex items-center gap-2">
                       <AlertCircle className="w-3 h-3" />
-                      Alertas Clínicos
+                      {language === "pt" ? "Alertas Clínicos" : "Clinical Alerts"}
                     </h4>
                     <div className="grid grid-cols-1 gap-2">
                       {selectedAssessment.clinical_alerts.map((alert: any, idx: number) => (
@@ -4895,6 +4958,16 @@ ${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:\n${noteForm.obs}` : ''}`;
           setIsEditModalOpen(false);
         }}
         onCancel={() => setShowConfirmDialog(false)}
+      />
+
+      <ConfirmDialog 
+        isOpen={!!confirmDeleteAssessment}
+        title={language === "pt" ? "Excluir Avaliação" : "Delete Assessment"}
+        description={language === "pt" ? "Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita." : "Are you sure you want to delete this assessment? This action cannot be undone."}
+        confirmText={language === "pt" ? "Excluir" : "Delete"}
+        loading={isDeletingAssessment}
+        onConfirm={handleDeleteAssessment}
+        onCancel={() => setConfirmDeleteAssessment(null)}
       />
 
       <ConfirmDialog 

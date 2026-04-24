@@ -55,8 +55,12 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
     return Math.round((diff / max) * 100);
   };
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       athleteId,
       measurements,
       asymmetries: {
@@ -69,6 +73,9 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
       date: new Date().toISOString(),
       type: 'dynamometry'
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const groups = [
@@ -215,11 +222,9 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
                 </div>
               </div>
 
-              <Button 
-                onClick={handleSave}
-                className="w-full mt-8 bg-amber-500 hover:bg-amber-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-amber-500/20"
+              <Button onClick={handleSave} disabled={isSaving} className="w-full mt-8 bg-amber-500 hover:bg-amber-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-amber-500/20"
               >
-                <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+                {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
               </Button>
             </CardContent>
           </Card>

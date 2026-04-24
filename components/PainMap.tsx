@@ -357,7 +357,11 @@ export function PainMap({
     }
   };
 
-  const handleSave = () => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
     if (selectedPart && onChange && tempLevel !== null) {
       onChange({
         ...value,
@@ -368,6 +372,9 @@ export function PainMap({
         },
       });
       setSelectedPart(null);
+    }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -807,10 +814,8 @@ export function PainMap({
                       {lang === "pt" ? "Remover" : "Remove"}
                     </Button>
                   )}
-                  <Button
-                    className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                    onClick={handleSave}
-                    disabled={tempLevel === null}
+                  <Button className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(6,182,212,0.4)]" onClick={handleSave}
+                    disabled={isSaving || tempLevel === null}
                   >
                     {lang === "pt" ? "Salvar" : "Save"}
                   </Button>

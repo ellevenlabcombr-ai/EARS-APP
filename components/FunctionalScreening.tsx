@@ -289,8 +289,12 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     }
   ];
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       type: "functional",
       score_total: totalScore,
       risk_level: alerts.risk,
@@ -304,6 +308,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
       athleteId,
       date: new Date().toISOString()
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -549,11 +556,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[5rem] resize-none text-xxs font-medium"
                 />
 
-                <Button 
-                  onClick={handleSave}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
+                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
                 >
-                  <Save className="w-4 h-4 mr-2" /> Salvar Avaliação
+                  {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
                 </Button>
               </div>
             </CardContent>

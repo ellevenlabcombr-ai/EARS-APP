@@ -74,13 +74,20 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    onSave({
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+    await onSave({
       ...formData,
       athleteId,
       date: new Date().toISOString(),
       type: 'physical_fitness'
     });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const steps = [
@@ -310,11 +317,9 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
             Próximo <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         ) : (
-          <Button 
-            onClick={handleSave}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white uppercase text-xxs font-black tracking-widest px-8 shadow-[0_0_20px_rgba(99,102,241,0.35)]"
+          <Button onClick={handleSave} disabled={isSaving} className="bg-indigo-500 hover:bg-indigo-600 text-white uppercase text-xxs font-black tracking-widest px-8 shadow-[0_0_20px_rgba(99,102,241,0.35)]"
           >
-            <Save className="w-4 h-4 mr-2" /> Finalizar Avaliação
+            {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Finalizar Avaliação
           </Button>
         )}
       </div>
