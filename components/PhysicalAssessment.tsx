@@ -39,9 +39,9 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
     // Body Composition
     weight: '',
     height: '',
-    fatPercentage: '',
-    muscleMass: '',
     visceralFat: '',
+    fatPercentage: '', // manually entered or overwritten
+    muscleMass: '', // manually entered or overwritten
     
     // Skinfolds (mm)
     sfTriceps: '',
@@ -74,8 +74,8 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
     notes: ''
   });
 
-  // Auto-calculate BF and Muscle Mass when skinfolds or weight change
-  useEffect(() => {
+  // Auto-calculate BF and Muscle Mass
+  const calculatedMetrics = React.useMemo(() => {
     const w = parseFloat(formData.weight);
     const tri = parseFloat(formData.sfTriceps) || 0;
     const sub = parseFloat(formData.sfSubscapular) || 0;
@@ -100,31 +100,26 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
       
       // Siri Equation
       let bf = (495 / bd) - 450;
-      if (bf < 2) bf = 2; // minimum boundary
-      if (bf > 60) bf = 60; // maximum boundary
+      if (bf < 2) bf = 2; 
+      if (bf > 60) bf = 60; 
 
-      // Muscle mass approx (Lean Mass - Bone - Residual)
-      // For simplicity in sports: Muscle Mass = Total Weight - Fat Mass - Bone Mass
-      // Bone mass is approx 15% of weight, Residual (organs/blood) ~ 25%.
-      // Often trainers just want "Lean Body Mass", but if "Muscle Mass" is asked:
-      // Lean Body Mass (LBM) = W - Fat
       const fatMass = w * (bf / 100);
       const lbm = w - fatMass;
-      // Let's assume Muscle Mass is roughly LBM * 0.5 or we just output LBM if they mean Massa Magra. 
-      // Many use (Weight - FatWeight) as Lean Mass. Let's provide Lean Mass as "Massa Muscular / Magra".
-      // To be more precise, skeletal muscle mass is ~ LBM * 0.55. Let's output LBM as it's standard.
+      const muscleMass = lbm; 
       
-      const muscleMass = lbm; // Using Lean Mass as proxy for "Massa Muscular" as often used interchangeably by coaches.
-
-      setFormData(prev => ({
-        ...prev,
+      return {
         fatPercentage: bf.toFixed(1),
         muscleMass: muscleMass.toFixed(1)
-      }));
+      };
     }
+    return {
+      fatPercentage: formData.fatPercentage,
+      muscleMass: formData.muscleMass
+    };
   }, [
     formData.weight, formData.sfTriceps, formData.sfSubscapular, formData.sfChest, 
     formData.sfAxillary, formData.sfSuprailiac, formData.sfAbdomen, formData.sfThigh,
+    formData.fatPercentage, formData.muscleMass,
     athleteAge, athleteGender
   ]);
 
@@ -135,6 +130,8 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
   const handleSave = () => {
     onSave({
       ...formData,
+      fatPercentage: calculatedMetrics.fatPercentage,
+      muscleMass: calculatedMetrics.muscleMass,
       athleteId,
       date: new Date().toISOString(),
       type: 'physical'
@@ -222,7 +219,7 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
                   </label>
                   <input 
                     type="number" 
-                    value={formData.fatPercentage}
+                    value={calculatedMetrics.fatPercentage}
                     onChange={(e) => handleChange('fatPercentage', e.target.value)}
                     className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-400 font-black focus:border-emerald-500 outline-none transition-colors placeholder:text-emerald-500/30"
                     placeholder="Auto ou Digite..."
@@ -234,7 +231,7 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
                   </label>
                   <input 
                     type="number" 
-                    value={formData.muscleMass}
+                    value={calculatedMetrics.muscleMass}
                     onChange={(e) => handleChange('muscleMass', e.target.value)}
                     className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-400 font-black focus:border-emerald-500 outline-none transition-colors placeholder:text-emerald-500/30"
                     placeholder="Auto ou Digite..."

@@ -1202,7 +1202,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -2096,18 +2096,26 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             ) : (
               <>
                 {/* 2. Decision cards row */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
           {[
             { 
               label: 'Prontidão', 
-              value: wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].readiness != null ? `${wellnessHistory[wellnessHistory.length - 1].readiness}%` : (athlete.readiness != null ? `${athlete.readiness}%` : 'Não informado'), 
+              value: clinicalSessionData?.readiness.score != null ? `${clinicalSessionData.readiness.score}%` : (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].readiness != null ? `${wellnessHistory[wellnessHistory.length - 1].readiness}%` : (athlete.readiness != null ? `${athlete.readiness}%` : 'Não informado')), 
               icon: Activity, 
-              color: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].readiness != null ? wellnessHistory[wellnessHistory.length - 1].readiness : (athlete.readiness || 0)) < 70 ? 'text-rose-400' : 'text-cyan-400', 
-              bg: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].readiness != null ? wellnessHistory[wellnessHistory.length - 1].readiness : (athlete.readiness || 0)) < 70 ? 'bg-rose-500/10' : 'bg-cyan-500/10', 
-              trend: wellnessHistory.length > 1 && wellnessHistory[wellnessHistory.length - 1].readiness != null && wellnessHistory[wellnessHistory.length - 2].readiness != null ? (wellnessHistory[wellnessHistory.length - 1].readiness >= wellnessHistory[wellnessHistory.length - 2].readiness ? 'up' : 'down') : 'stable',
-              alert: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].readiness != null ? wellnessHistory[wellnessHistory.length - 1].readiness : (athlete.readiness || 0)) < 70 ? 'Queda Crítica' : null 
+              color: (clinicalSessionData?.readiness.score || 100) < 60 ? 'text-rose-400' : (clinicalSessionData?.readiness.score || 100) < 80 ? 'text-amber-400' : 'text-cyan-400', 
+              bg: (clinicalSessionData?.readiness.score || 100) < 60 ? 'bg-rose-500/10' : (clinicalSessionData?.readiness.score || 100) < 80 ? 'bg-amber-500/10' : 'bg-cyan-500/10', 
+              trend: clinicalSessionData?.trends.readinessTrend === "improving" ? 'up' : clinicalSessionData?.trends.readinessTrend === "worsening" ? 'down' : 'stable',
+              alert: (clinicalSessionData?.readiness.score || 100) < 60 ? 'Queda Crítica' : null 
             },
-            { label: 'Nível de Risco', value: athlete.riskLevel || 'Baixo', icon: AlertCircle, color: riskCfg.color, bg: riskCfg.bg, trend: 'stable', alert: athlete.riskLevel === 'Crítico' ? 'Ação Imediata' : null },
+            { 
+              label: 'Nível de Risco', 
+              value: clinicalSessionData?.priorityOutput.riskScore != null ? (clinicalSessionData.priorityOutput.riskScore > 75 ? 'Crítico' : clinicalSessionData.priorityOutput.riskScore > 45 ? 'Moderado' : 'Baixo') : (athlete.riskLevel || 'Baixo'), 
+              icon: AlertCircle, 
+              color: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'text-rose-400' : (clinicalSessionData?.priorityOutput.riskScore || 0) > 45 ? 'text-amber-400' : 'text-emerald-400', 
+              bg: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'bg-rose-500/10' : (clinicalSessionData?.priorityOutput.riskScore || 0) > 45 ? 'bg-amber-500/10' : 'bg-emerald-500/10', 
+              trend: 'stable', 
+              alert: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'Ação Imediata' : null 
+            },
             { 
               label: 'Status de Dor', 
               value: wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].pain != null ? `Nível ${wellnessHistory[wellnessHistory.length - 1].pain}` : 'Não informado', 
@@ -2115,7 +2123,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               color: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].pain != null && wellnessHistory[wellnessHistory.length - 1].pain > 3) ? 'text-rose-400' : 'text-emerald-400', 
               bg: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].pain != null && wellnessHistory[wellnessHistory.length - 1].pain > 3) ? 'bg-rose-500/10' : 'bg-emerald-500/10', 
               trend: wellnessHistory.length > 1 && wellnessHistory[wellnessHistory.length - 1].pain != null && wellnessHistory[wellnessHistory.length - 2].pain != null ? (wellnessHistory[wellnessHistory.length - 1].pain > wellnessHistory[wellnessHistory.length - 2].pain ? 'up' : 'down') : 'stable',
-              alert: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].pain != null && wellnessHistory[wellnessHistory.length - 1].pain > 5) ? 'Ponto Crítico' : null 
+              alert: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].pain != null) ? (wellnessHistory[wellnessHistory.length - 1].pain >= 7 ? 'Ponto Crítico' : wellnessHistory[wellnessHistory.length - 1].pain >= 4 ? 'Atenção' : null) : null
             },
             { 
               label: 'Horas de Sono', 
@@ -2143,7 +2151,23 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               trend: 'stable', 
               alert: (wellnessHistory.length > 0 && wellnessHistory[wellnessHistory.length - 1].fatigue != null && wellnessHistory[wellnessHistory.length - 1].fatigue > 7) ? 'Fadiga Alta' : null 
             },
-            { label: 'Disponibilidade', value: athlete.status || 'Total', icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10', trend: 'stable' },
+            { 
+              label: 'Disponibilidade', 
+              value: clinicalSessionData?.priorityOutput.adjustedDecision === 'hold' ? 'HOLD' : 
+                     clinicalSessionData?.priorityOutput.adjustedDecision === 'recovery' ? 'Recovery' :
+                     clinicalSessionData?.priorityOutput.adjustedDecision === 'modified_train' ? 'Restrição' : 
+                     'Apto', 
+              icon: ShieldCheck, 
+              color: clinicalSessionData?.priorityOutput.adjustedDecision === 'hold' ? 'text-rose-400' : 
+                     clinicalSessionData?.priorityOutput.adjustedDecision === 'recovery' ? 'text-amber-400' :
+                     clinicalSessionData?.priorityOutput.adjustedDecision === 'modified_train' ? 'text-indigo-400' : 
+                     'text-emerald-400', 
+              bg: clinicalSessionData?.priorityOutput.adjustedDecision === 'hold' ? 'bg-rose-500/10' : 
+                  clinicalSessionData?.priorityOutput.adjustedDecision === 'recovery' ? 'bg-amber-500/10' :
+                  clinicalSessionData?.priorityOutput.adjustedDecision === 'modified_train' ? 'bg-indigo-500/10' : 
+                  'bg-emerald-500/10', 
+              trend: 'stable' 
+            },
           ].map((card, i) => (
             <Card key={i} className={`bg-slate-900/40 border-slate-800/50 shadow-lg group hover:border-slate-700 transition-all active:scale-[0.98] cursor-pointer relative overflow-hidden ${card.alert ? 'ring-1 ring-rose-500/30' : ''}`}>
               {card.alert && (

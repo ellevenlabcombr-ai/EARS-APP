@@ -25,25 +25,28 @@ export const EARSEngine = {
 
     const normalize = (val: number | undefined, max: number = 5) => {
       if (!val) return 0;
-      return (val / max) * 100;
+      // If val is already potentially a percentage (> 10), assume it's 0-100 and just return it clamped
+      if (val > 10) return Math.max(0, Math.min(100, val));
+      return Math.max(0, Math.min(100, (val / max) * 100));
     };
 
     // Use decayed metrics if available for a more stable baseline
-    const sleepVal = decayed ? (decayed.weightedSleep / 2) : checkin.sleep_quality; // simple heuristic to bridge 10h scope to 1-5 scale
-    const legVal = checkin.leg_heaviness;
-
+    // Simple heuristic to bridge 10h scope to 1-5 scale if it's hours, or just pass if it's quality
+    const sleepQuality = checkin.sleep_quality || (checkin.sleep_hours ? (checkin.sleep_hours >= 8 ? 5 : checkin.sleep_hours >= 6 ? 3 : 1) : 3);
+    
     // Invert negative metrics (Stress & Leg Heaviness)
-    const legHeavinessValue = legVal ? (6 - legVal) : 3;
-    const stressValue = checkin.stress ? (6 - checkin.stress) : 3;
+    const legVal = checkin.leg_heaviness || 3;
+    const stressVal = checkin.stress || 3;
+    const legHeavinessValue = 6 - Math.min(5, Math.max(1, legVal));
+    const stressValue = 6 - Math.min(5, Math.max(1, stressVal));
 
     const scores = {
-      sleep: decayed ? (decayed.weightedReadiness) : normalize(checkin.sleep_quality), 
-      // Actually, let's keep it simple: normalize input, but maybe average with decayed
+      sleep: decayed ? (decayed.weightedReadiness) : normalize(sleepQuality), 
       energy: normalize(checkin.energy),
       soreness: normalize(legHeavinessValue),
       stress: normalize(stressValue),
       mood: normalize(checkin.mood),
-      other: normalize(checkin.hydration || checkin.nutrition || checkin.overall_readiness || 3)
+      other: normalize(checkin.overall_readiness || checkin.hydration || checkin.nutrition || 3)
     };
 
     // If decayed readiness is provided, it acts as a "buffer" to the today's base score
@@ -187,7 +190,7 @@ export const EARSEngine = {
 
     const totalDeductions = (painDeduction + symptomDeduction + sleepDeduction + menstrualDeduction + multipliers) * ageMultiplier * synergyMultiplier * trendFactor;
     
-    const finalScore = Math.max(0, Math.round((decayed ? (baseScore * 0.8 + decayed.weightedReadiness * 0.2) : baseScore) - totalDeductions));
+    const finalScore = Math.max(0, Math.min(100, Math.round((decayed ? (baseScore * 0.8 + decayed.weightedReadiness * 0.2) : baseScore) - totalDeductions)));
     
     let level: ReadinessLevel = 'ready';
     if (finalScore < 60) level = 'risk';
