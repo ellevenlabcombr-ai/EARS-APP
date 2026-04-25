@@ -13,9 +13,9 @@ export const t = {
     readyForGame: 'Pronto para o Jogo! 🚀',
     moderateAttention: 'Atenção Moderada ⚠️',
     lowBattery: 'Bateria Fraca 🛑',
-    goodRecovery: 'Sua recuperação está excelente. Vá com tudo no treino!',
-    moderateFatigue: 'Você está com um pouco de fadiga. Preste atenção aos sinais do seu corpo.',
-    highRisk: 'Nível de prontidão baixo. Redobre a atenção e foque na recuperação.',
+    goodRecovery: 'Sua recuperação está excelente. Seu corpo está preparado para absorver cargas altas de treino.',
+    moderateFatigue: 'Seu corpo apresenta sinais de fadiga moderada, o que reduz sua capacidade para produzir e manter performance máxima. Isso é previsto após cargas acumuladas, mas requer sabedoria.',
+    highRisk: 'Seu nível de prontidão está criticamente baixo. Seu corpo está esgotado e o risco de lesões articulares ou musculares está elevado.',
     yourAnswers: 'Suas Respostas',
     painMapping: 'Mapeamento de Dor',
     backToHome: 'Voltar ao Início',
@@ -27,7 +27,7 @@ export const t = {
     syncing: 'Sincronizando...',
     syncData: 'Sincronizar Dados',
     streak: '🔥 {count} dias seguidos!',
-    tips: 'Dicas para você',
+    tips: 'Missões de Recuperação',
     painLevel: 'Nível',
     painType: 'Tipo',
     painTypes: {
@@ -52,6 +52,7 @@ export const t = {
       menstrual_cycle: { label: 'Ciclo Menstrual', desc: 'Em qual fase do ciclo você está hoje?' },
       rpe_simple: { label: 'Esforço (Ontem)', desc: 'Qual foi o esforço no treino de ontem?' },
       duration_minutes: { label: 'Duração (Ontem)', desc: 'Quanto tempo durou o treino? (Minutos)' },
+      previous_activity: { label: 'Atividade de Ontem', desc: 'Qual foi sua principal atividade física ontem?' },
     },
     options: {
       veryBad: 'Muito Mal',
@@ -85,14 +86,19 @@ export const t = {
       rpe_medium: 'Médio',
       rpe_hard: 'Difícil',
       rpe_very_hard: 'Muito Difícil',
+      act_rest: 'Descanso Total',
+      act_phys: 'Físico / Academia',
+      act_train: 'Treino Tático/Técnico',
+      act_friendly: 'Amistoso',
+      act_match: 'Jogo Oficial',
     },
     advice: {
-      hydrationLow: 'Sua hidratação está baixa hoje. Tente andar com uma garrafinha!',
-      sleepLow: 'Seu sono não foi ideal. Considere um cochilo de 20 min à tarde.',
-      nutritionLow: 'A alimentação de ontem não foi a melhor. Foque em nutrientes hoje!',
-      stressHigh: 'Nível de estresse alto. Tente fazer um exercício de respiração antes do treino.',
-      energyLow: 'Energia baixa. Não force além do limite hoje.',
-      recoveryLow: 'Recuperação incompleta. Um trabalho regenerativo pode ser uma boa ideia.'
+      hydrationLow: 'Aumente imediatamente a ingestão de água. Beba pelo menos 3L hoje e mantenha uma garrafa sempre com você.',
+      sleepLow: 'Seu sono foi inadequado. Adicione obrigatoriamente um cochilo de 20-30 minutos à tarde e durma 1 hora mais cedo esta noite.',
+      nutritionLow: 'Nutrição deficiente. Realize refeições completas hoje, priorizando proteínas e carboidratos de qualidade. Evite ultraprocessados.',
+      stressHigh: 'Você está sob alto estresse. Execute 5 minutos de respiração diafragmática agora e antes do treino para baixar a frequência cardíaca.',
+      energyLow: 'Energia em nível crítico. Requer moderação na intensidade do treino de hoje.',
+      recoveryLow: 'O corpo não se recuperou. Sessão de liberação miofascial e banho de contraste (ou gelo) são obrigatórios hoje pós-treino.'
     }
   },
   en: {
@@ -107,9 +113,9 @@ export const t = {
     readyForGame: 'Ready for the Game! 🚀',
     moderateAttention: 'Moderate Attention ⚠️',
     lowBattery: 'Low Battery 🛑',
-    goodRecovery: 'Your recovery is excellent. Go all out in training!',
-    moderateFatigue: 'You have some fatigue. Pay attention to your body signals.',
-    highRisk: 'Low readiness level. Double your attention and focus on recovery.',
+    goodRecovery: 'Your recovery is excellent. Your body is ready to absorb high training loads.',
+    moderateFatigue: 'Your body shows signs of moderate fatigue, which reduces your maximum performance capacity. This is an expected after accumulated loads, but requires smart management.',
+    highRisk: 'Your readiness level is critically low. Your body is exhausted and the risk of joint or muscle injuries is elevated.',
     yourAnswers: 'Your Answers',
     painMapping: 'Pain Mapping',
     backToHome: 'Back to Home',
@@ -121,7 +127,7 @@ export const t = {
     syncing: 'Syncing...',
     syncData: 'Sync Data',
     streak: '🔥 {count} day streak!',
-    tips: 'Tips for you',
+    tips: 'Recovery Missions',
     painLevel: 'Level',
     painType: 'Type',
     painTypes: {
@@ -146,6 +152,7 @@ export const t = {
       menstrual_cycle: { label: 'Menstrual Cycle', desc: 'What phase of your cycle are you in today?' },
       rpe_simple: { label: 'Effort (Yesterday)', desc: 'What was your effort level in yesterday\'s training?' },
       duration_minutes: { label: 'Duration (Yesterday)', desc: 'How long was the training? (Minutes)' },
+      previous_activity: { label: 'Yesterday\'s Activity', desc: 'What was your main physical activity yesterday?' },
     },
     options: {
       veryBad: 'Very Bad',
@@ -179,14 +186,19 @@ export const t = {
       rpe_medium: 'Medium',
       rpe_hard: 'Hard',
       rpe_very_hard: 'Very Hard',
+      act_rest: 'Full Rest',
+      act_phys: 'Physical / Gym',
+      act_train: 'Tactical/Tech Training',
+      act_friendly: 'Friendly Match',
+      act_match: 'Official Match',
     },
     advice: {
-      hydrationLow: 'Your hydration is low today. Try to carry a water bottle!',
-      sleepLow: 'Your sleep wasn\'t ideal. Consider a 20-min nap in the afternoon.',
-      nutritionLow: 'Yesterday\'s nutrition wasn\'t the best. Focus on nutrients today!',
-      stressHigh: 'High stress level. Try a breathing exercise before training.',
-      energyLow: 'Low energy. Don\'t push beyond your limits today.',
-      recoveryLow: 'Incomplete recovery. Regenerative work might be a good idea.'
+      hydrationLow: 'Increase water intake immediately. Drink at least 3L today and keep a water bottle with you at all times.',
+      sleepLow: 'Inadequate sleep duration. You must add a 20-30 minute nap this afternoon and go to bed 1 hour earlier tonight.',
+      nutritionLow: 'Nutritional recovery is deficient. Eat complete meals today, prioritizing quality proteins and carbs. Avoid ultra-processed foods.',
+      stressHigh: 'High stress detected. Execute 5 minutes of diaphragmatic breathing now and before training to lower your heart rate.',
+      energyLow: 'Critical energy level. Requires moderation in training intensity today.',
+      recoveryLow: 'Incomplete recovery. A myofascial release session and contrast bath (or ice) are mandatory after today\'s training.'
     }
   }
 };

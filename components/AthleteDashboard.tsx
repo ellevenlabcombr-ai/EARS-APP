@@ -290,6 +290,14 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
     { value: 5, label: opts.rpe_very_hard, color: "bg-red-500", emoji: "🥵" },
   ];
 
+  const previousActivityOptions = [
+    { value: 5, label: opts.act_rest, color: "bg-emerald-500", emoji: "🛌" },
+    { value: 4, label: opts.act_phys, color: "bg-lime-500", emoji: "🏋️" },
+    { value: 3, label: opts.act_train, color: "bg-yellow-500", emoji: "⚽" },
+    { value: 2, label: opts.act_friendly, color: "bg-orange-500", emoji: "🤝" },
+    { value: 1, label: opts.act_match, color: "bg-red-500", emoji: "🔥" },
+  ];
+
   switch (metricId) {
     case "sleep_hours":
       return sleepHourOptions;
@@ -311,6 +319,8 @@ const getOptionsForMetric = (metricId: string, lang: Language) => {
       return legHeavinessOptions;
     case "rpe_simple":
       return rpeOptions;
+    case "previous_activity":
+      return previousActivityOptions;
     case "mood":
     case "training_recovery":
     case "overall_wellbeing":
@@ -385,6 +395,13 @@ const getMetrics = (lang: Language, gender: "M" | "F" = "M") => {
       description: m.pre_training_meal.desc,
     },
     // Evening/Performance Section
+    {
+      id: "previous_activity",
+      group: "evening",
+      label: m.previous_activity.label,
+      icon: Activity,
+      description: m.previous_activity.desc,
+    },
     {
       id: "training_recovery",
       group: "evening",
@@ -939,7 +956,7 @@ export function AthleteDashboard({
 
     Object.entries(answers).forEach(([key, value]) => {
       // Exclude menstrual cycle from standard calculating out of 5
-      if (key === "menstrual_cycle") return;
+      if (key === "menstrual_cycle" || key === "duration_minutes" || key === "rpe_simple" || key === "previous_activity") return;
 
       let scoreValue = value;
 
@@ -988,15 +1005,27 @@ export function AthleteDashboard({
       }
     }
 
-    const totalDeductions = (painDeduction + signsDeduction) * ageMultiplier;
+    // Activity Deduction
+    const previousActivity = answers["previous_activity"];
+    let activityDeduction = 0;
+    if (previousActivity === 1) activityDeduction = 15; // Match -> huge drop
+    else if (previousActivity === 2) activityDeduction = 10; // Friendly -> big drop
+    else if (previousActivity === 3) activityDeduction = 5; // Tactical -> slight drop
+    else if (previousActivity === 4) activityDeduction = 0; // Gym -> nothing
+    else if (previousActivity === 5) activityDeduction = -5; // Rest -> gain readiness
 
-    if (maxScore === 0) return Math.max(0, 100 - Math.round(totalDeductions));
+    const totalDeductions = ((painDeduction + signsDeduction) * ageMultiplier) + activityDeduction;
+
+    if (maxScore === 0) return Math.min(100, Math.max(0, 100 - Math.round(totalDeductions)));
 
     let baseReadiness = (totalScore / maxScore) * 100;
     
-    return Math.max(
-      0,
-      Math.round(baseReadiness - totalDeductions)
+    return Math.min(
+      100,
+      Math.max(
+        0,
+        Math.round(baseReadiness - totalDeductions)
+      )
     );
   };
 
@@ -1039,20 +1068,33 @@ export function AthleteDashboard({
     return streak;
   };
 
-  const getTips = () => {
+  const getTips = (record?: any) => {
     const tips = [];
     const adv = t[lang].advice;
+    
+    // Check values either from the passed record or current unsubmitted answers
+    const hasLowHydration = record ? record.hydration_perception <= 2 : (answers["hydration"] && answers["hydration"] <= 2);
+    const hasLowSleep = record ? record.sleep_hours <= 6 : (answers["sleep_hours"] && answers["sleep_hours"] <= 6);
+    const hasLowNutrition = record ? record.nutrition <= 2 : (answers["nutrition"] && answers["nutrition"] <= 2);
+    const hasHighStress = record ? record.stress_level <= 2 : (answers["stress"] && answers["stress"] <= 2);
+    const hasLowEnergy = record ? record.fatigue_level <= 2 : (answers["energy"] && answers["energy"] <= 2);
+    const hasLowRecovery = record ? record.training_recovery <= 2 : (answers["training_recovery"] && answers["training_recovery"] <= 2);
 
-    if (answers["hydration"] && answers["hydration"] <= 2)
-      tips.push(adv.hydrationLow);
-    if (answers["sleep_hours"] && answers["sleep_hours"] <= 6)
-      tips.push(adv.sleepLow);
-    if (answers["nutrition"] && answers["nutrition"] <= 2)
-      tips.push(adv.nutritionLow);
-    if (answers["stress"] && answers["stress"] <= 2) tips.push(adv.stressHigh);
-    if (answers["energy"] && answers["energy"] <= 2) tips.push(adv.energyLow);
-    if (answers["training_recovery"] && answers["training_recovery"] <= 2)
-      tips.push(adv.recoveryLow);
+    const currentReadiness = record ? record.readiness_score : calculateReadiness();
+    if (currentReadiness >= 75) {
+      tips.push(lang === 'pt' ? 'Mantenha o ritmo! Nenhuma ação corretiva drástica é necessária hoje.' : 'Keep the pace! No drastic corrective action needed today.');
+    } else if (currentReadiness >= 50) {
+      tips.push(lang === 'pt' ? 'Recuperação ativa obrigatória: execute 15min de mobilidade e trabalho regenerativo hoje.' : 'Mandatory active recovery: execute 15min of mobility and regenerative work today.');
+    } else {
+      tips.push(lang === 'pt' ? 'Recuperação passiva obrigatória: descanso total. Comunique imediatamente o departamento físico sobre qualquer dor.' : 'Mandatory passive recovery: total rest. Immediately notify the physical department of any pain.');
+    }
+
+    if (hasLowHydration) tips.push(adv.hydrationLow);
+    if (hasLowSleep) tips.push(adv.sleepLow);
+    if (hasLowNutrition) tips.push(adv.nutritionLow);
+    if (hasHighStress) tips.push(adv.stressHigh);
+    if (hasLowEnergy) tips.push(adv.energyLow);
+    if (hasLowRecovery) tips.push(adv.recoveryLow);
 
     return tips;
   };
@@ -1164,6 +1206,7 @@ export function AthleteDashboard({
         symptoms: {
           ...(clinicalSigns.length > 0 ? clinicalSigns.reduce((acc, sign) => ({ ...acc, [sign]: 1 }), {}) : {}),
           leg_heaviness: answers["leg_heaviness"] || 0,
+          previous_activity: answers["previous_activity"] || 0,
           rpe_simple: rpe_simple,
           mapped_rpe: mapped_rpe,
           duration_minutes: duration_minutes,
@@ -1512,6 +1555,8 @@ export function AthleteDashboard({
         );
       }
 
+      const todayTips = todaySummary ? getTips(todaySummary) : [];
+
       return (
         <Card className="bg-[#0A1120] border-emerald-500/30 overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent pointer-events-none" />
@@ -1549,11 +1594,30 @@ export function AthleteDashboard({
               <Button 
                 variant="outline" 
                 onClick={() => setSelectedRecord(todaySummary)}
-                className="w-full md:w-auto border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/10"
+                className="w-full md:w-auto border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/10 shrink-0"
               >
                 Ver Detalhes
               </Button>
             </div>
+
+            {todayTips.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-emerald-500/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <Lightbulb className="w-5 h-5 text-emerald-400" />
+                  <h4 className="text-sm font-black text-white uppercase tracking-widest">{t[lang].tips}</h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {todayTips.map((tip, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800/50 hover:border-emerald-500/30 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-emerald-400 text-xs font-black">{i + 1}</span>
+                      </div>
+                      <p className="text-sm text-slate-300 font-medium leading-relaxed">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       );
@@ -1982,7 +2046,7 @@ export function AthleteDashboard({
                                 <span
                                   className={`text-2xl font-black ${isGood ? "text-emerald-400" : isWarning ? "text-amber-400" : "text-red-400"}`}
                                 >
-                                  {record.readiness_score}%
+                                  {Math.min(100, Math.round(record.readiness_score))}%
                                 </span>
                               </div>
                             </div>
@@ -2058,14 +2122,14 @@ export function AthleteDashboard({
                         strokeWidth="8"
                         fill="transparent"
                         strokeDasharray={364.4}
-                        strokeDashoffset={364.4 - (364.4 * selectedRecord.readiness_score) / 100}
+                        strokeDashoffset={364.4 - (364.4 * Math.min(100, Math.round(selectedRecord.readiness_score))) / 100}
                         className={`${
                           selectedRecord.readiness_score >= 75 ? "text-emerald-500" : 
                           selectedRecord.readiness_score >= 50 ? "text-amber-500" : "text-red-500"
                         } transition-all duration-1000 ease-out`}
                       />
                     </svg>
-                    <span className="absolute text-3xl font-black text-white">{selectedRecord.readiness_score}%</span>
+                    <span className="absolute text-3xl font-black text-white">{Math.min(100, Math.round(selectedRecord.readiness_score))}%</span>
                   </div>
                   <p className="mt-4 text-xs font-black text-slate-500 uppercase tracking-widest">Nível de Prontidão</p>
                 </div>
@@ -2073,7 +2137,7 @@ export function AthleteDashboard({
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {metrics.map((m) => {
-                    let val = null;
+                    let val: any = null;
                     if (selectedRecord) {
                       switch(m.id) {
                         case 'sleep': val = selectedRecord.sleep_quality; break;
@@ -2081,16 +2145,32 @@ export function AthleteDashboard({
                         case 'stress': val = selectedRecord.stress_level; break;
                         case 'hydration': val = selectedRecord.hydration_perception; break;
                         case 'leg_heaviness': val = selectedRecord.muscle_soreness ? Math.ceil(selectedRecord.muscle_soreness / 2) : null; break;
+                        case 'previous_activity': val = selectedRecord.symptoms?.previous_activity || (selectedRecord.wellness_records && selectedRecord.wellness_records[0]?.symptoms?.previous_activity); break;
+                        case 'duration_minutes': val = selectedRecord.symptoms?.duration_minutes || (selectedRecord.wellness_records && selectedRecord.wellness_records[0]?.symptoms?.duration_minutes); break;
+                        case 'rpe_simple': val = selectedRecord.symptoms?.rpe_simple || (selectedRecord.wellness_records && selectedRecord.wellness_records[0]?.symptoms?.rpe_simple); break;
                         default: val = (selectedRecord as any)[m.id];
                       }
                     }
-                    const opt = getOptionsForMetric(m.id, lang).find(o => o.value === val);
-                    if (!opt) return null;
+                    if (val === undefined || val === null) return null;
+                    
+                    let emoji = "";
+                    let labelStr = "";
+
+                    if (m.id === "duration_minutes") {
+                      emoji = "⏱️";
+                      labelStr = `${val} min`;
+                    } else {
+                      const opt = getOptionsForMetric(m.id, lang).find(o => o.value === val);
+                      if (!opt) return null;
+                      emoji = opt.emoji;
+                      labelStr = opt.label;
+                    }
+
                     return (
                       <div key={m.id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800/50 flex flex-col items-center text-center">
                         <m.icon className={`w-5 h-5 ${theme.text} mb-2`} />
                         <span className="text-xxs text-slate-500 uppercase font-black tracking-widest mb-1">{m.label}</span>
-                        <span className="text-base">{opt.emoji} <span className="text-sm text-white font-bold ml-1">{opt.label}</span></span>
+                        <span className="text-base">{emoji} <span className="text-sm text-white font-bold ml-1">{labelStr}</span></span>
                       </div>
                     );
                   })}
@@ -2222,13 +2302,13 @@ export function AthleteDashboard({
                   ? t[lang].moderateAttention
                   : t[lang].lowBattery}
             </CardTitle>
-            <CardDescription className="text-slate-400 mt-2 text-base max-w-md mx-auto">
+            <div className="text-slate-400 mt-4 text-base max-w-lg mx-auto text-center">
               {readiness >= 75
                 ? t[lang].goodRecovery
                 : readiness >= 50
                   ? t[lang].moderateFatigue
                   : t[lang].highRisk}
-            </CardDescription>
+            </div>
           </CardHeader>
           <CardContent className="pt-6">
             {tips.length > 0 && (
@@ -2258,9 +2338,23 @@ export function AthleteDashboard({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pb-8">
               {metrics.map((m) => {
                 const val = answers[m.id];
-                const opt = getOptionsForMetric(m.id, lang).find(
-                  (o) => o.value === val,
-                );
+                if (val === undefined || val === null) return null;
+
+                let emoji = "";
+                let labelStr = "";
+
+                if (m.id === "duration_minutes") {
+                  emoji = "⏱️";
+                  labelStr = `${val} min`;
+                } else {
+                  const opt = getOptionsForMetric(m.id, lang).find(
+                    (o) => o.value === val,
+                  );
+                  if (!opt) return null;
+                  emoji = opt.emoji;
+                  labelStr = opt.label;
+                }
+
                 return (
                   <div
                     key={m.id}
@@ -2271,9 +2365,9 @@ export function AthleteDashboard({
                       {m.label}
                     </span>
                     <span className="text-lg">
-                      {opt?.emoji}{" "}
+                      {emoji}{" "}
                       <span className="text-sm text-white font-medium ml-1">
-                        {opt?.label}
+                        {labelStr}
                       </span>
                     </span>
                   </div>
@@ -2464,7 +2558,7 @@ export function AthleteDashboard({
                           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold uppercase tracking-widest text-xs">min</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {[30, 45, 60, 90].map((val) => (
+                          {[30, 45, 60, 90, 120, 150, 180].map((val) => (
                             <button
                               key={val}
                               onClick={() => handleSelect(metric.id, val)}

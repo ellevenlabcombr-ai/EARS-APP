@@ -89,6 +89,8 @@ import { MenstrualAssessmentForm } from "./MenstrualAssessmentForm";
 import { HydrationAssessmentForm } from "./HydrationAssessmentForm";
 import { AthleteRegistration } from "./AthleteRegistration";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { PosturalAssessmentModal, FRONTAL_SEGMENTS, LATERAL_SEGMENTS } from "./PosturalAssessmentModal";
+import { PosturalAnalysisTool } from "./PosturalAnalysisTool";
 import { AttachmentUploadForm, ATTACHMENT_CATEGORIES } from "./AttachmentUploadForm";
 import { AttachmentPreviewModal } from "./AttachmentPreviewModal";
 import { AttachmentVersionHistory } from "./AttachmentVersionHistory";
@@ -274,41 +276,51 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const translateKey = (key: string, lang: string): string => {
-  const dict: Record<string, string> = {
+  const normalizedKey = key.toLowerCase();
+  
+  const ptDict: Record<string, string> = {
+    // common
+    pms: 'TPM',
+    flow: 'Fluxo',
+    pain: 'Dor',
+    regularity: 'Regularidade',
+    'cycle length': 'Duração do Ciclo',
+    'menarche age': 'Idade da Menarca',
+    'missed periods': 'Menstruações Atrasadas',
     // Sleep
     duration: 'Duração',
     bedtime: 'Hora de Dormir',
-    wakeTime: 'Hora de Acordar',
+    waketime: 'Hora de Acordar',
     quality: 'Qualidade',
-    feltRested: 'Sentiu-se Descansado',
-    difficultyFallingAsleep: 'Dificuldade para Dormir',
-    wokeUpDuringNight: 'Acordou Durante a Noite',
-    earlyAwakening: 'Acordou Muito Cedo',
-    daytimeSleepiness: 'Sonolência Diurna',
-    sleepEnvironment: 'Ambiente de Sono',
-    caffeineLate: 'Cafeína Tarde',
-    screenTime: 'Tempo de Tela',
-    stressLevel: 'Nível de Estresse',
+    feltrested: 'Sentiu-se Descansado',
+    difficultyfallingasleep: 'Dificuldade para Dormir',
+    wokeupduringnight: 'Acordou Durante a Noite',
+    earlyawakening: 'Acordou Muito Cedo',
+    daytimesleepiness: 'Sonolência Diurna',
+    sleepenvironment: 'Ambiente de Sono',
+    caffeinelate: 'Cafeína Tarde',
+    screentime: 'Tempo de Tela',
+    stresslevel: 'Nível de Estresse',
     
     // Orthopedic
-    painLevel: 'Nível de Dor',
-    painLocation: 'Local da Dor',
-    functionalImpact: 'Impacto Funcional',
+    painlevel: 'Nível de Dor',
+    painlocation: 'Local da Dor',
+    functionalimpact: 'Impacto Funcional',
     training: 'Treino',
     competition: 'Competição',
-    dailyActivities: 'Atividades Diárias',
-    functionalTests: 'Testes Funcionais',
+    dailyactivities: 'Atividades Diárias',
+    functionaltests: 'Testes Funcionais',
     squat: 'Agachamento',
     jump: 'Salto',
     balance: 'Equilíbrio',
     
     // Biomechanical
-    kneeAlignment: 'Alinhamento do Joelho',
-    hipControl: 'Controle do Quadril',
-    trunkControl: 'Controle do Tronco',
+    kneealignment: 'Alinhamento do Joelho',
+    hipcontrol: 'Controle do Quadril',
+    trunkcontrol: 'Controle do Tronco',
     depth: 'Profundidade',
-    landingStability: 'Estabilidade na Aterrissagem',
-    shockAbsorption: 'Absorção de Impacto',
+    landingstability: 'Estabilidade na Aterrissagem',
+    shockabsorption: 'Absorção de Impacto',
     stability: 'Estabilidade',
     control: 'Controle',
     valgus: 'Valgo',
@@ -317,21 +329,21 @@ const translateKey = (key: string, lang: string): string => {
     asymmetry: 'Assimetria',
     
     // Physical
-    trainingLoad: 'Carga de Treino',
-    rpe: 'PSE (Percepção Subjetiva de Esforço)',
+    trainingload: 'Carga de Treino',
+    rpe: 'PSE',
     fatigue: 'Fadiga',
     recovery: 'Recuperação',
     
     // Common
     score: 'Pontuação',
-    riskLevel: 'Nível de Risco',
+    risklevel: 'Nível de Risco',
     date: 'Data',
     notes: 'Observações',
     classification: 'Classificação',
     alerts: 'Alertas',
     
     // Neurological
-    reactionTime: 'Tempo de Reação',
+    reactiontime: 'Tempo de Reação',
     coordination: 'Coordenação',
     dizziness: 'Tontura',
     
@@ -342,100 +354,111 @@ const translateKey = (key: string, lang: string): string => {
     focus: 'Foco',
     
     // Nutritional
-    mealsPerDay: 'Refeições por Dia',
-    hydrationLiters: 'Hidratação (Litros)',
+    mealsperday: 'Refeições por Dia',
+    hydrationliters: 'Hidratação (Litros)',
     supplements: 'Suplementos',
     appetite: 'Apetite',
     
     // RED-S
-    energyAvailability: 'Disponibilidade de Energia',
-    menstrualStatus: 'Status Menstrual',
-    boneHealth: 'Saúde Óssea',
-    eatingHabits: 'Hábitos Alimentares',
+    energyavailability: 'Disponibilidade de Energia',
+    menstrualstatus: 'Status Menstrual',
+    bonehealth: 'Saúde Óssea',
+    eatinghabits: 'Hábitos Alimentares',
     
     // Anthropometric
     weight: 'Peso',
     height: 'Altura',
-    bodyFat: 'Gordura Corporal (%)',
-    muscleMass: 'Massa Muscular',
+    bodyfat: 'Gordura Corporal (%)',
+    musclemass: 'Massa Muscular',
+    skinfolds: 'Dobras Cutâneas',
+    measurements: 'Medidas',
+    chest: 'Peitoral',
+    thigh: 'Coxa',
+    abdomen: 'Abdômen',
+    triceps: 'Tríceps',
+    axillary: 'Axilar Médio',
+    suprailiac: 'Suprailíaca',
+    subscapular: 'Subescapular',
+    hip: 'Quadril',
+    neck: 'Pescoço',
+    waist: 'Cintura',
+    leftcalf: 'Panturrilha Esq.',
+    leftthigh: 'Coxa Esq.',
+    rightcalf: 'Panturrilha Dir.',
+    rightthigh: 'Coxa Dir.',
+    leftforearm: 'Antebraço Esq.',
+    rightforearm: 'Antebraço Dir.',
+    shoulders: 'Ombros',
+    leftarmflexed: 'Braço Esq. Contraído',
+    leftarmrelaxed: 'Braço Esq. Relaxado',
+    rightarmflexed: 'Braço Dir. Contraído',
+    rightarmrelaxed: 'Braço Dir. Relaxado',
     
     // Maturation
-    tannerStage: 'Estágio de Tanner',
-    phv: 'Pico de Velocidade de Crescimento (PHV)',
-    growthVelocity: 'Velocidade de Crescimento',
+    tannerstage: 'Estágio de Tanner',
+    phv: 'Pico Vel. Crescimento',
+    growthvelocity: 'Velocidade Crescimento',
     
     // Menstrual
-    cycleLength: 'Duração do Ciclo',
-    flowDuration: 'Duração do Fluxo',
-    painIntensity: 'Intensidade da Dor',
+    cyclelength: 'Duração do Ciclo',
+    flowduration: 'Duração do Fluxo',
+    painintensity: 'Intensidade da Dor',
     symptoms: 'Sintomas',
     
     // Hydration
-    urineColor: 'Cor da Urina',
-    thirstLevel: 'Nível de Sede',
-    weightLossDuringExercise: 'Perda de Peso no Exercício',
+    urinecolor: 'Cor da Urina',
+    thirstlevel: 'Nível de Sede',
+    weightlossduringexercise: 'Perda de Peso',
     
     // Functional
-    fmsScore: 'Score FMS',
-    yBalance: 'Y-Balance Test',
-    hopTest: 'Hop Test',
+    fmsscore: 'Score FMS',
+    ybalance: 'Y-Balance Test',
+    hoptest: 'Hop Test',
     
     // Dynamometry
-    gripStrength: 'Força de Preensão',
-    quadricepsStrength: 'Força de Quadríceps',
-    hamstringStrength: 'Força de Isquiotibiais',
+    gripstrength: 'Força de Preensão',
+    quadricepsstrength: 'Força de Quadríceps',
+    hamstringstrength: 'Força de Isquiotibiais',
     
     // Postural
-    headAlignment: 'Alinhamento da Cabeça',
-    shoulderSymmetry: 'Simetria dos Ombros',
-    pelvisAlignment: 'Alinhamento da Pelve',
-    footArch: 'Arco do Pé',
+    headalignment: 'Alinhamento da Cabeça',
+    shouldersymmetry: 'Simetria dos Ombros',
+    pelvisalignment: 'Alinhamento da Pelve',
+    footarch: 'Arco do Pé',
   };
 
-  if (lang === "pt" && dict[key]) return dict[key];
-  if (lang === "en") {
-    const enDict: Record<string, string> = { 
-      trainingLoad: "Training Load", rpe: "RPE", fatigue: "Fatigue", recovery: "Recovery", score: "Score", riskLevel: "Risk Level", date: "Date", notes: "Notes", classification: "Classification", alerts: "Alerts", skinfolds: "Skinfolds", measurements: "Measurements", chest: "Chest", thigh: "Thigh", abdomen: "Abdomen", triceps: "Triceps", axillary: "Axillary", suprailiac: "Suprailiac", subscapular: "Subscapular", hip: "Hip", neck: "Neck", waist: "Waist", "LEFT CALF": "Left Calf", "LEFT THIGH": "Left Thigh", "RIGHT CALF": "Right Calf", "RIGHT THIGH": "Right Thigh", "LEFT FOREARM": "Left Forearm", "RIGHT FOREARM": "Right Forearm", shoulders: "Shoulders"
-    };
-    if (enDict[key]) return enDict[key];
+  const ptVal = ptDict[normalizedKey] || ptDict[normalizedKey.replace(/\s+/g, '')];
+  if (lang === "pt" && ptVal) {
+    return ptVal;
   }
   
+  if (lang === "en") {
+    const enDict: Record<string, string> = { 
+      trainingload: "Training Load", rpe: "RPE", fatigue: "Fatigue", recovery: "Recovery", score: "Score", risklevel: "Risk Level", date: "Date", notes: "Notes", classification: "Classification", alerts: "Alerts", skinfolds: "Skinfolds", measurements: "Measurements", chest: "Chest", thigh: "Thigh", abdomen: "Abdomen", triceps: "Triceps", axillary: "Axillary", suprailiac: "Suprailiac", subscapular: "Subscapular", hip: "Hip", neck: "Neck", waist: "Waist", 'left calf': "Left Calf", 'left thigh': "Left Thigh", 'right calf': "Right Calf", 'right thigh': "Right Thigh", 'left forearm': "Left Forearm", 'right forearm': "Right Forearm", shoulders: "Shoulders", pms: "PMS", flow: "Flow", pain: "Pain", regularity: "Regularity", 'cycle length': "Cycle Length", 'menarche age': "Menarche Age", 'missed periods': "Missed Periods", duration: "Duration"
+    };
+    const enVal = enDict[normalizedKey] || enDict[normalizedKey.replace(/\s+/g, '')];
+    if (enVal) return enVal;
+  }
+
   // Convert camelCase or snake_case to Title Case
   return key
     .replace(/([A-Z])/g, ' $1')
     .replace(/_/g, ' ')
     .replace(/^./, str => str.toUpperCase());
 };
-
 const translateValue = (value: any, lang: string): string => {
   if (typeof value === 'boolean') return value ? (lang === 'pt' ? 'Sim' : 'Yes') : (lang === 'pt' ? 'Não' : 'No');
   if (value === null || value === undefined) return 'N/A';
   if (Array.isArray(value)) return value.map(v => translateValue(v, lang)).join(', ');
   if (typeof value === 'string') {
+    if (lang !== 'pt') return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     const dict: Record<string, string> = {
-      'low': 'Baixo',
-      'medium': 'Médio',
-      'high': 'Alto',
-      'normal': 'Normal',
-      'abnormal': 'Anormal',
-      'positive': 'Positivo',
-      'negative': 'Negativo',
-      'yes': 'Sim',
-      'no': 'Não',
-      'true': 'Sim',
-      'false': 'Não',
-      'left': 'Esquerda',
-      'right': 'Direita',
-      'bilateral': 'Bilateral',
-      'mild': 'Leve',
-      'moderate': 'Moderado',
-      'severe': 'Severo'
+      'low': 'Baixo', 'medium': 'Médio', 'high': 'Alto', 'normal': 'Normal', 'abnormal': 'Anormal', 'positive': 'Positivo', 'negative': 'Negativo', 'yes': 'Sim', 'no': 'Não', 'true': 'Sim', 'false': 'Não', 'left': 'Esquerda', 'right': 'Direita', 'bilateral': 'Bilateral', 'mild': 'Leve', 'moderate': 'Moderado', 'severe': 'Severo', 'regular': 'Regular', 'irregular': 'Irregular'
     };
-    return dict[value.toLowerCase()] || value;
+    return dict[value.toLowerCase()] || (String(value).charAt(0).toUpperCase() + String(value).slice(1));
   }
   return String(value);
 };
-
 const renderDataNode = (key: string, value: any, lang: string, depth = 0): React.ReactNode => {
   // Skip internal or redundant fields at root level
   if (depth === 0 && ['classification', 'classification_color', 'alerts', 'score', 'athlete_id', 'id', 'created_at', 'assessment_date', 'clinical_report', 'clinical_alerts'].includes(key)) return null;
@@ -1192,21 +1215,26 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         - Nome: ${athlete.name}
         - Modalidade: ${athlete.modalidade}
         - Posição: ${athlete.posicao}
-        - Categoria: ${athlete.category}
-        - Nível de Risco Atual: ${athlete.risk_level}
         
         TAREFA:
-        1. Gere um RELATÓRIO CLÍNICO DIRETO E OBJETIVO (em ${language === "en" ? "Inglês" : "Português"}), com linguagem profissional e prática. Seja direto ao ponto, não escreva como um artigo científico nem use introduções genéricas. Traga conclusões práticas para o dia a dia.
-        2. Realize um CRUZAMENTO DE DADOS entre os resultados atuais e as demandas da posição e modalidade do atleta.
-        3. Identifique alertas clínicos específicos (mínimo 1, máximo 5).
+        Você deve gerar um RELATÓRIO CLÍNICO DIRETO E OBJETIVO (em ${language === "en" ? "Inglês" : "Português"}), estruturado exatamente como um padrão de "Prontuário Médico Esportivo".
+        Use emojis indicativos para que fique agradável de ler na tela.
+        Escreva no formato detalhado abaixo e com as linhas e blocos separados usando enter para pular 2 linhas (evite um grande bloco denso de texto):
         
-        FORMATO DE RESPOSTA (JSON):
-        {
-          "report": "Texto formatado em Markdown, com tópicos diretos.",
-          "alerts": [
-            { "type": "warning" | "danger" | "info", "message": "Descrição do alerta (no mesmo idioma do relatório)", "priority": "high" | "medium" | "low" }
-          ]
-        }
+        🎯 CONTEXTO CLÍNICO & OBJETIVO:
+        [descrição breve do contexto do atleta e o objetivo da avaliação com base na modalidade/posição]
+
+        📊 SUBJETIVO / RESPOSTA DO PACIENTE:
+        [interpretação principal dos dados numéricos ou queixas levantadas pela avaliação, ex: "Paciente compareceu com score X e reportou..."]
+
+        🛠️ CONDUTAS & RACIOCÍNIO CLÍNICO:
+        - Regiões Alvo: [ex: Cervical, Ombro]
+        - Risco/Diagnóstico principal: [ex: Simetria muscular em deficit...]
+        [breve conclusão sobre o impacto disto na posição/modalidade do atleta e o que deve ser feito para corrigir ou manter, por que foram escolhidas essas intervenções?]
+
+        📍 ATUALIZAÇÃO DE TAGS RECOMENDADAS:
+        [+] [tag para adicionar baseada nos achados]
+        [-] [tag caso o paciente tenha melhorado de algo]
       `;
 
       const response = await ai.models.generateContent({
@@ -2116,7 +2144,18 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <SessionModePanel 
                  visibleBlocks={clinicalSessionData?.priorityOutput.visibleBlocks || []}
                  decision={clinicalSessionData?.priorityOutput.adjustedDecision || 'full_train'}
-                 content={clinicalSessionData?.priorityOutput.content || { factors: [], actions: [], tags: [] }}
+                 content={(() => {
+                   const content = clinicalSessionData?.priorityOutput.content || { factors: [], actions: [], tags: [] };
+                   // Inject AI Condutas from recent postural assessment
+                   const recentPosturalActions = clinicalAssessments?.find(a => a.assessment_type === 'postural')?.raw_data?.ai_actions;
+                   if (recentPosturalActions) {
+                     return {
+                       ...content,
+                       actions: [...content.actions, { title: "Condutas Específicas (IA - Postural)", desc: recentPosturalActions }]
+                     };
+                   }
+                   return content;
+                 })()}
                  metrics={{
                     readiness: clinicalSessionData?.readiness.score || 0,
                     trend: clinicalSessionData?.trends.trendScore || 0
@@ -2836,7 +2875,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         </div>
 
         {/* Pending Assessments Card (Moved down) */}
-        <Card className="bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden">
+        <Card className="bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden mt-6">
           <CardHeader className="border-b border-slate-800/50 bg-slate-900/20 px-6 py-4">
             <CardTitle className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-cyan-500" />
@@ -2847,6 +2886,65 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <ClipboardList className="w-6 h-6 text-slate-800 mb-2" />
               <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Nenhuma avaliação agendada</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Alerts and Condutas */}
+        <Card className="bg-slate-900/40 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.05)] overflow-hidden mt-6">
+          <CardHeader className="border-b border-rose-500/20 bg-rose-500/5 px-6 py-4">
+            <CardTitle className="text-xs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              Alertas & Condutas Orientadas (IA)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Alertas */}
+              <div className="space-y-4">
+                <h3 className="text-xxs font-black text-rose-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <BellRing className="w-3 h-3" />
+                  Alertas Ativos Principais
+                </h3>
+                {athleteAlerts.filter(a => a.status === 'active').length > 0 ? (
+                  <ul className="space-y-2">
+                    {athleteAlerts.filter(a => a.status === 'active').slice(0, 4).map(alert => (
+                      <li key={alert.id} className="flex items-start gap-2 bg-slate-950/50 p-3 rounded-xl border border-rose-500/20 shadow-sm">
+                        <span className="text-rose-500 mt-0.5">•</span>
+                        <div className="flex-1">
+                          <span className="text-xs text-rose-100 font-medium">{alert.message}</span>
+                          <p className="text-[10px] text-rose-500/50 uppercase font-black tracking-widest mt-1">{(alert.priority || 'Medium')} Priority</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                   <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl flex items-center gap-3">
+                     <CheckCircle className="w-5 h-5 text-emerald-500/50" />
+                     <p className="text-emerald-400/80 text-xs font-bold uppercase tracking-widest">Nenhum alerta crítico ativo</p>
+                   </div>
+                )}
+              </div>
+
+              {/* Condutas */}
+              <div className="space-y-4">
+                <h3 className="text-xxs font-black text-cyan-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <Stethoscope className="w-3 h-3" />
+                  Condutas Recentes (IA)
+                </h3>
+                {clinicalAssessments?.find(a => a.assessment_type === 'postural')?.raw_data?.ai_actions ? (
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-cyan-500/20 text-xs text-cyan-100 whitespace-pre-wrap leading-relaxed shadow-sm font-medium">
+                    {clinicalAssessments.find(a => a.assessment_type === 'postural')?.raw_data?.ai_actions}
+                  </div>
+                ) : (
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800 text-xs text-slate-500 whitespace-pre-wrap leading-relaxed flex items-center justify-center">
+                    <p className="font-bold flex items-center gap-2">
+                      <Zap className="w-4 h-4 opacity-50" />
+                      Sem condutas geradas por IA (Avalie a postura).
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -4005,9 +4103,68 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 {/* Data Details */}
                 <div className="space-y-4">
                   <h4 className="text-xxs font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">{language === "pt" ? "Dados Detalhados" : "Detailed Data"}</h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value, language))}
-                  </div>
+                  
+                  {selectedAssessment.assessment_type === 'postural' ? (
+                    <div className="w-full flex flex-col gap-4 mt-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {(selectedAssessment.raw_data || selectedAssessment.data)?.frontal?.url && (
+                          <PosturalAnalysisTool 
+                            label={language === 'pt' ? "Visão Frontal" : "Frontal View"} 
+                            imageUrl={(selectedAssessment.raw_data || selectedAssessment.data).frontal.url} 
+                            onImageChange={() => {}} 
+                            segments={(selectedAssessment.raw_data || selectedAssessment.data).frontal.segments || []} 
+                            onSegmentsChange={() => {}} 
+                            availableSegmentDefinitions={FRONTAL_SEGMENTS}
+                            readOnly 
+                          />
+                        )}
+                        {(selectedAssessment.raw_data || selectedAssessment.data)?.dorsal?.url && (
+                          <PosturalAnalysisTool 
+                            label={language === 'pt' ? "Visão Dorsal" : "Dorsal View"} 
+                            imageUrl={(selectedAssessment.raw_data || selectedAssessment.data).dorsal.url} 
+                            onImageChange={() => {}} 
+                            segments={(selectedAssessment.raw_data || selectedAssessment.data).dorsal.segments || []} 
+                            onSegmentsChange={() => {}} 
+                            availableSegmentDefinitions={FRONTAL_SEGMENTS}
+                            readOnly 
+                          />
+                        )}
+                        {(selectedAssessment.raw_data || selectedAssessment.data)?.lateralR?.url && (
+                          <PosturalAnalysisTool 
+                            label={language === 'pt' ? "Lateral Direita" : "Right Lateral"} 
+                            imageUrl={(selectedAssessment.raw_data || selectedAssessment.data).lateralR.url} 
+                            onImageChange={() => {}} 
+                            segments={(selectedAssessment.raw_data || selectedAssessment.data).lateralR.segments || []} 
+                            onSegmentsChange={() => {}} 
+                            availableSegmentDefinitions={LATERAL_SEGMENTS}
+                            readOnly 
+                          />
+                        )}
+                        {(selectedAssessment.raw_data || selectedAssessment.data)?.lateralL?.url && (
+                          <PosturalAnalysisTool 
+                            label={language === 'pt' ? "Lateral Esquerda" : "Left Lateral"} 
+                            imageUrl={(selectedAssessment.raw_data || selectedAssessment.data).lateralL.url} 
+                            onImageChange={() => {}} 
+                            segments={(selectedAssessment.raw_data || selectedAssessment.data).lateralL.segments || []} 
+                            onSegmentsChange={() => {}} 
+                            availableSegmentDefinitions={LATERAL_SEGMENTS}
+                            readOnly 
+                          />
+                        )}
+                      </div>
+                      
+                      {(selectedAssessment.raw_data || selectedAssessment.data)?.notes && (
+                        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl mt-4">
+                          <p className="text-xs text-slate-400 font-medium">Notas da Avaliação</p>
+                          <p className="text-sm text-slate-300 mt-1 whitespace-pre-wrap">{(selectedAssessment.raw_data || selectedAssessment.data).notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-3">
+                      {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value, language))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Clinical Report */}
@@ -4088,180 +4245,19 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
       </main>
 
-      {/* Postural Comparison Modal */}
-      <AnimatePresence>
-        {showPosturalModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-slate-950/95 backdrop-blur-xl">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#0A1120] border border-slate-800 w-full h-full max-w-6xl rounded-3xl overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]"
-            >
-              <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-cyan-500/10 rounded-xl">
-                    <Columns className="w-6 h-6 text-cyan-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight">{t('postural.title')}</h3>
-                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{t('postural.desc')}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setPosturalView(posturalView === 'technical' ? 'side-by-side' : 'technical')}
-                    className={`border-slate-800 font-bold uppercase text-xxs ${posturalView === 'technical' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'text-slate-400'}`}
-                  >
-                    <ClipboardList className="w-4 h-4 mr-2" /> {posturalView === 'technical' ? t('postural.view.photos') : t('postural.view.technical')}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setShowGrid(!showGrid)}
-                    className={`border-slate-800 font-bold uppercase text-xxs ${showGrid ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400'}`}
-                  >
-                    <Grid3X3 className="w-4 h-4 mr-2" /> {showGrid ? t('postural.grid.hide') : t('postural.grid.show')}
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setShowPosturalModal(false)} className="text-slate-400 hover:text-white">
-                    <X className="w-6 h-6" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-                {posturalView === 'technical' ? (
-                  <div className="flex-1 overflow-y-auto p-8 bg-slate-950/50">
-                    <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-6">
-                        <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">{t('postural.segments.title')}</h4>
-                        
-                        {[
-                          { id: 'head', label: t('postural.segments.head'), options: ['Normal', 'Projeção Anterior', 'Inclinação Lateral D', 'Inclinação Lateral E'] },
-                          { id: 'shoulders', label: t('postural.segments.shoulders'), options: ['Simétrico', 'Elevado D', 'Elevado E', 'Protraído', 'Escápula Alada'] },
-                          { id: 'pelvis', label: t('postural.segments.pelvis'), options: ['Nivelada', 'Anteversão', 'Retroversão', 'Inclinação Lateral D', 'Inclinação Lateral E'] },
-                          { id: 'knees', label: t('postural.segments.knees'), options: ['Alinhados', 'Valgo', 'Varo', 'Recurvato', 'Flexo'] },
-                          { id: 'feet', label: t('postural.segments.feet'), options: ['Normal', 'Pronado', 'Supinado', 'Desabamento de Arco'] },
-                        ].map((item) => (
-                          <div key={item.id} className="space-y-2">
-                            <label className="text-xxs font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
-                            <select 
-                              value={posturalEvaluation[item.id as keyof typeof posturalEvaluation]}
-                              onChange={(e) => setPosturalEvaluation({...posturalEvaluation, [item.id]: e.target.value})}
-                              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-500 outline-none transition-colors"
-                            >
-                              {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                            </select>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="space-y-6">
-                        <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">{t('postural.notes')}</h4>
-                        <textarea 
-                          value={posturalEvaluation.notes}
-                          onChange={(e) => setPosturalEvaluation({...posturalEvaluation, notes: e.target.value})}
-                          className="w-full h-64 bg-slate-900 border border-slate-800 rounded-xl px-4 py-4 text-sm text-white focus:border-cyan-500 outline-none transition-colors resize-none"
-                          placeholder="Descreva detalhadamente os achados clínicos..."
-                        />
-                        
-                        <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-                          <h5 className="text-xxs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <Info className="w-3 h-3" /> Dica Técnica
-                          </h5>
-                          <p className="text-xxs text-slate-400 leading-relaxed font-medium">
-                            Utilize a grade de referência nas fotos para medir desvios em centímetros ou graus. Compare sempre a vista anterior, posterior e lateral.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* Left Photo */}
-                    <div className="flex-1 relative border-r border-slate-800 bg-black group">
-                      <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
-                        <p className="text-xxs font-black text-white uppercase">{compareDates[0]?.date || '-'}</p>
-                      </div>
-                      <div className="w-full h-full relative">
-                        {compareDates[0]?.url ? (
-                          <Image src={compareDates[0].url} alt="Postural 1" fill className="object-contain" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-700">
-                            <Activity className="w-12 h-12" />
-                          </div>
-                        )}
-                        {showGrid && (
-                          <div className="absolute inset-0 pointer-events-none opacity-30" 
-                               style={{ backgroundImage: 'linear-gradient(#22d3ee 1px, transparent 1px), linear-gradient(90deg, #22d3ee 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-                        )}
-                        {/* Center Reference Line */}
-                        {showGrid && <div className="absolute left-1/2 top-0 bottom-0 w-px bg-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />}
-                      </div>
-                    </div>
-
-                    {/* Right Photo */}
-                    <div className="flex-1 relative bg-black group">
-                      <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10">
-                        <p className="text-xxs font-black text-white uppercase">{compareDates[1]?.date || '-'}</p>
-                      </div>
-                      <div className="w-full h-full relative">
-                        {compareDates[1]?.url ? (
-                          <Image src={compareDates[1].url} alt="Postural 2" fill className="object-contain" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-700">
-                            <Activity className="w-12 h-12" />
-                          </div>
-                        )}
-                        {showGrid && (
-                          <div className="absolute inset-0 pointer-events-none opacity-30" 
-                               style={{ backgroundImage: 'linear-gradient(#22d3ee 1px, transparent 1px), linear-gradient(90deg, #22d3ee 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-                        )}
-                        {showGrid && <div className="absolute left-1/2 top-0 bottom-0 w-px bg-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="p-6 bg-slate-900/80 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
-                  {posturalHistory.map((photo) => (
-                    <button 
-                      key={photo.id}
-                      onClick={() => setCompareDates([compareDates[1], photo])}
-                      className={`shrink-0 w-20 h-24 rounded-xl border-2 overflow-hidden transition-all ${compareDates.some(d => d.id === photo.id) ? 'border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'border-slate-800 opacity-50 hover:opacity-100'}`}
-                    >
-                      <div className="relative w-full h-full">
-                        <Image src={photo.url} alt={photo.date} fill className="object-cover" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-1">
-                          <p className="text-xxs font-bold text-white text-center">{photo.date}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                  <label className="shrink-0 w-20 h-24 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 hover:border-cyan-500/50 transition-all cursor-pointer">
-                    <input type="file" accept="image/*" className="hidden" onChange={handlePosturalUpload} />
-                    <Plus className="w-5 h-5" />
-                    <span className="text-xxs font-black uppercase">Nova Foto</span>
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                  <Button variant="outline" className="flex-1 md:flex-none border-slate-800 text-slate-400 font-black uppercase text-xxs py-6 px-8 rounded-xl">
-                    Exportar Comparativo
-                  </Button>
-                  <Button className="flex-1 md:flex-none bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs py-6 px-10 rounded-xl shadow-lg shadow-cyan-500/20">
-                    Salvar Observações
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Postural Assessment Modal */}
+      <PosturalAssessmentModal
+        athleteId={athlete.id}
+        isOpen={showPosturalModal}
+        onClose={() => setShowPosturalModal(false)}
+        supabase={supabase}
+        onSaveSuccess={() => {
+          fetchAllAssessmentsData(athlete.id).then(refreshedData => {
+            setClinicalAssessments(refreshedData);
+          });
+        }}
+        language={language}
+      />
 
       {/* Fast Clinical Note Modal */}
       <AnimatePresence>
@@ -4658,7 +4654,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       const validationContext = noteForm.suggestionMatch === 'Yes' ? 'total adesão à realidade clínica' : noteForm.suggestionMatch === 'Partially' ? 'ajustes pontuais necessários' : 'divergência observada na prática';
 
                       const clustersContext = clinicalSessionData?.clusters && clinicalSessionData.clusters.length > 0 
-                        ? `\nOs principais clusters de risco identificados no momento: ${clinicalSessionData.clusters.map(c => c.label).join(', ')}.` 
+                        ? `
+Os principais clusters de risco identificados no momento: ${clinicalSessionData.clusters.map(c => c.label).join(', ')}.` 
                         : '';
 
                       let treatmentsReasoning = '';
@@ -4668,7 +4665,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
                       const adjustments = noteForm.tagAdjustments.filter(a => a.action !== 'keep');
                       const tagContext = adjustments.length > 0 || noteForm.newTags.length > 0
-                        ? `\n📍 ATUALIZAÇÃO DE TAGS:\n${adjustments.map(a => `${a.action === 'remove' ? '[-] Remover' : '[+] Reforçar'} "${clinicalTags.find(t => t.id === a.id)?.tag}"`).join('; ')}${noteForm.newTags.length > 0 ? `; [+] Adicionar: ${noteForm.newTags.join(', ')}` : ''}`
+                        ? `
+📍 ATUALIZAÇÃO DE TAGS:
+${adjustments.map(a => `${a.action === 'remove' ? '[-] Remover' : '[+] Reforçar'} "${clinicalTags.find(t => t.id === a.id)?.tag}"`).join('; ')}${noteForm.newTags.length > 0 ? `; [+] Adicionar: ${noteForm.newTags.join(', ')}` : ''}`
                         : '';
 
                       const text = `🎯 CONTEXTO CLÍNICO & OBJETIVO:
@@ -4683,7 +4682,8 @@ Paciente compareceu à sessão fisioterapêutica relatando estar se sentindo ${n
 - Intervenções Aplicadas: ${treatmentsText}.
 ${treatmentsReasoning}${tagContext}
 
-${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:\n${noteForm.obs}` : ''}`;
+${noteForm.obs ? `📝 OBSERVAÇÕES ADICIONAIS:
+${noteForm.obs}` : ''}`;
                       
                       setGeneratedNote(text);
                       setShowSignatureStep(true);
