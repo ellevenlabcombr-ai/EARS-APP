@@ -107,6 +107,7 @@ export default function Home() {
           onDirtyChange={setIsDirty}
           athleteId={loggedInAthlete?.id}
           athleteGender={loggedInAthlete?.gender}
+          initialAthleteData={loggedInAthlete}
         />
         <ConfirmDialog 
           isOpen={pendingAction === 'logout'}

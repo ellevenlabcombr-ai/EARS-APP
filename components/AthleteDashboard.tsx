@@ -78,7 +78,10 @@ import {
   Download,
   Share2,
   Shield,
-  Stethoscope
+  Stethoscope,
+  Bell,
+  PhoneCall,
+  WifiOff
 } from "lucide-react";
 import Image from "next/image";
 import { PainMap } from "@/components/PainMap";
@@ -500,13 +503,15 @@ interface AthleteDashboardProps {
   onDirtyChange?: (dirty: boolean) => void;
   athleteId?: string;
   athleteGender?: 'M' | 'F';
+  initialAthleteData?: any;
 }
 
 export function AthleteDashboard({ 
   onBack, 
   onDirtyChange,
   athleteId,
-  athleteGender = "F"
+  athleteGender = "F",
+  initialAthleteData
 }: AthleteDashboardProps) {
   console.log("AthleteDashboard rendered with athleteId:", athleteId);
   const { checkins, loading: storeLoading, fetchCheckins: storeFetchCheckins } = useAthleteStore();
@@ -515,7 +520,7 @@ export function AthleteDashboard({
   const [view, setView] = useState<ViewState>("history");
 
   // Athlete profile state
-  const [athleteData, setAthleteData] = useState<Athlete | null>(null);
+  const [athleteData, setAthleteData] = useState<Athlete | null>(initialAthleteData || null);
   const [loadingAthlete, setLoadingAthlete] = useState(true);
   const [athleteCode, setAthleteCode] = useState<string | null>(null);
 
@@ -542,6 +547,95 @@ export function AthleteDashboard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [reminderTime, setReminderTime] = useState("08:00");
+  const [isOffline, setIsOffline] = useState(false);
+  const [hasPushPermission, setHasPushPermission] = useState<NotificationPermission>("default");
+
+  useEffect(() => {
+    setIsOffline(!navigator.onLine);
+    const handleOnline = () => {
+      setIsOffline(false);
+      syncOfflineData();
+    };
+    const handleOffline = () => setIsOffline(true);
+    
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    if ("Notification" in window) {
+      setHasPushPermission(Notification.permission);
+    }
+    
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [athleteId]);
+
+  const syncOfflineData = async () => {
+    if (!supabase) return;
+    const pendingJson = localStorage.getItem(`pending_checkins_${athleteId}`);
+    if (!pendingJson) return;
+
+    try {
+      const pendingData = JSON.parse(pendingJson);
+      for (const item of pendingData) {
+        // Assume item matches everything inserted in handleSubmit
+        const { checkInDataToInsert, painReportsToInsert, sprintDataToInsert, workloadDataToInsert, cycleDataToInsert } = item;
+        
+        const { data: checkInData, error: checkInError } = await supabase.from("check_ins").insert([checkInDataToInsert]).select();
+        if (checkInError) throw checkInError;
+        
+        const checkInId = checkInData[0].id;
+        
+        if (painReportsToInsert?.length > 0) {
+          const finalPainReports = painReportsToInsert.map((p: any) => ({ ...p, check_in_id: checkInId }));
+          await supabase.from("pain_reports").insert(finalPainReports);
+        }
+        if (sprintDataToInsert) {
+          await supabase.from("sprint_data").insert([{ ...sprintDataToInsert, check_in_id: checkInId }]);
+        }
+        if (workloadDataToInsert) {
+          await supabase.from("workload_tracking").insert([{ ...workloadDataToInsert, check_in_id: checkInId }]);
+        }
+        if (cycleDataToInsert) {
+          await supabase.from("menstrual_tracking").insert([{ ...cycleDataToInsert, check_in_id: checkInId }]);
+        }
+      }
+      localStorage.removeItem(`pending_checkins_${athleteId}`);
+      storeFetchCheckins(athleteId!, athleteData?.sport);
+    } catch (e) {
+      console.error("Error syncing offline data:", e);
+    }
+  };
+
+  const handlePushPermission = async () => {
+    setShowNotificationSettings(true);
+  };
+
+  const handleSaveNotifications = async () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      try {
+        const permission = await Notification.requestPermission();
+        setHasPushPermission(permission);
+      } catch (err) {
+        console.error("Error asking push permission:", err);
+      }
+    } else if ("Notification" in window) {
+      setHasPushPermission(Notification.permission);
+    }
+    
+    // Save to local storage representing the backend config for now
+    localStorage.setItem(`ears_reminder_time_${athleteId}`, reminderTime);
+    setShowNotificationSettings(false);
+    alert(lang === "pt" ? `Lembrete configurado para as ${reminderTime}!` : `Reminder set for ${reminderTime}!`);
+  };
+
+  useEffect(() => {
+    const savedTime = localStorage.getItem(`ears_reminder_time_${athleteId}`);
+    if (savedTime) setReminderTime(savedTime);
+  }, [athleteId]);
 
   useEffect(() => {
     if (athleteId) {
@@ -1159,30 +1253,7 @@ export function AthleteDashboard({
         overall_wellbeing: answers["overall_wellbeing"]
       };
 
-      const { data: checkInData, error: checkInError } = await supabase
-        .from("check_ins")
-        .insert([checkInDataToInsert])
-        .select();
-
-      if (checkInError) throw checkInError;
-
-      const checkInId = checkInData[0].id;
-
-      // Insert into pain_reports
-      if (Object.keys(painMap).length > 0) {
-        const painReportsToInsert = Object.entries(painMap).map(([partId, data]) => ({
-          check_in_id: checkInId,
-          athlete_id: athleteId,
-          body_part_id: partId,
-          pain_level: data.level,
-          pain_type: data.type
-        }));
-        await supabase.from("pain_reports").insert(painReportsToInsert);
-      }
-
-      // Sync into wellness_records to make sure Dashboards get it
       const wellnessDataToInsert = {
-        id: checkInId,
         athlete_id: athleteId,
         record_date: fullTimestamp,
         sleep_hours: answers["sleep_hours"],
@@ -1213,12 +1284,10 @@ export function AthleteDashboard({
           session_load: session_load
         }
       };
-      
-      const { error: wellnessError } = await supabase.from("wellness_records").insert([wellnessDataToInsert]);
-      if (wellnessError) console.error("Could not sync to wellness_records:", wellnessError);
 
+      let loadAssessment = null;
       if (session_load > 0) {
-        const loadAssessment = {
+        loadAssessment = {
           athlete_id: athleteId,
           assessment_date: fullTimestamp,
           score: session_load,
@@ -1229,13 +1298,42 @@ export function AthleteDashboard({
             duration: duration_minutes
           }
         };
-        await supabase.from("physical_load_assessments").insert([loadAssessment]);
       }
 
-      console.log("Check-in enviado com sucesso");
-      
-      await storeFetchCheckins(athleteId, athleteData?.sport);
-      await fetchData();
+      const existingPending = JSON.parse(localStorage.getItem(`pending_checkins_${athleteId}`) || "[]");
+      const pendingItem = { checkInDataToInsert, painReportsToInsert: Object.keys(painMap).length > 0 ? Object.entries(painMap).map(([partId, data]) => ({ body_part_id: partId, pain_level: data.level, pain_type: data.type, athlete_id: athleteId })) : [], wellnessDataToInsert, loadAssessment };
+
+      if (isOffline || !navigator.onLine) {
+        existingPending.push(pendingItem);
+        localStorage.setItem(`pending_checkins_${athleteId}`, JSON.stringify(existingPending));
+        console.log("Check-in saved locally (offline mode)");
+      } else {
+        const { data: checkInData, error: checkInError } = await supabase
+          .from("check_ins")
+          .insert([checkInDataToInsert])
+          .select();
+
+        if (checkInError) throw checkInError;
+
+        const checkInId = checkInData[0].id;
+
+        if (pendingItem.painReportsToInsert.length > 0) {
+          const painReports = pendingItem.painReportsToInsert.map(p => ({ ...p, check_in_id: checkInId }));
+          await supabase.from("pain_reports").insert(painReports);
+        }
+
+        const finalWellnessData = { ...wellnessDataToInsert, id: checkInId };
+        const { error: wellnessError } = await supabase.from("wellness_records").insert([finalWellnessData]);
+        if (wellnessError) console.error("Could not sync to wellness_records:", wellnessError);
+
+        if (loadAssessment) {
+          await supabase.from("physical_load_assessments").insert([{ ...loadAssessment, check_in_id: checkInId }]);
+        }
+
+        console.log("Check-in enviado com sucesso");
+        await storeFetchCheckins(athleteId, athleteData?.sport);
+        await fetchData();
+      }
     } catch (error: any) {
       console.error("Error saving check-in:", error);
       setSubmitError(error.message || "Erro ao salvar check-in.");
@@ -1522,10 +1620,13 @@ export function AthleteDashboard({
 
 
     const WellnessWidget = () => {
+      const maxPainLevel = Math.max(0, ...Object.values(latestPainMap).map(p => p.level));
+      const showSOS = respondedToday && maxPainLevel >= 8;
+
       const summaryMetrics = [
         { label: lang === "pt" ? "Sono" : "Sleep", value: todaySummary?.sleep_quality || 0, icon: Moon, color: "text-blue-400" },
         { label: lang === "pt" ? "Fadiga" : "Fatigue", value: todaySummary?.fatigue_level || 0, icon: Battery, color: "text-amber-400" },
-        { label: lang === "pt" ? "Dor" : "Pain", value: Math.max(0, ...Object.values(latestPainMap).map(p => p.level)), icon: Activity, color: "text-rose-400" },
+        { label: lang === "pt" ? "Dor" : "Pain", value: maxPainLevel, icon: Activity, color: "text-rose-400" },
       ];
 
       if (!respondedToday) {
@@ -1558,68 +1659,101 @@ export function AthleteDashboard({
       const todayTips = todaySummary ? getTips(todaySummary) : [];
 
       return (
-        <Card className="bg-[#0A1120] border-emerald-500/30 overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent pointer-events-none" />
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-5">
-                <div className="p-4 bg-emerald-500/20 rounded-3xl border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] text-emerald-400 flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8" />
-                </div>
-                <div className="text-left space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter leading-none">Status: Concluído</h3>
-                    <div className="px-2 py-0.5 bg-emerald-500/20 rounded-full border border-emerald-500/30 flex items-center gap-1">
-                      <Zap className="w-3 h-3 text-emerald-400" />
-                      <span className="text-xxs font-black text-emerald-400 uppercase tracking-widest">{streak}d</span>
-                    </div>
+        <div className="space-y-4">
+          <Card className="bg-[#0A1120] border-emerald-500/30 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent pointer-events-none" />
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="flex items-center gap-5">
+                  <div className="p-4 bg-emerald-500/20 rounded-3xl border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] text-emerald-400 flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8" />
                   </div>
-                  <p className="text-slate-400 text-sm font-medium">Sua prontidão diária foi registrada. Bom trabalho!</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-                {summaryMetrics.map((m, i) => (
-                  <div key={i} className="flex-1 md:flex-none bg-slate-950/80 border border-emerald-500/10 p-4 rounded-2xl text-center min-w-[5.625rem] shadow-lg">
-                    <m.icon className={`w-5 h-5 mx-auto mb-2 ${m.color}`} />
-                    <p className="text-xxs text-slate-500 font-black uppercase tracking-[0.2em] mb-1">{m.label}</p>
-                    <p className="text-xl font-black text-white leading-none">
-                      {m.value}
-                      <span className="text-xxs text-slate-600 ml-1 font-bold">/{m.label === "Dor" ? "10" : "5"}</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <Button 
-                variant="outline" 
-                onClick={() => setSelectedRecord(todaySummary)}
-                className="w-full md:w-auto border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/10 shrink-0"
-              >
-                Ver Detalhes
-              </Button>
-            </div>
-
-            {todayTips.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-emerald-500/20">
-                <div className="flex items-center gap-2 mb-4">
-                  <Lightbulb className="w-5 h-5 text-emerald-400" />
-                  <h4 className="text-sm font-black text-white uppercase tracking-widest">{t[lang].tips}</h4>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {todayTips.map((tip, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800/50 hover:border-emerald-500/30 transition-colors">
-                      <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-emerald-400 text-xs font-black">{i + 1}</span>
+                  <div className="text-left space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-2xl font-black text-white uppercase tracking-tighter leading-none">Status: Concluído</h3>
+                      <div className="px-2 py-0.5 bg-emerald-500/20 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-emerald-400" />
+                        <span className="text-xxs font-black text-emerald-400 uppercase tracking-widest">{streak}d</span>
                       </div>
-                      <p className="text-sm text-slate-300 font-medium leading-relaxed">{tip}</p>
+                    </div>
+                    <p className="text-slate-400 text-sm font-medium">Sua prontidão diária foi registrada. Bom trabalho!</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                  {summaryMetrics.map((m, i) => (
+                    <div key={i} className="flex-1 md:flex-none bg-slate-950/80 border border-emerald-500/10 p-4 rounded-2xl text-center min-w-[5.625rem] shadow-lg">
+                      <m.icon className={`w-5 h-5 mx-auto mb-2 ${m.color}`} />
+                      <p className="text-xxs text-slate-500 font-black uppercase tracking-[0.2em] mb-1">{m.label}</p>
+                      <p className="text-xl font-black text-white leading-none">
+                        {m.value}
+                        <span className="text-xxs text-slate-600 ml-1 font-bold">/{m.label === "Dor" ? "10" : "5"}</span>
+                      </p>
                     </div>
                   ))}
                 </div>
+
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedRecord(todaySummary)}
+                  className="w-full md:w-auto border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/10 shrink-0"
+                >
+                  Ver Detalhes
+                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              {todayTips.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-emerald-500/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Lightbulb className="w-5 h-5 text-emerald-400" />
+                    <h4 className="text-sm font-black text-white uppercase tracking-widest">{t[lang].tips}</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {todayTips.map((tip, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800/50 hover:border-emerald-500/30 transition-colors">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-emerald-400 text-xs font-black">{i + 1}</span>
+                        </div>
+                        <p className="text-sm text-slate-300 font-medium leading-relaxed">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {showSOS && (
+            <Card className="bg-red-500/10 border-red-500/30 overflow-hidden relative shadow-[0_0_30px_rgba(239,68,68,0.15)] animate-in fade-in zoom-in duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent pointer-events-none" />
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 bg-red-500/20 rounded-3xl border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.3)] text-red-400 flex items-center justify-center animate-pulse">
+                      <AlertTriangle className="w-8 h-8" />
+                    </div>
+                    <div className="text-left space-y-1">
+                      <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tighter leading-none">
+                        SOS Fisioterapia
+                      </h3>
+                      <p className="text-red-200 text-sm font-medium">Dor intensa identificada. Precisamos cuidar de você agora.</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      const msg = encodeURIComponent(`Olá, sou o atleta ${athleteData?.nickname || athleteData?.name}, finalizei meu check-in e reportei uma dor preocupante de nível ${maxPainLevel}. Gostaria de solicitar ajuda da fisioterapia.`);
+                      window.open(`https://wa.me/5511912952647?text=${msg}`, '_blank');
+                    }}
+                    className="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest px-8 py-6 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all hover:scale-105 group border border-red-400"
+                  >
+                    <PhoneCall className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                    Falar com a Fisio
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       );
     };
 
@@ -1658,6 +1792,22 @@ export function AthleteDashboard({
             </h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar w-full sm:w-auto justify-center sm:justify-end py-1">
+            {isOffline && (
+              <div className="flex items-center gap-1.5 bg-rose-500/10 px-2 py-1 rounded-full border border-rose-500/20 shrink-0" title="Offline">
+                <WifiOff className="w-3.5 h-3.5 text-rose-400" />
+                <span className="hidden sm:inline text-xxs font-bold text-rose-400 uppercase">Offline</span>
+              </div>
+            )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePushPermission}
+                className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 shrink-0 text-xxs sm:text-xs h-8 px-2"
+                title="Configurar Notificações"
+              >
+                <Bell className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 ${hasPushPermission === "granted" ? "text-amber-400" : "animate-pulse"}`} />
+                <span className="hidden sm:inline">Alertas</span>
+              </Button>
             <div className={`flex items-center gap-2 ${theme.bgAlpha} px-2.5 py-1 rounded-full border ${theme.border} shrink-0`}>
               <Trophy className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${theme.text}`} />
               <span className={`text-xxs sm:text-xs font-bold ${theme.icon}`}>
@@ -2426,6 +2576,58 @@ export function AthleteDashboard({
                     className="w-2 h-2 rounded-full bg-emerald-500"
                   />
                 ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showNotificationSettings && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#050B14]/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-[#0A1120] border border-amber-500/30 p-8 rounded-[2rem] shadow-[0_0_50px_rgba(245,158,11,0.2)] text-center max-w-sm w-full"
+            >
+              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/30 mb-6">
+                <Bell className="w-8 h-8 text-amber-400" />
+              </div>
+              <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">
+                {lang === "pt" ? "Lembretes Diários" : "Daily Reminders"}
+              </h2>
+              <p className="text-slate-400 text-sm mb-6">
+                {lang === "pt" ? "Configure o horário ideal para você ser lembrado de responder o seu check-in diário de saúde (EARS)." : "Set the ideal time to be reminded to answer your daily health check-in (EARS)."}
+              </p>
+              
+              <div className="space-y-4 text-left">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{lang === "pt" ? "Horário do lembrete" : "Reminder time"}</label>
+                  <input 
+                    type="time" 
+                    value={reminderTime}
+                    onChange={(e) => setReminderTime(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 text-white p-4 rounded-xl focus:outline-none focus:border-amber-500/50"
+                  />
+                </div>
+                
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button 
+                    className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold uppercase py-6 rounded-xl"
+                    onClick={handleSaveNotifications}
+                  >
+                    {lang === "pt" ? "Salvar Configuração" : "Save Settings"}
+                  </Button>
+                  <Button 
+                    className="w-full bg-transparent hover:bg-slate-800 text-slate-400 font-bold uppercase py-6 rounded-xl border border-slate-800"
+                    onClick={() => setShowNotificationSettings(false)}
+                  >
+                    {lang === "pt" ? "Agora Não" : "Not Now"}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

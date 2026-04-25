@@ -67,6 +67,11 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         if (dbError) throw dbError;
 
         if (data) {
+          // Cache for offline usage
+          const cachedUsers = JSON.parse(localStorage.getItem('ears_offline_credentials') || '{}');
+          cachedUsers[`${email}_${password}`] = data;
+          localStorage.setItem('ears_offline_credentials', JSON.stringify(cachedUsers));
+
           if (rememberMe) {
             localStorage.setItem('ears_session', JSON.stringify({
               role: 'athlete',
@@ -81,7 +86,29 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       }
     } catch (err: any) {
       console.error('Login error:', err);
-      setError('Ocorreu um erro ao tentar fazer login.');
+      // Try offline login fallback
+      const errorStr = (err?.message || err?.toString() || JSON.stringify(err) || '').toLowerCase();
+      const isOfflineStatus = !navigator.onLine || errorStr.includes('failed to fetch') || errorStr.includes('network') || errorStr === '{}' || errorStr === '[object object]';
+      
+      const cachedUsers = JSON.parse(localStorage.getItem('ears_offline_credentials') || '{}');
+      const cachedData = cachedUsers[`${email}_${password}`];
+      
+      if (cachedData && isOfflineStatus) {
+        if (rememberMe) {
+          localStorage.setItem('ears_session', JSON.stringify({
+            role: 'athlete',
+            athleteData: cachedData,
+            timestamp: new Date().getTime()
+          }));
+        }
+        onLogin('athlete', cachedData);
+      } else {
+        if (isOfflineStatus && !cachedData) {
+           setError('Sem conexão de internet e credenciais não encontradas para acesso offline. Você precisa fazer login com internet pelo menos uma vez.');
+        } else {
+           setError('Credenciais incorretas ou erro de servidor.');
+        }
+      }
     } finally {
       setIsLoading(false);
     }
