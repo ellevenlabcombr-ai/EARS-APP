@@ -1908,14 +1908,15 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       />
 
             {/* Top App Bar */}
-      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 pt-10 pb-4 flex flex-col gap-8">
-        <div className="flex justify-between items-center mb-0">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 pt-10 pb-4 flex flex-col lg:grid lg:grid-cols-4 lg:grid-rows-[auto_auto_1fr] gap-x-8 gap-y-6">
+        <div className="col-span-full mb-0 lg:mb-2">
           <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
         </div>
 
         {/* Large Profile Header block restored */}
-        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
-          <div className="relative w-full h-[350px] sm:h-[450px]">
+        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-2 order-1 min-w-0 flex flex-col">
+          <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
+            <div className="relative w-full h-[250px] sm:h-[350px] lg:h-[400px]">
             {athletePhoto ? (
               <Image 
                 src={athletePhoto} 
@@ -1986,8 +1987,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             </div>
           </div>
         </Card>
+        </div>
 
-        <div className="overflow-x-auto custom-scrollbar pb-4 pt-2">
+        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-3 order-3 overflow-x-auto custom-scrollbar pb-4 pt-2">
           <div className="flex items-center justify-between min-w-[600px]">
             {[
               { id: 'overview', label: 'Visão Geral', icon: Activity },
@@ -2020,8 +2022,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           </div>
         </div>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3 space-y-10 order-2 lg:order-1 min-w-0">
+        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-4 order-4 space-y-10 min-w-0 pb-32">
         {activeTab === 'overview' && (
           <div className="space-y-10 pb-32">
             {/* Session Mode Toggle Container */}
@@ -4218,7 +4219,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                 </div>
              </div>
           </div>
-        </div>
       </main>
 
       {/* Postural Assessment Modal */}
