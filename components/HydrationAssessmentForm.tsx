@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Droplet, AlertTriangle, Save, ArrowLeft, Activity, Thermometer } from "lucide-react";
+import { Droplet, AlertTriangle, Save, Activity, Thermometer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HydrationAssessmentProps {
@@ -20,10 +20,10 @@ const Slider = ({ label, value, onChange, invertColor = false, min = 0, max = 10
     : (ratio < 0.4 ? 'text-rose-400' : ratio < 0.7 ? 'text-amber-400' : 'text-emerald-400');
 
   return (
-    <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
+    <div className="space-y-2 bg-slate-900/30 p-4 rounded-xl border border-slate-800/50">
       <div className="flex justify-between items-end">
-        <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
-        <span className={`text-lg font-black ${valueColor}`}>{value}</span>
+        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</label>
+        <span className={`text-sm font-black ${valueColor}`}>{value}/{max}</span>
       </div>
       <input
         type="range"
@@ -32,44 +32,39 @@ const Slider = ({ label, value, onChange, invertColor = false, min = 0, max = 10
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+        className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
       />
-      <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
-        <span>{min}</span>
-        <span>{max}</span>
-      </div>
     </div>
   );
 };
 
 const NumberInput = ({ label, value, unit, onChange, step = 1 }: { label: string, value: number, unit: string, onChange: (v: number) => void, step?: number }) => (
-  <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-    <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+  <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-800/50 flex flex-col justify-between">
+    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{label}</label>
     <div className="relative">
       <input
         type="number"
         step={step}
         value={value === 0 ? "0" : value || ''}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
+        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold text-sm focus:outline-none focus:border-cyan-500 transition-colors"
       />
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase">{unit}</span>
     </div>
   </div>
 );
 
 const Checkbox = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (v: boolean) => void }) => (
   <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-800/50 bg-slate-900/30 cursor-pointer hover:bg-slate-800/50 transition-colors">
-    <div className={`w-5 h-5 rounded flex items-center justify-center border ${checked ? 'bg-rose-500 border-rose-500' : 'border-slate-600'}`}>
-      {checked && <div className="w-2.5 h-2.5 bg-[#050B14] rounded-sm" />}
+    <div className={`w-4 h-4 rounded flex items-center justify-center border ${checked ? 'bg-rose-500 border-rose-500' : 'border-slate-600'}`}>
+      {checked && <div className="w-2 h-2 bg-[#050B14] rounded-sm" />}
     </div>
-    <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">{label}</span>
+    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{label}</span>
   </label>
 );
 
 export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: HydrationAssessmentProps) {
-  // Inputs
-
+  const [step, setStep] = useState(1);
   const [data, setData] = useState({
     perception: 5,
     urineColor: 4, // 1-8
@@ -151,16 +146,16 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    await onSave({
-      type: "Hidratação",
-      score,
-      classification: classification.label,
-      classification_color: classification.color,
-      hydration_index: metrics.hydrationIndex,
-      physiological_stress: metrics.physiologicalStress,
-      alerts,
-      raw_data: data
-    });
+      await onSave({
+        type: "Hidratação",
+        score,
+        classification: classification.label,
+        classification_color: classification.color,
+        hydration_index: metrics.hydrationIndex,
+        physiological_stress: metrics.physiologicalStress,
+        alerts,
+        raw_data: data
+      });
     } finally {
       setIsSaving(false);
     }
@@ -176,108 +171,131 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
     return map[color] || map.cyan;
   };
 
+  const formSteps = [
+    { id: 1, title: 'Status', icon: Droplet },
+    { id: 2, title: 'Fisiologia', icon: Thermometer },
+  ];
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
-    >
-      {/* Header & Summary Card */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1">
-          <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-          </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <Droplet className="w-6 h-6 text-blue-500" />
-            Avaliação de Hidratação
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Status de Hidratação e Impacto na Recuperação
-          </p>
-        </div>
-
-        <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+            <Droplet className="w-6 h-6 text-blue-400" />
+          </div>
           <div>
-            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score de Hidratação</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black">{score}</span>
-              <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
-            </div>
-            {alerts.length > 0 && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
-                    <AlertTriangle className="w-3 h-3" /> {alert}
-                  </div>
-                ))}
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Hidratação</h2>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Status de Hidratação e Impacto</p>
+          </div>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between px-4 max-w-sm mx-auto">
+        {formSteps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
               </div>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+            </div>
+            {i < formSteps.length - 1 && (
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-blue-500' : 'bg-slate-800'}`}></div>
             )}
-          </div>
-          <Activity className="w-12 h-12 opacity-20" />
-        </div>
+          </React.Fragment>
+        ))}
       </div>
 
-      {/* Indices Preview */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Hidratação</p>
-          <p className={`text-2xl font-black ${metrics.hydrationIndex > 70 ? 'text-emerald-400' : metrics.hydrationIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.hydrationIndex}%
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Estresse Fisiológico</p>
-          <p className={`text-2xl font-black ${metrics.physiologicalStress < 30 ? 'text-emerald-400' : metrics.physiologicalStress < 70 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.physiologicalStress}%
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Section 1: Hydration Status */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Droplet className="w-4 h-4 text-blue-500" /> Status de Hidratação
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Percepção de Hidratação" value={data.perception} onChange={(v) => setData({...data, perception: v})} />
-            <Slider label="Cor da Urina (1-Clara, 8-Escura)" value={data.urineColor} min={1} max={8} onChange={(v) => setData({...data, urineColor: v})} invertColor />
-            <Slider label="Nível de Sede" value={data.thirst} onChange={(v) => setData({...data, thirst: v})} invertColor />
-            <NumberInput label="Ingestão de Líquidos" value={data.fluidIntake} unit="L/dia" step={0.1} onChange={(v) => setData({...data, fluidIntake: v})} />
-          </div>
-        </div>
-
-        {/* Section 2: Physiological Impact */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Thermometer className="w-4 h-4 text-blue-500" /> Impacto Fisiológico
-          </h3>
-          <div className="space-y-3">
-            <NumberInput label="Variação de Peso (Ex: -2 para perda de 2%)" value={data.weightVariation} unit="%" step={0.1} onChange={(v) => setData({...data, weightVariation: v})} />
-            
-            <div className="pt-2">
-              <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Sintomas Relatados</label>
-              <div className="grid grid-cols-2 gap-2">
-                <Checkbox label="Dor de Cabeça" checked={data.symptoms.headache} onChange={(v) => setData({...data, symptoms: {...data.symptoms, headache: v}})} />
-                <Checkbox label="Tontura" checked={data.symptoms.dizziness} onChange={(v) => setData({...data, symptoms: {...data.symptoms, dizziness: v}})} />
-                <Checkbox label="Cãibras" checked={data.symptoms.cramps} onChange={(v) => setData({...data, symptoms: {...data.symptoms, cramps: v}})} />
-                <Checkbox label="Fadiga" checked={data.symptoms.fatigue} onChange={(v) => setData({...data, symptoms: {...data.symptoms, fatigue: v}})} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {step === 1 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Droplet className="w-4 h-4 text-blue-500" /> Status de Hidratação
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Slider label="Percepção de Hidratação" value={data.perception} onChange={(v) => setData({...data, perception: v})} />
+                <Slider label="Cor da Urina" value={data.urineColor} min={1} max={8} onChange={(v) => setData({...data, urineColor: v})} invertColor />
+                <Slider label="Nível de Sede" value={data.thirst} onChange={(v) => setData({...data, thirst: v})} invertColor />
+                <NumberInput label="Ingestão de Líquidos" value={data.fluidIntake} unit="L/dia" step={0.1} onChange={(v) => setData({...data, fluidIntake: v})} />
               </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Thermometer className="w-4 h-4 text-blue-500" /> Impacto Fisiológico
+              </h3>
+              <div className="space-y-4">
+                <NumberInput label="Variação de Peso (Ex: -2 para perda de 2%)" value={data.weightVariation} unit="%" step={0.1} onChange={(v) => setData({...data, weightVariation: v})} />
+                
+                <div className="pt-2">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sintomas Relatados</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Checkbox label="Dor de Cabeça" checked={data.symptoms.headache} onChange={(v) => setData({...data, symptoms: {...data.symptoms, headache: v}})} />
+                    <Checkbox label="Tontura" checked={data.symptoms.dizziness} onChange={(v) => setData({...data, symptoms: {...data.symptoms, dizziness: v}})} />
+                    <Checkbox label="Cãibras" checked={data.symptoms.cramps} onChange={(v) => setData({...data, symptoms: {...data.symptoms, cramps: v}})} />
+                    <Checkbox label="Fadiga" checked={data.symptoms.fatigue} onChange={(v) => setData({...data, symptoms: {...data.symptoms, fatigue: v}})} />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Results Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Score Hidratação</p>
+                <div className="text-6xl font-black text-white mb-2">{score}</div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+                  {classification.label}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Índice Hidratação</span>
+                  <span className={`text-sm font-black ${metrics.hydrationIndex > 70 ? 'text-emerald-400' : metrics.hydrationIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.hydrationIndex}%</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Estresse</span>
+                  <span className={`text-sm font-black ${metrics.physiologicalStress < 30 ? 'text-emerald-400' : metrics.physiologicalStress < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.physiologicalStress}%</span>
+                </div>
+              </div>
+
+              {alerts.length > 0 && (
+                <div className="space-y-2 mb-6">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-[10px] font-black">
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+              </Button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Footer Actions */}
-      <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
-          Cancelar
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-blue-500 hover:bg-blue-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
-        </Button>
-      </div>
-    </motion.div>
+    </div>
   );
 }

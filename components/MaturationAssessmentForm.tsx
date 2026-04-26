@@ -1,9 +1,8 @@
- 
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { PersonStanding, AlertTriangle, Save, ArrowLeft, Ruler, Activity } from "lucide-react";
+import { PersonStanding, AlertTriangle, Save, Activity, Ruler, Target, Heart, Flame, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MaturationAssessmentProps {
@@ -13,14 +12,14 @@ interface MaturationAssessmentProps {
 }
 
 const NumberInput = ({ label, value, unit, onChange }: { label: string, value: number, unit: string, onChange: (v: number) => void }) => (
-  <div className="bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50 flex flex-col justify-between">
-    <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+  <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-800/50 flex flex-col justify-between">
+    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{label}</label>
     <div className="relative">
       <input
         type="number"
         value={value || ''}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white font-bold focus:outline-none focus:border-cyan-500 transition-colors"
+        className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-white font-black text-sm focus:outline-none focus:border-cyan-500 transition-colors"
       />
       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 uppercase">{unit}</span>
     </div>
@@ -28,6 +27,8 @@ const NumberInput = ({ label, value, unit, onChange }: { label: string, value: n
 );
 
 export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: MaturationAssessmentProps) {
+  const [step, setStep] = useState(1);
+
   // Inputs
   const [data, setData] = useState({
     age: 14,
@@ -37,7 +38,6 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     motherHeight: 160,
     fatherHeight: 175
   });
-
 
   // Derived State
   const [score, setScore] = useState(100);
@@ -57,19 +57,15 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     const ratio = data.sittingHeight / data.height;
     
     // 1. Maturation Index Approximation (0-100)
-    // A lower ratio (longer legs relative to sitting height) often indicates entering the growth spurt.
-    // Typical ratio is ~0.52. 
     let maturationIndex = 50;
-    if (ratio < 0.5) maturationIndex = 80; // Legs growing fast (Circa-PHV)
-    else if (ratio > 0.53) maturationIndex = 30; // Pre-PHV or Post-PHV
+    if (ratio < 0.5) maturationIndex = 80; 
+    else if (ratio > 0.53) maturationIndex = 30; 
     
     // Adjust based on age and weight
     if (data.age < 12) maturationIndex -= 20;
     if (data.age > 16) maturationIndex += 20;
 
-    // Optional: Predictive component based on parents height
     const midParentHeight = (data.motherHeight + data.fatherHeight) / 2;
-    // We adjust score conceptually for the mock preview
     if (data.height > midParentHeight) maturationIndex += 5;
 
     maturationIndex = Math.max(0, Math.min(100, maturationIndex));
@@ -79,10 +75,9 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     if (maturationIndex < 40) status = 'Pre-PHV';
     else if (maturationIndex > 70) status = 'Post-PHV';
 
-    // 3. Final Score (Stability of growth pattern)
-    // For this mock, we'll consider Circa-PHV (rapid growth) as lower stability (needs attention)
+    // 3. Final Score 
     let finalScore = 100;
-    if (status === 'Circa-PHV') finalScore = 60; // Needs attention due to growth spurt risk
+    if (status === 'Circa-PHV') finalScore = 60; 
     else if (status === 'Pre-PHV') finalScore = 80;
     else finalScore = 90;
 
@@ -94,8 +89,6 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
       ratio: Number(ratio.toFixed(2))
     });
 
-    // Classification (Precoce, Normal, Tardio)
-    // This is a simplification. Usually requires population norms.
     let classLabel = 'Normal';
     let classColor = 'cyan';
     
@@ -112,11 +105,10 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     
     setClassification({ label: classLabel, color: classColor });
 
-    // Alerts
     const newAlerts: string[] = [];
-    if (classLabel === 'Precoce') newAlerts.push("Aceleração Precoce do Crescimento");
+    if (classLabel === 'Precoce') newAlerts.push("Aceleração Precoce");
     if (classLabel === 'Tardio') newAlerts.push("Desenvolvimento Tardio");
-    if (status === 'Circa-PHV') newAlerts.push("Risco de Estirão de Crescimento (Atenção à Carga)");
+    if (status === 'Circa-PHV') newAlerts.push("Risco de Estirão (Atenção)");
     setAlerts(newAlerts);
 
   }, [data]);
@@ -126,16 +118,16 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    await onSave({
-      type: "Maturação",
-      score,
-      classification: classification.label,
-      classification_color: classification.color,
-      growth_status: growthStatus,
-      maturation_index: metrics.maturationIndex,
-      alerts,
-      raw_data: data
-    });
+      await onSave({
+        type: "Maturação",
+        score,
+        classification: classification.label,
+        classification_color: classification.color,
+        growth_status: growthStatus,
+        maturation_index: metrics.maturationIndex,
+        alerts,
+        raw_data: data
+      });
     } finally {
       setIsSaving(false);
     }
@@ -151,98 +143,137 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     return map[color] || map.cyan;
   };
 
+  const formSteps = [
+    { id: 1, title: 'Atleta', icon: PersonStanding },
+    { id: 2, title: 'Segmentos', icon: Ruler },
+    { id: 3, title: 'Pais', icon: Target },
+  ];
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
-    >
-      {/* Header & Summary Card */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1">
-          <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-          </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <PersonStanding className="w-6 h-6 text-indigo-500" />
-            Avaliação de Maturação
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Estágio de Maturação Biológica e PHV
-          </p>
-        </div>
-
-        <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+            <PersonStanding className="w-6 h-6 text-cyan-400" />
+          </div>
           <div>
-            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score de Estabilidade</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black">{score}</span>
-              <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
-            </div>
-            <p className="text-xxs font-black uppercase tracking-widest mt-1 opacity-90">Status: {growthStatus}</p>
-            {alerts.length > 0 && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
-                    <AlertTriangle className="w-3 h-3" /> {alert}
-                  </div>
-                ))}
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação de Maturação</h2>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Estágio de Maturação e PHV</p>
+          </div>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between px-4 max-w-sm mx-auto">
+        {formSteps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
               </div>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+            </div>
+            {i < formSteps.length - 1 && (
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-cyan-500' : 'bg-slate-800'}`}></div>
             )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {step === 1 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <PersonStanding className="w-4 h-4 text-cyan-500" /> Dados Básicos
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <NumberInput label="Idade" value={data.age} unit="anos" onChange={(v) => setData({...data, age: v})} />
+                <NumberInput label="Peso Atual" value={data.weight} unit="kg" onChange={(v) => setData({...data, weight: v})} />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Ruler className="w-4 h-4 text-cyan-500" /> Estatura e Segmentos
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <NumberInput label="Altura (Em Pé)" value={data.height} unit="cm" onChange={(v) => setData({...data, height: v})} />
+                <NumberInput label="Altura Sentado" value={data.sittingHeight} unit="cm" onChange={(v) => setData({...data, sittingHeight: v})} />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Target className="w-4 h-4 text-cyan-500" /> Alvo Genético
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <NumberInput label="Altura da Mãe" value={data.motherHeight} unit="cm" onChange={(v) => setData({...data, motherHeight: v})} />
+                <NumberInput label="Altura do Pai" value={data.fatherHeight} unit="cm" onChange={(v) => setData({...data, fatherHeight: v})} />
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Results Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Estabilidade</p>
+                <div className="text-6xl font-black text-white mb-2">{score}</div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+                  {classification.label}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Índice</span>
+                  <span className="text-xs font-black mt-1 text-cyan-400">{metrics.maturationIndex}</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Razão</span>
+                  <span className="text-xs font-black mt-1 text-cyan-400">{metrics.ratio}</span>
+                </div>
+                <div className="col-span-2 bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Status</span>
+                  <span className="text-xs font-black mt-1 truncate max-w-[150px] text-cyan-400">{growthStatus}</span>
+                </div>
+              </div>
+
+              {alerts.length > 0 && (
+                <div className="space-y-2 mb-6">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-[10px] font-black">
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+              </Button>
+            </div>
           </div>
-          <Activity className="w-12 h-12 opacity-20" />
         </div>
       </div>
-
-      {/* Indices Preview */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Maturação</p>
-          <p className="text-2xl font-black text-indigo-400">
-            {metrics.maturationIndex}
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Comprimento da Perna</p>
-          <p className="text-2xl font-black text-slate-300">
-            {metrics.legLength} <span className="text-xs text-slate-500">cm</span>
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Razão Tronco-Estatura</p>
-          <p className="text-2xl font-black text-slate-300">
-            {metrics.ratio}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Section 1: Basic Measurements */}
-        <div className="space-y-4 md:col-span-2">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Ruler className="w-4 h-4 text-indigo-500" /> Dados Antropométricos
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <NumberInput label="Idade" value={data.age} unit="anos" onChange={(v) => setData({...data, age: v})} />
-            <NumberInput label="Altura" value={data.height} unit="cm" onChange={(v) => setData({...data, height: v})} />
-            <NumberInput label="Altura Sentado" value={data.sittingHeight} unit="cm" onChange={(v) => setData({...data, sittingHeight: v})} />
-            <NumberInput label="Peso" value={data.weight} unit="kg" onChange={(v) => setData({...data, weight: v})} />
-            
-            <NumberInput label="Altura da Mãe" value={data.motherHeight} unit="cm" onChange={(v) => setData({...data, motherHeight: v})} />
-            <NumberInput label="Altura do Pai" value={data.fatherHeight} unit="cm" onChange={(v) => setData({...data, fatherHeight: v})} />
-          </div>
-        </div>
-      </div>
-
-      {/* Footer Actions */}
-      <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
-          Cancelar
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-indigo-500 hover:bg-indigo-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
-        </Button>
-      </div>
-    </motion.div>
+    </div>
   );
 }

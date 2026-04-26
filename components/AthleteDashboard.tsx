@@ -553,6 +553,42 @@ export function AthleteDashboard({
   const [hasPushPermission, setHasPushPermission] = useState<NotificationPermission>("default");
 
   useEffect(() => {
+    const syncOfflineData = async () => {
+      if (!supabase) return;
+      const pendingJson = localStorage.getItem(`pending_checkins_${athleteId}`);
+      if (!pendingJson) return;
+
+      try {
+        const pendingData = JSON.parse(pendingJson);
+        for (const item of pendingData) {
+          const { checkInDataToInsert, painReportsToInsert, sprintDataToInsert, workloadDataToInsert, cycleDataToInsert } = item;
+          
+          const { data: checkInData, error: checkInError } = await supabase.from("check_ins").insert([checkInDataToInsert]).select();
+          if (checkInError) throw checkInError;
+          
+          const checkInId = checkInData[0].id;
+          
+          if (painReportsToInsert?.length > 0) {
+            const finalPainReports = painReportsToInsert.map((p: any) => ({ ...p, check_in_id: checkInId }));
+            await supabase.from("pain_reports").insert(finalPainReports);
+          }
+          if (sprintDataToInsert) {
+            await supabase.from("sprint_data").insert([{ ...sprintDataToInsert, check_in_id: checkInId }]);
+          }
+          if (workloadDataToInsert) {
+            await supabase.from("workload_tracking").insert([{ ...workloadDataToInsert, check_in_id: checkInId }]);
+          }
+          if (cycleDataToInsert) {
+            await supabase.from("menstrual_tracking").insert([{ ...cycleDataToInsert, check_in_id: checkInId }]);
+          }
+        }
+        localStorage.removeItem(`pending_checkins_${athleteId}`);
+        storeFetchCheckins(athleteId!, athleteData?.sport);
+      } catch (e) {
+        console.error("Error syncing offline data:", e);
+      }
+    };
+
     setIsOffline(!navigator.onLine);
     const handleOnline = () => {
       setIsOffline(false);
@@ -571,44 +607,7 @@ export function AthleteDashboard({
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [athleteId]);
-
-  const syncOfflineData = async () => {
-    if (!supabase) return;
-    const pendingJson = localStorage.getItem(`pending_checkins_${athleteId}`);
-    if (!pendingJson) return;
-
-    try {
-      const pendingData = JSON.parse(pendingJson);
-      for (const item of pendingData) {
-        // Assume item matches everything inserted in handleSubmit
-        const { checkInDataToInsert, painReportsToInsert, sprintDataToInsert, workloadDataToInsert, cycleDataToInsert } = item;
-        
-        const { data: checkInData, error: checkInError } = await supabase.from("check_ins").insert([checkInDataToInsert]).select();
-        if (checkInError) throw checkInError;
-        
-        const checkInId = checkInData[0].id;
-        
-        if (painReportsToInsert?.length > 0) {
-          const finalPainReports = painReportsToInsert.map((p: any) => ({ ...p, check_in_id: checkInId }));
-          await supabase.from("pain_reports").insert(finalPainReports);
-        }
-        if (sprintDataToInsert) {
-          await supabase.from("sprint_data").insert([{ ...sprintDataToInsert, check_in_id: checkInId }]);
-        }
-        if (workloadDataToInsert) {
-          await supabase.from("workload_tracking").insert([{ ...workloadDataToInsert, check_in_id: checkInId }]);
-        }
-        if (cycleDataToInsert) {
-          await supabase.from("menstrual_tracking").insert([{ ...cycleDataToInsert, check_in_id: checkInId }]);
-        }
-      }
-      localStorage.removeItem(`pending_checkins_${athleteId}`);
-      storeFetchCheckins(athleteId!, athleteData?.sport);
-    } catch (e) {
-      console.error("Error syncing offline data:", e);
-    }
-  };
+  }, [athleteId, athleteData?.sport, storeFetchCheckins]);
 
   const handlePushPermission = async () => {
     setShowNotificationSettings(true);
@@ -1322,7 +1321,22 @@ export function AthleteDashboard({
           await supabase.from("pain_reports").insert(painReports);
         }
 
-        const finalWellnessData = { ...wellnessDataToInsert, id: checkInId };
+        const finalWellnessData = { 
+          id: checkInId,
+          athlete_id: athleteId,
+          record_date: new Date().toISOString(),
+          sleep_hours: answers["sleep_hours"],
+          sleep_quality: answers["sleep"],
+          fatigue_level: answers["energy"],
+          muscle_soreness: maxPain > 0 ? maxPain : (answers["leg_heaviness"] || 0),
+          soreness_location: compiledSorenessLocation,
+          stress_level: answers["stress"],
+          readiness_score: readiness,
+          comments: finalNotes,
+          hydration_perception: answers["hydration"],
+          hydration_score: answers["hydration"],
+          menstrual_cycle: cycleInfo?.phase,
+        };
         const { error: wellnessError } = await supabase.from("wellness_records").insert([finalWellnessData]);
         if (wellnessError) console.error("Could not sync to wellness_records:", wellnessError);
 
@@ -1350,6 +1364,7 @@ export function AthleteDashboard({
   };
 
   const resetForm = () => {
+    setAnswers({});
     setPainMap({});
     setNotes("");
     setView("history");
@@ -1831,47 +1846,79 @@ export function AthleteDashboard({
           </div>
         </div>
 
-        <div className="text-center space-y-3 sm:space-y-4">
-          <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
-            <div className={`relative w-32 h-32 sm:w-44 sm:h-44 rounded-full border-4 ${theme.border} shadow-2xl transition-all duration-500 hover:scale-105`}>
-              <div className="absolute inset-0 rounded-full overflow-hidden">
-                {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
-                  <Image 
-                    src={athleteData.avatar_url} 
-                    alt={athleteData.name} 
-                    fill 
-                    className="object-cover"
-                    unoptimized
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className={`w-full h-full ${theme.bgAlpha} flex items-center justify-center`}>
-                    <User className={`w-16 h-16 sm:w-24 sm:h-24 ${theme.icon}`} />
-                  </div>
-                )}
+        {/* Large Profile Header block restored */}
+        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
+          <div className="relative w-full h-[350px] sm:h-[450px]">
+            {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
+              <Image 
+                src={athleteData.avatar_url} 
+                alt={athleteData.name} 
+                fill 
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                unoptimized
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className={`w-full h-full bg-slate-900 flex items-center justify-center`}>
+                <User className="w-32 h-32 text-slate-800" />
               </div>
-              
-              {/* Readiness Badge next to photo */}
-              <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1.5 rounded-full border-2 border-slate-800 shadow-xl z-20">
-                <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center border ${currentReadiness >= 80 ? 'border-emerald-500/50 bg-emerald-500/10' : currentReadiness >= 50 ? 'border-amber-500/50 bg-amber-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
-                  <span className={`text-xs sm:text-sm font-black ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {currentReadiness}%
-                  </span>
+            )}
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050B14] via-[#050B14]/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050B14]/70 to-transparent pointer-events-none" />
+            
+            {/* Top badges */}
+            <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-10">
+              <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg ${currentReadiness >= 80 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : currentReadiness >= 50 ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-red-500/20 border-red-500/50 text-red-400'}`}>
+                 <CheckCircle className="w-4 h-4" />
+                 {currentReadiness >= 80 ? "Apto" : currentReadiness >= 50 ? "Atenção" : "Em Risco"}
+              </div>
+              <div className="flex flex-col items-end">
+                <div className="bg-[#050B14]/80 backdrop-blur-md rounded-2xl p-3 border border-slate-800 shadow-xl flex flex-col items-center">
+                   <span className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
+                   <span className={`text-3xl font-black leading-none ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{currentReadiness}%</span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-2">
-              <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] text-center">
-                {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
-              </h2>
-              {athleteCode && (
-                <span className={`px-3 py-1 ${theme.bgAlpha} ${theme.text} text-xxs sm:text-xs font-bold rounded-full uppercase tracking-widest border ${theme.borderAlpha} shadow-lg`}>
-                  #{athleteCode}
-                </span>
-              )}
+
+            {/* Bottom Info */}
+            <div className="absolute bottom-6 left-6 right-6 z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
+                  {athleteData?.name}
+                </h2>
+                {athleteCode && (
+                  <span className={`px-2.5 py-1 ${theme.bgAlpha} ${theme.text} text-xxs font-bold rounded-lg uppercase tracking-widest border ${theme.borderAlpha} shadow-lg hidden sm:inline-block`}>
+                    #{athleteCode}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-bold">
+                 {athleteData?.sport && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">MODALIDADE</span> {athleteData.sport}
+                   </div>
+                 )}
+                 {athleteData?.position && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">POSIÇÃO</span> {athleteData.position}
+                   </div>
+                 )}
+                 {athleteData?.category && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">CATEGORIA</span> {athleteData.category}
+                   </div>
+                 )}
+                 {athleteData?.birth_date && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">IDADE</span> {new Date().getFullYear() - new Date(athleteData.birth_date).getFullYear()} ANOS
+                   </div>
+                 )}
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Motivational Quote */}
         <div className={`bg-slate-900/40 p-6 rounded-2xl border ${theme.borderAlpha} relative ${theme.shadowStrong} overflow-hidden max-w-sm mx-auto`}>

@@ -1907,205 +1907,122 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         onCancel={() => setConfirmDeleteAttachment(null)}
       />
 
-      {/* 1. Cinematic Hero Header */}
-      <div className="relative w-full pt-24 pb-8 md:pt-32 md:pb-12 overflow-hidden shrink-0">
-        {/* Background Layer */}
-        <div className="absolute inset-0 z-0">
-          {athletePhoto ? (
-            <div className="relative w-full h-full">
+            {/* Top App Bar */}
+      <div className="px-6 py-4 flex justify-between items-center bg-transparent sticky top-0 z-40">
+        <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
+      </div>
+
+      <div className="max-w-6xl mx-auto w-full px-6 pt-2 pb-4 overflow-x-auto custom-scrollbar">
+        {/* Large Profile Header block restored */}
+        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group mb-8`}>
+          <div className="relative w-full h-[350px] sm:h-[450px]">
+            {athletePhoto ? (
               <Image 
                 src={athletePhoto} 
-                alt="" 
+                alt={athlete.name} 
                 fill 
-                className="object-cover blur-2xl opacity-30 scale-110"
-                referrerPolicy="no-referrer"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized
+                referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/60 to-transparent" />
-            </div>
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-900 via-[#020617] to-cyan-950/20" />
-          )}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-        </div>
-
-        {/* Navigation Bar (Floating) */}
-        <div className="absolute top-0 left-0 right-0 z-50 p-4 md:p-6 flex justify-between items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onBack} 
-            className="text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-md rounded-2xl h-10 w-10 md:h-12 md:w-12 border border-white/5"
-          >
-            <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
-          </Button>
-          
-          <div className="flex items-center gap-3">
-            {athlete.athlete_code && (
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setShowQrModal(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl backdrop-blur-md transition-all group"
-                >
-                  <QrCode className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xxs md:text-xs font-black tracking-widest uppercase">#{athlete.athlete_code}</span>
-                </button>
+            ) : (
+              <div className={`w-full h-full bg-slate-900 flex items-center justify-center`}>
+                <User className="w-32 h-32 text-slate-800" />
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 flex items-end">
-          <div className="max-w-7xl mx-auto w-full px-4 md:px-6 flex flex-col sm:flex-row items-center sm:items-end gap-6 md:gap-8">
-            {/* Large Profile Photo */}
-            <motion.div 
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="relative shrink-0 mt-4 sm:mt-0"
-            >
-              <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-3xl md:rounded-[2.5rem] overflow-hidden border-4 border-[#020617] shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-slate-900 group">
-                {athletePhoto ? (
-                  <Image 
-                    src={athletePhoto} 
-                    alt={athlete.name} 
-                    fill 
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    referrerPolicy="no-referrer"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <User className="w-12 h-12 md:w-16 md:h-16 text-slate-700" />
-                  </div>
-                )}
-                
-                {/* Status Badge Over Photo */}
-                <div className={`absolute bottom-0 left-0 right-0 py-1.5 md:py-2 text-center backdrop-blur-md border-t border-white/10 ${statusCfg.bg.replace('/10', '/40')} ${statusCfg.color}`}>
-                  <span className="text-xxs md:text-xxs font-black uppercase tracking-[0.2em]">{statusCfg.label}</span>
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050B14] via-[#050B14]/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050B14]/80 to-transparent pointer-events-none" />
+            
+            {/* Top badges */}
+            <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-10">
+              <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg ${athlete.status === 'active' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : athlete.status === 'injured' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-slate-500/20 border-slate-500/50 text-slate-400'}`}>
+                 <CheckCircle className="w-4 h-4" />
+                 {athlete.status === 'active' ? "APTO" : athlete.status === 'injured' ? "LESIONADO" : "INATIVO"}
+              </div>
+              <div className="flex flex-col items-end">
+                <div className="bg-[#050B14]/80 backdrop-blur-md rounded-2xl p-3 border border-slate-800 shadow-xl flex flex-col items-center">
+                   <span className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
+                   <span className={`text-3xl font-black leading-none ${(athlete.readiness || 0) >= 80 ? 'text-emerald-400' : (athlete.readiness || 0) >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{athlete.readiness !== undefined ? `${athlete.readiness}%` : '--%'}</span>
                 </div>
               </div>
-              
-              {/* Floating Readiness Indicator */}
-              <div className="absolute -top-2 -right-2 md:-top-3 md:-right-3 w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-[#0A1120] border-2 border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-                <span className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-tighter">Score</span>
-                <span className={`text-lg md:text-xl font-black ${athlete.readiness < 70 ? 'text-rose-500' : 'text-cyan-400'}`}>
-                  {athlete.readiness}%
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Athlete Info */}
-            <div className="flex-1 pb-2 text-center sm:text-left">
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-              >
-                <div className="flex flex-col sm:flex-row flex-wrap items-center sm:items-end gap-3 mb-4">
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-none flex items-center gap-3">
-                    {athlete.name}
-                    {athlete.group_name && athlete.group_name.toUpperCase().includes('AGUIA') && (
-                      <span className="text-3xl sm:text-4xl" title="Projeto Águias">🦅</span>
-                    )}
-                  </h1>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 md:gap-x-6 gap-y-3">
-                  <div className="flex items-center gap-2 md:gap-2.5">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Modalidade</p>
-                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">
-                        {athlete.modalidade === 'Volleyball' && language === 'pt' ? 'Vôlei' : (athlete.modalidade || '-')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-2.5">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Posição</p>
-                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">{athlete.position || '-'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-2.5">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Categoria</p>
-                      <p className="text-xxs md:text-xs font-bold text-white uppercase tracking-tight">{athlete.category || '-'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-2.5">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-xxs md:text-xxs font-black text-slate-500 uppercase tracking-widest">Idade</p>
-                      <p className="text-xs font-bold text-white uppercase tracking-tight">{athleteAge || '-'} Anos</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
             </div>
 
-            {/* Risk Level (Right Side) */}
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="hidden lg:block pb-2"
-            >
-              <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 min-w-[11.25rem]`}>
-                <div className={`w-3 h-3 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.5)]`}></div>
-                <p className="text-xxs font-black text-slate-500 uppercase tracking-[0.2em]">Risco Clínico</p>
-                <span className={`text-xl font-black uppercase tracking-widest ${riskCfg.color}`}>
-                  {riskCfg.label}
-                </span>
+            {/* Bottom Info */}
+            <div className="absolute bottom-6 left-6 right-6 z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
+                  {athlete.name}
+                </h2>
+                {athlete.athlete_code && (
+                  <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xxs font-bold rounded-lg uppercase tracking-widest border border-cyan-500/30 shadow-lg hidden sm:inline-block">
+                    #{athlete.athlete_code}
+                  </span>
+                )}
               </div>
-            </motion.div>
+              <div className="flex flex-wrap gap-2 text-xs font-bold">
+                 {athlete.sport && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">MODALIDADE</span> {athlete.sport}
+                   </div>
+                 )}
+                 {athlete.position && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">POSIÇÃO</span> {athlete.position}
+                   </div>
+                 )}
+                 {athlete.category && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">CATEGORIA</span> {athlete.category}
+                   </div>
+                 )}
+                 {athlete.birth_date && (
+                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
+                     <span className="text-slate-500 mr-2">IDADE</span> {new Date().getFullYear() - new Date(athlete.birth_date).getFullYear()} ANOS
+                   </div>
+                 )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </Card>
 
-      {/* Tabs Navigation */}
-      <div className="border-b border-slate-800/50 bg-[#0A1120] sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-8 overflow-x-auto custom-scrollbar">
-            {[
-              { id: 'overview', label: 'Visão Geral', icon: Activity },
-              { id: 'ficha', label: 'Ficha', icon: User },
-              { id: 'clinical', label: 'Avaliações', icon: Stethoscope },
-              { id: 'prontuario', label: 'Prontuário', icon: FileText },
-              { id: 'attachments', label: 'Anexos', icon: ClipboardList },
-              { id: 'history', label: 'Histórico', icon: Clock },
-            ].map(tab => (
-              <button
-                key={tab.id}
+        {/* Progress Steps / Tabs */}
+        <div className="flex items-center justify-between min-w-[600px] mb-8">
+          {[
+            { id: 'overview', label: 'Visão Geral', icon: Activity },
+            { id: 'ficha', label: 'Cadastro', icon: User },
+            { id: 'clinical', label: 'Avaliações', icon: Stethoscope },
+            { id: 'prontuario', label: 'Prontuário', icon: FileText },
+            { id: 'attachments', label: 'Anexos', icon: ClipboardList },
+            { id: 'history', label: 'Histórico', icon: Clock },
+          ].map((tab, i, arr) => {
+            const activeIndex = arr.findIndex(t => t.id === activeTab);
+            const isPast = activeIndex > i;
+            const isActive = activeIndex === i;
+            
+            return (
+            <React.Fragment key={tab.id}>
+              <div 
+                className={`flex flex-col items-center gap-3 cursor-pointer transition-all ${isActive ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab.id 
-                    ? 'border-cyan-500 text-cyan-400' 
-                    : 'border-transparent text-slate-500 hover:text-slate-300'
-                }`}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="text-xxs font-black uppercase tracking-widest">{tab.label}</span>
-              </button>
-            ))}
-          </div>
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center border-[3px] ${isActive ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]' : 'border-slate-700 bg-slate-900/50 text-slate-400'}`}>
+                  <tab.icon className="w-6 h-6" />
+                </div>
+                <span className={`text-[0.65rem] font-black uppercase tracking-widest text-center max-w-[6rem] leading-tight ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{tab.label}</span>
+              </div>
+              {i < arr.length - 1 && (
+                <div className={`flex-1 h-[3px] mx-4 mb-8 rounded-full ${activeIndex > i ? 'bg-cyan-500/50' : 'bg-slate-800'}`}></div>
+              )}
+            </React.Fragment>
+          )})}
         </div>
       </div>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 space-y-10">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3 space-y-10">
         {activeTab === 'overview' && (
           <div className="space-y-10 pb-32">
             {/* Session Mode Toggle Container */}
@@ -3402,6 +3319,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
             {activeAssessment === 'orthopedic' && (
               <OrthopedicAssessment 
+                athleteId={athlete.id}
                 athleteName={athlete.name}
                 onBack={() => setActiveAssessment('list')}
                 onSave={async (score, data) => {
@@ -4242,7 +4160,66 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           </div>
         )}
       </AnimatePresence>
+      
+          </div> {/* End Left Column */}
 
+          {/* RIGHT COLUMN: Summary Sidebar */}
+          <div className="space-y-6 lg:col-span-1 border-l border-slate-800/50 pl-6 sticky top-24 h-max">
+             {/* Clinical Risk Summary */}
+             <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 w-full`}>
+                <div className={`w-3 h-3 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.5)]`}></div>
+                <p className="text-xxs font-black text-slate-500 uppercase tracking-[0.2em]">Risco Clínico Atual</p>
+                <span className={`text-2xl font-black uppercase tracking-widest ${riskCfg.color}`}>
+                  {riskCfg.label}
+                </span>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                 <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800 flex flex-col items-center justify-center text-center">
+                    <span className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status</span>
+                    <span className={`text-xs font-black uppercase tracking-tighter ${statusCfg.color}`}>{statusCfg.label}</span>
+                 </div>
+                 <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800 flex flex-col items-center justify-center text-center">
+                    <span className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Prontidão</span>
+                    <span className={`text-xl font-black ${athlete.readiness < 70 ? 'text-rose-500' : 'text-cyan-400'}`}>{athlete.readiness}%</span>
+                 </div>
+             </div>
+
+             {/* Recent Tags */}
+             <div className="bg-slate-900/40 rounded-2xl border border-slate-800 p-5 space-y-4">
+                <h3 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                   <Tag className="w-3.5 h-3.5 text-purple-400" /> Tags Ativas
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                   {clinicalTags.length > 0 ? (
+                      clinicalTags.map(tag => (
+                         <span key={tag.id} className="text-[9px] px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase font-black tracking-widest">{tag.tag}</span>
+                      ))
+                   ) : (
+                      <span className="text-[10px] text-slate-600 font-bold italic">Nenhuma tag ativa.</span>
+                   )}
+                </div>
+             </div>
+
+             {/* Focus Action Planner */}
+             <div className="bg-slate-900/40 rounded-2xl border border-slate-800 p-5 space-y-4">
+                <h3 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                   <Target className="w-3.5 h-3.5 text-rose-500" /> Foco de Recuperação
+                </h3>
+                <div className="space-y-3">
+                   {athleteAlerts.filter(a => a.status === 'active').slice(0, 3).map(alert => (
+                     <div key={alert.id} className="flex gap-2">
+                        <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                        <span className="text-[10px] font-bold text-slate-300 leading-tight">{alert.message}</span>
+                     </div>
+                   ))}
+                   {athleteAlerts.filter(a => a.status === 'active').length === 0 && (
+                      <span className="text-[10px] text-slate-600 font-bold italic">Nenhum foco de risco.</span>
+                   )}
+                </div>
+             </div>
+          </div>
+        </div>
       </main>
 
       {/* Postural Assessment Modal */}

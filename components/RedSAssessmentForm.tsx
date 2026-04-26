@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Activity, TrendingDown, ShieldAlert, ActivitySquare, Utensils, AlertTriangle, Save, ArrowLeft } from "lucide-react";
+import { Activity, TrendingDown, ShieldAlert, ActivitySquare, Utensils, AlertTriangle, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface RedSAssessmentProps {
@@ -12,7 +12,55 @@ interface RedSAssessmentProps {
   onSave: (data: any) => void;
 }
 
+const Slider = ({ label, value, onChange, invertColor = false, max = 10 }: { label: string, value: number, onChange: (v: number) => void, invertColor?: boolean, max?: number }) => {
+  const isHighBad = invertColor;
+  const ratio = value / max;
+  const valueColor = isHighBad 
+    ? (ratio > 0.7 ? 'text-rose-400' : ratio > 0.4 ? 'text-amber-400' : 'text-emerald-400')
+    : (ratio < 0.4 ? 'text-rose-400' : ratio < 0.7 ? 'text-amber-400' : 'text-emerald-400');
+
+  return (
+    <div className="space-y-2 bg-slate-900/30 p-4 rounded-xl border border-slate-800/50">
+      <div className="flex justify-between items-end">
+        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</label>
+        <span className={`text-sm font-black ${valueColor}`}>{value}/{max}</span>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+      />
+    </div>
+  );
+};
+
+const SelectGroup = ({ label, value, options, onChange }: { label: string, value: string | boolean, options: {id: string | boolean, label: string}[], onChange: (v: any) => void }) => (
+  <div className="space-y-3 bg-slate-900/30 p-4 rounded-xl border border-slate-800/50">
+    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</label>
+    <div className="grid grid-cols-2 gap-2">
+      {options.map(opt => (
+        <button
+          key={String(opt.id)}
+          onClick={() => onChange(opt.id)}
+          className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+            value === opt.id 
+              ? 'bg-rose-500 text-[#050B14] shadow-lg shadow-rose-500/20' 
+              : 'bg-slate-900/50 text-slate-500 border border-slate-800 hover:border-slate-700'
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
 export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessmentProps) {
+  const [step, setStep] = useState(1);
+
   // Section 1: Energy Balance
   const [energy, setEnergy] = useState({
     dailyEnergy: 5,
@@ -121,7 +169,7 @@ export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessme
     if (energy.weightLoss && (energy.exhaustion > 6 || recovery.persistentFatigue > 6)) newAlerts.push("Alto Risco de RED-S");
     if (gender === 'F' && (hormonalF.irregularCycle || hormonalF.missedPeriods)) newAlerts.push("Disfunção Hormonal");
     if (recovery.illness) newAlerts.push("Supressão Imunológica");
-    if (behavior.restrictiveEating) newAlerts.push("Comportamento de Restrição de Energia");
+    if (behavior.restrictiveEating) newAlerts.push("Comportamento de Restrição");
     setAlerts(newAlerts);
 
   }, [energy, performance, recovery, gender, hormonalF, hormonalM, behavior]);
@@ -131,20 +179,20 @@ export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessme
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    await onSave({
-      type: "RED-S",
-      score,
-      classification: classification.label,
-      classification_color: classification.color,
-      risk_level: riskLevel,
-      energy_deficit_index: metrics.energyDeficit,
-      performance_decline_index: metrics.performanceDecline,
-      recovery_impairment_index: metrics.recoveryImpairment,
-      hormonal_risk_index: metrics.hormonalRisk,
-      behavior_risk_index: metrics.behaviorRisk,
-      alerts,
-      raw_data: { energy, performance, recovery, gender, hormonalF, hormonalM, behavior }
-    });
+      await onSave({
+        type: "RED-S",
+        score,
+        classification: classification.label,
+        classification_color: classification.color,
+        risk_level: riskLevel,
+        energy_deficit_index: metrics.energyDeficit,
+        performance_decline_index: metrics.performanceDecline,
+        recovery_impairment_index: metrics.recoveryImpairment,
+        hormonal_risk_index: metrics.hormonalRisk,
+        behavior_risk_index: metrics.behaviorRisk,
+        alerts,
+        raw_data: { energy, performance, recovery, gender, hormonalF, hormonalM, behavior }
+      });
     } finally {
       setIsSaving(false);
     }
@@ -160,234 +208,224 @@ export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessme
     return map[color] || map.cyan;
   };
 
-  const Slider = ({ label, value, onChange, invertColor = false }: { label: string, value: number, onChange: (v: number) => void, invertColor?: boolean }) => {
-    const isHighBad = invertColor;
-    const valueColor = isHighBad 
-      ? (value > 7 ? 'text-rose-400' : value > 4 ? 'text-amber-400' : 'text-emerald-400')
-      : (value < 4 ? 'text-rose-400' : value < 7 ? 'text-amber-400' : 'text-emerald-400');
-
-    return (
-      <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
-        <div className="flex justify-between items-end">
-          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
-          <span className={`text-lg font-black ${valueColor}`}>{value}</span>
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="10"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-        />
-        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
-          <span>Baixo (0)</span>
-          <span>Alto (10)</span>
-        </div>
-      </div>
-    );
-  };
-
-  const SelectGroup = ({ label, value, options, onChange }: { label: string, value: string | boolean, options: {id: string | boolean, label: string}[], onChange: (v: any) => void }) => (
-    <div className="space-y-3 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
-      <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(opt => (
-          <button
-            key={String(opt.id)}
-            onClick={() => onChange(opt.id)}
-            className={`py-2 px-1 rounded-xl text-xxs font-black uppercase tracking-widest transition-all ${
-              value === opt.id 
-                ? 'bg-cyan-500 text-[#050B14] shadow-lg shadow-cyan-500/20' 
-                : 'bg-slate-900/50 text-slate-500 border border-slate-800 hover:border-slate-700'
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  const formSteps = [
+    { id: 1, title: 'Energia', icon: Activity },
+    { id: 2, title: 'Perform.', icon: TrendingDown },
+    { id: 3, title: 'Recuper.', icon: ShieldAlert },
+    { id: 4, title: 'Hormonal', icon: ActivitySquare },
+    { id: 5, title: 'Nutrição', icon: Utensils },
+  ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
-    >
-      {/* Header & Summary Card */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1">
-          <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-          </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <ActivitySquare className="w-6 h-6 text-rose-500" />
-            Avaliação RED-S
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Risco de Deficiência Relativa de Energia no Esporte
-          </p>
-        </div>
-
-        <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
-          <div>
-            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score RED-S</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black">{score}</span>
-              <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
-            </div>
-            <p className="text-xxs font-black uppercase tracking-widest mt-1 opacity-90">{riskLevel}</p>
-            {alerts.length > 0 && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
-                    <AlertTriangle className="w-3 h-3" /> {alert}
-                  </div>
-                ))}
-              </div>
-            )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
+            <ActivitySquare className="w-6 h-6 text-rose-400" />
           </div>
-          <ShieldAlert className="w-12 h-12 opacity-20" />
+          <div>
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação RED-S</h2>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Deficiência Relativa de Energia</p>
+          </div>
         </div>
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
+          <X className="w-5 h-5" />
+        </Button>
       </div>
 
-      {/* Indices Preview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {[
-          { label: 'Déficit Energia', value: metrics.energyDeficit },
-          { label: 'Queda Perf.', value: metrics.performanceDecline },
-          { label: 'Falha Recup.', value: metrics.recoveryImpairment },
-          { label: 'Risco Hormonal', value: metrics.hormonalRisk },
-          { label: 'Risco Comport.', value: metrics.behaviorRisk }
-        ].map(idx => (
-          <div key={idx.label} className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-            <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">{idx.label}</p>
-            <p className={`text-xl font-black ${idx.value > 60 ? 'text-rose-400' : idx.value > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>
-              {idx.value}%
-            </p>
-          </div>
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between px-4 max-w-2xl mx-auto">
+        {formSteps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-rose-500 bg-rose-500/10 text-rose-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
+              </div>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+            </div>
+            {i < formSteps.length - 1 && (
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-rose-500' : 'bg-slate-800'}`}></div>
+            )}
+          </React.Fragment>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Section 1: Energy Balance */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-rose-500" /> Balanço Energético
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Nível de Energia Diária" value={energy.dailyEnergy} onChange={(v) => setEnergy({...energy, dailyEnergy: v})} />
-            <Slider label="Sensação de Exaustão no Treino" value={energy.exhaustion} onChange={(v) => setEnergy({...energy, exhaustion: v})} invertColor />
-            <Slider label="Recuperação entre Sessões" value={energy.recovered} onChange={(v) => setEnergy({...energy, recovered: v})} />
-            <SelectGroup 
-              label="Perda de peso recente inexplicada" 
-              value={energy.weightLoss} 
-              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-              onChange={(v) => setEnergy({...energy, weightLoss: v})} 
-            />
-          </div>
-        </div>
-
-        {/* Section 2: Performance Impact */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-rose-500" /> Impacto na Performance
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Queda de Performance" value={performance.drop} onChange={(v) => setPerformance({...performance, drop: v})} invertColor />
-            <Slider label="Fadiga Precoce no Treino" value={performance.earlyFatigue} onChange={(v) => setPerformance({...performance, earlyFatigue: v})} invertColor />
-            <Slider label="Percepção de Redução de Força" value={performance.reducedStrength} onChange={(v) => setPerformance({...performance, reducedStrength: v})} invertColor />
-          </div>
-        </div>
-
-        {/* Section 3: Recovery & Immunity */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-rose-500" /> Recuperação e Imunidade
-          </h3>
-          <div className="space-y-3">
-            <SelectGroup 
-              label="Doenças Frequentes (Imunidade Baixa)" 
-              value={recovery.illness} 
-              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-              onChange={(v) => setRecovery({...recovery, illness: v})} 
-            />
-            <Slider label="Lentidão na Recuperação" value={recovery.slowRecovery} onChange={(v) => setRecovery({...recovery, slowRecovery: v})} invertColor />
-            <Slider label="Fadiga Persistente" value={recovery.persistentFatigue} onChange={(v) => setRecovery({...recovery, persistentFatigue: v})} invertColor />
-          </div>
-        </div>
-
-        {/* Section 4: Hormonal Indicators */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <ActivitySquare className="w-4 h-4 text-rose-500" /> Indicadores Hormonais
-          </h3>
-          <div className="space-y-3">
-            <SelectGroup 
-              label="Sexo Biológico" 
-              value={gender} 
-              options={[{id: 'M', label: 'Masculino'}, {id: 'F', label: 'Feminino'}]}
-              onChange={(v) => setGender(v)} 
-            />
-            
-            {gender === 'F' ? (
-              <>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {step === 1 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-rose-500" /> Balanço Energético
+              </h3>
+              <div className="space-y-4">
+                <Slider label="Nível de Energia Diária" value={energy.dailyEnergy} onChange={(v) => setEnergy({...energy, dailyEnergy: v})} />
+                <Slider label="Sensação de Exaustão no Treino" value={energy.exhaustion} onChange={(v) => setEnergy({...energy, exhaustion: v})} invertColor />
+                <Slider label="Recuperação entre Sessões" value={energy.recovered} onChange={(v) => setEnergy({...energy, recovered: v})} />
                 <SelectGroup 
-                  label="Ciclo Menstrual Irregular" 
-                  value={hormonalF.irregularCycle} 
+                  label="Perda de peso recente inexplicada" 
+                  value={energy.weightLoss} 
                   options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-                  onChange={(v) => setHormonalF({...hormonalF, irregularCycle: v})} 
+                  onChange={(v) => setEnergy({...energy, weightLoss: v})} 
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <TrendingDown className="w-4 h-4 text-rose-500" /> Impacto na Performance
+              </h3>
+              <div className="space-y-4">
+                <Slider label="Queda de Performance" value={performance.drop} onChange={(v) => setPerformance({...performance, drop: v})} invertColor />
+                <Slider label="Fadiga Precoce no Treino" value={performance.earlyFatigue} onChange={(v) => setPerformance({...performance, earlyFatigue: v})} invertColor />
+                <Slider label="Percepção de Redução de Força" value={performance.reducedStrength} onChange={(v) => setPerformance({...performance, reducedStrength: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-rose-500" /> Recuperação e Imunidade
+              </h3>
+              <div className="space-y-4">
+                <SelectGroup 
+                  label="Doenças Frequentes (Imunidade Baixa)" 
+                  value={recovery.illness} 
+                  options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+                  onChange={(v) => setRecovery({...recovery, illness: v})} 
+                />
+                <Slider label="Lentidão na Recuperação" value={recovery.slowRecovery} onChange={(v) => setRecovery({...recovery, slowRecovery: v})} invertColor />
+                <Slider label="Fadiga Persistente" value={recovery.persistentFatigue} onChange={(v) => setRecovery({...recovery, persistentFatigue: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <ActivitySquare className="w-4 h-4 text-rose-500" /> Indicadores Hormonais
+              </h3>
+              <div className="space-y-4">
+                <SelectGroup 
+                  label="Sexo Biológico" 
+                  value={gender} 
+                  options={[{id: 'M', label: 'Masculino'}, {id: 'F', label: 'Feminino'}]}
+                  onChange={(v) => setGender(v)} 
+                />
+                
+                {gender === 'F' ? (
+                  <>
+                    <SelectGroup 
+                      label="Ciclo Menstrual Irregular" 
+                      value={hormonalF.irregularCycle} 
+                      options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+                      onChange={(v) => setHormonalF({...hormonalF, irregularCycle: v})} 
+                    />
+                    <SelectGroup 
+                      label="Ausência de Menstruação (Amenorreia)" 
+                      value={hormonalF.missedPeriods} 
+                      options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+                      onChange={(v) => setHormonalF({...hormonalF, missedPeriods: v})} 
+                    />
+                    <Slider label="Aumento de Sintomas Menstruais" value={hormonalF.symptoms} onChange={(v) => setHormonalF({...hormonalF, symptoms: v})} invertColor />
+                  </>
+                ) : (
+                  <>
+                    <Slider label="Redução de Libido" value={hormonalM.reducedLibido} onChange={(v) => setHormonalM({...hormonalM, reducedLibido: v})} invertColor />
+                    <Slider label="Baixa Motivação Geral" value={hormonalM.lowMotivation} onChange={(v) => setHormonalM({...hormonalM, lowMotivation: v})} invertColor />
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Utensils className="w-4 h-4 text-rose-500" /> Comportamento Nutricional
+              </h3>
+              <div className="space-y-4">
+                <SelectGroup 
+                  label="Pula Refeições" 
+                  value={behavior.skippingMeals} 
+                  options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+                  onChange={(v) => setBehavior({...behavior, skippingMeals: v})} 
                 />
                 <SelectGroup 
-                  label="Ausência de Menstruação (Amenorreia)" 
-                  value={hormonalF.missedPeriods} 
+                  label="Alimentação Restritiva" 
+                  value={behavior.restrictiveEating} 
                   options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-                  onChange={(v) => setHormonalF({...hormonalF, missedPeriods: v})} 
+                  onChange={(v) => setBehavior({...behavior, restrictiveEating: v})} 
                 />
-                <Slider label="Aumento de Sintomas Menstruais" value={hormonalF.symptoms} onChange={(v) => setHormonalF({...hormonalF, symptoms: v})} invertColor />
-              </>
-            ) : (
-              <>
-                <Slider label="Redução de Libido" value={hormonalM.reducedLibido} onChange={(v) => setHormonalM({...hormonalM, reducedLibido: v})} invertColor />
-                <Slider label="Baixa Motivação Geral" value={hormonalM.lowMotivation} onChange={(v) => setHormonalM({...hormonalM, lowMotivation: v})} invertColor />
-              </>
-            )}
-          </div>
+                <Slider label="Medo de Ganhar Peso" value={behavior.fearWeightGain} onChange={(v) => setBehavior({...behavior, fearWeightGain: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
         </div>
 
-        {/* Section 5: Nutritional Behavior */}
-        <div className="space-y-4 md:col-span-2">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            <Utensils className="w-4 h-4 text-rose-500" /> Comportamento Nutricional
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <SelectGroup 
-              label="Pula Refeições" 
-              value={behavior.skippingMeals} 
-              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-              onChange={(v) => setBehavior({...behavior, skippingMeals: v})} 
-            />
-            <SelectGroup 
-              label="Alimentação Restritiva" 
-              value={behavior.restrictiveEating} 
-              options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-              onChange={(v) => setBehavior({...behavior, restrictiveEating: v})} 
-            />
-            <Slider label="Medo de Ganhar Peso" value={behavior.fearWeightGain} onChange={(v) => setBehavior({...behavior, fearWeightGain: v})} invertColor />
+        {/* Results Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Score RED-S</p>
+                <div className="text-6xl font-black text-white mb-2">{score}</div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${getColorClasses(classification.color)}`}>
+                  {classification.label}
+                </div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{riskLevel}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Déficit Energia</span>
+                  <span className={`text-sm font-black mt-1 ${metrics.energyDeficit > 60 ? 'text-rose-400' : metrics.energyDeficit > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{metrics.energyDeficit}%</span>
+                </div>
+               <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Perda Perf.</span>
+                  <span className={`text-sm font-black mt-1 ${metrics.performanceDecline > 60 ? 'text-rose-400' : metrics.performanceDecline > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{metrics.performanceDecline}%</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Recup./Imunidade</span>
+                  <span className={`text-sm font-black mt-1 ${metrics.recoveryImpairment > 60 ? 'text-rose-400' : metrics.recoveryImpairment > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{metrics.recoveryImpairment}%</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Risco Hormonal</span>
+                  <span className={`text-sm font-black mt-1 ${metrics.hormonalRisk > 60 ? 'text-rose-400' : metrics.hormonalRisk > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{metrics.hormonalRisk}%</span>
+                </div>
+                <div className="bg-slate-950 col-span-2 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                  <span className="text-[8px] font-bold text-slate-500 uppercase">Risco Comport.</span>
+                  <span className={`text-sm font-black mt-1 ${metrics.behaviorRisk > 60 ? 'text-rose-400' : metrics.behaviorRisk > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{metrics.behaviorRisk}%</span>
+                </div>
+              </div>
+
+              {alerts.length > 0 && (
+                <div className="space-y-2 mb-6">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-rose-600 hover:bg-rose-500 text-white uppercase tracking-widest text-[10px] font-black">
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Footer Actions */}
-      <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
-          Cancelar
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-rose-500 hover:bg-rose-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
-        </Button>
-      </div>
-    </motion.div>
+    </div>
   );
 }

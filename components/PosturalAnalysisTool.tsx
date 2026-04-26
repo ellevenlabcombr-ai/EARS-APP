@@ -143,6 +143,7 @@ export function PosturalAnalysisTool({
             className={`relative w-full h-full ${activeSegmentId && !readOnly ? 'cursor-crosshair' : ''}`}
             onClick={handleCanvasClick}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={imageUrl} 
               alt={label}

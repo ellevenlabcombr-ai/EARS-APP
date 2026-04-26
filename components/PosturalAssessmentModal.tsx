@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PosturalAnalysisTool, SegmentData } from './PosturalAnalysisTool';
 import { X, Save, ArrowLeft, History, Plus, Trash2, Edit2, SplitSquareHorizontal, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
@@ -102,17 +102,7 @@ export function PosturalAssessmentModal({
     }
   };
 
-   
-  useEffect(() => {
-    if (isOpen) {
-      fetchHistory();
-      setViewState('history');
-      resetForm();
-      setComparingIds([]);
-    }
-  }, [isOpen, athleteId]);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     if (!supabase) return;
     const { data } = await supabase
       .from('postural_assessments')
@@ -122,7 +112,17 @@ export function PosturalAssessmentModal({
     if (data) {
       setHistory(data);
     }
-  };
+  }, [supabase, athleteId]);
+
+   
+  useEffect(() => {
+    if (isOpen) {
+      fetchHistory();
+      setViewState('history');
+      resetForm();
+      setComparingIds([]);
+    }
+  }, [isOpen, athleteId, fetchHistory]);
 
   const uploadImage = async (file: File, path: string) => {
     const fileExt = file.name.split('.').pop();

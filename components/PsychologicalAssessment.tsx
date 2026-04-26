@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { BrainCircuit, AlertTriangle, Save, ArrowLeft, Activity } from "lucide-react";
+import { BrainCircuit, AlertTriangle, Save, ArrowLeft, Activity, Heart, Zap, Target, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PsychologicalAssessmentProps {
@@ -13,6 +13,7 @@ interface PsychologicalAssessmentProps {
 }
 
 export function PsychologicalAssessment({ athleteId, onCancel, onSave }: PsychologicalAssessmentProps) {
+  const [step, setStep] = useState(1);
   // Section 1: Emotional State (0-10)
   const [emotional, setEmotional] = useState({ mood: 5, stress: 5, anxiety: 5 });
 
@@ -71,7 +72,7 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
     // Alerts
     const newAlerts: string[] = [];
     if (stressIndex > 70) newAlerts.push("Alto Estresse");
-    if (confidence.fearInjury > 7) newAlerts.push("Cinesiofobia (Medo de Movimento)");
+    if (confidence.fearInjury > 7) newAlerts.push("Cinesiofobia");
     if (motivation.train < 4) newAlerts.push("Baixa Motivação");
     if (confidence.confidence < 4) newAlerts.push("Baixa Confiança");
     setAlerts(newAlerts);
@@ -83,17 +84,17 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    await onSave({
-      type: "Psicológica",
-      score,
-      classification: classification.label,
-      classification_color: classification.color,
-      stress_index: metrics.stressIndex,
-      fatigue_index: metrics.fatigueIndex,
-      readiness_index: metrics.readinessIndex,
-      alerts,
-      raw_data: { emotional, cognition, motivation, confidence, pressure }
-    });
+      await onSave({
+        type: "Psicológica",
+        score,
+        classification: classification.label,
+        classification_color: classification.color,
+        stress_index: metrics.stressIndex,
+        fatigue_index: metrics.fatigueIndex,
+        readiness_index: metrics.readinessIndex,
+        alerts,
+        raw_data: { emotional, cognition, motivation, confidence, pressure }
+      });
     } finally {
       setIsSaving(false);
     }
@@ -110,18 +111,16 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
   };
 
   const Slider = ({ label, value, onChange, invertColor = false }: { label: string, value: number, onChange: (v: number) => void, invertColor?: boolean }) => {
-    // For positive traits (mood, confidence), high is green.
-    // For negative traits (stress, fear), high is red.
     const isHighBad = invertColor;
     const valueColor = isHighBad 
       ? (value > 7 ? 'text-rose-400' : value > 4 ? 'text-amber-400' : 'text-emerald-400')
       : (value < 4 ? 'text-rose-400' : value < 7 ? 'text-amber-400' : 'text-emerald-400');
 
     return (
-      <div className="space-y-2 bg-slate-900/30 p-4 rounded-2xl border border-slate-800/50">
+      <div className="space-y-2 bg-slate-900/30 p-4 rounded-xl border border-slate-800/50">
         <div className="flex justify-between items-end">
-          <label className="text-xxs font-black text-slate-400 uppercase tracking-widest">{label}</label>
-          <span className={`text-lg font-black ${valueColor}`}>{value}</span>
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</label>
+          <span className={`text-sm font-black ${valueColor}`}>{value}/10</span>
         </div>
         <input
           type="range"
@@ -129,151 +128,175 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
           max="10"
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+          className={`w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer ${isHighBad ? 'accent-rose-500' : 'accent-purple-500'}`}
         />
-        <div className="flex justify-between text-xxs font-bold text-slate-600 uppercase tracking-widest">
-          <span>Baixo (0)</span>
-          <span>Alto (10)</span>
-        </div>
       </div>
     );
   };
 
+  const steps = [
+    { id: 1, title: 'Emocional', icon: Heart },
+    { id: 2, title: 'Cognição', icon: BrainCircuit },
+    { id: 3, title: 'Motivação', icon: Zap },
+    { id: 4, title: 'Confiança', icon: Target },
+    { id: 5, title: 'Pressão', icon: AlertTriangle },
+  ];
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
-    >
-      {/* Header & Summary Card */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1">
-          <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-          </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <BrainCircuit className="w-6 h-6 text-cyan-500" />
-            Avaliação Psicológica
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Prontidão Mental e Risco Comportamental
-          </p>
-        </div>
-
-        <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+            <BrainCircuit className="w-6 h-6 text-purple-400" />
+          </div>
           <div>
-            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score Psicológico</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black">{score}</span>
-              <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
-            </div>
-            {alerts.length > 0 && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
-                    <AlertTriangle className="w-3 h-3" /> {alert}
-                  </div>
-                ))}
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Psicológica</h2>
+            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Prontidão Mental e Risco</p>
+          </div>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between px-4">
+        {steps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-purple-500 bg-purple-500/10 text-purple-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
               </div>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-purple-500' : 'bg-slate-800'}`}></div>
             )}
-          </div>
-          <Activity className="w-12 h-12 opacity-20" />
-        </div>
+          </React.Fragment>
+        ))}
       </div>
 
-      {/* Indices Preview */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Prontidão</p>
-          <p className={`text-2xl font-black ${metrics.readinessIndex > 70 ? 'text-emerald-400' : metrics.readinessIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.readinessIndex}%
-          </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {step === 1 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Heart className="w-4 h-4 text-purple-400" /> Estado Emocional
+              </h3>
+              <div className="space-y-3">
+                <Slider label="Humor Geral" value={emotional.mood} onChange={(v) => setEmotional({...emotional, mood: v})} />
+                <Slider label="Nível de Estresse" value={emotional.stress} onChange={(v) => setEmotional({...emotional, stress: v})} invertColor />
+                <Slider label="Ansiedade" value={emotional.anxiety} onChange={(v) => setEmotional({...emotional, anxiety: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <BrainCircuit className="w-4 h-4 text-purple-400" /> Cognição
+              </h3>
+              <div className="space-y-3">
+                <Slider label="Concentração" value={cognition.concentration} onChange={(v) => setCognition({...cognition, concentration: v})} />
+                <Slider label="Fadiga Mental" value={cognition.mentalFatigue} onChange={(v) => setCognition({...cognition, mentalFatigue: v})} invertColor />
+                <Slider label="Distração" value={cognition.distraction} onChange={(v) => setCognition({...cognition, distraction: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-purple-400" /> Motivação
+              </h3>
+              <div className="space-y-3">
+                <Slider label="Vontade de Treinar" value={motivation.train} onChange={(v) => setMotivation({...motivation, train: v})} />
+                <Slider label="Prazer na Prática" value={motivation.enjoyment} onChange={(v) => setMotivation({...motivation, enjoyment: v})} />
+                <Slider label="Vontade de Competir" value={motivation.compete} onChange={(v) => setMotivation({...motivation, compete: v})} />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Target className="w-4 h-4 text-purple-400" /> Confiança e Medo
+              </h3>
+              <div className="space-y-3">
+                <Slider label="Autoconfiança" value={confidence.confidence} onChange={(v) => setConfidence({...confidence, confidence: v})} />
+                <Slider label="Medo de Lesão" value={confidence.fearInjury} onChange={(v) => setConfidence({...confidence, fearInjury: v})} invertColor />
+                <Slider label="Medo de Errar" value={confidence.fearMistakes} onChange={(v) => setConfidence({...confidence, fearMistakes: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-purple-400" /> Pressão Percebida
+              </h3>
+              <div className="space-y-3">
+                <Slider label="Pressão Escolar/Acadêmica" value={pressure.school} onChange={(v) => setPressure({...pressure, school: v})} invertColor />
+                <Slider label="Pressão Familiar" value={pressure.family} onChange={(v) => setPressure({...pressure, family: v})} invertColor />
+                <Slider label="Pressão Constante por Resultados" value={pressure.competition} onChange={(v) => setPressure({...pressure, competition: v})} invertColor />
+              </div>
+            </motion.div>
+          )}
         </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Estresse</p>
-          <p className={`text-2xl font-black ${metrics.stressIndex < 40 ? 'text-emerald-400' : metrics.stressIndex < 70 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.stressIndex}%
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Índice de Fadiga Mental</p>
-          <p className={`text-2xl font-black ${metrics.fatigueIndex < 40 ? 'text-emerald-400' : metrics.fatigueIndex < 70 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.fatigueIndex}%
-          </p>
+
+        {/* Results Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Score Psicológico</p>
+                <div className="text-6xl font-black text-white mb-2">{score}</div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+                  {classification.label}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Índice Prontidão</span>
+                  <span className={`text-sm font-black ${metrics.readinessIndex > 70 ? 'text-emerald-400' : metrics.readinessIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.readinessIndex}%</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Índice Estresse</span>
+                  <span className={`text-sm font-black ${metrics.stressIndex < 40 ? 'text-emerald-400' : metrics.stressIndex < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.stressIndex}%</span>
+                </div>
+                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Índice Fadiga</span>
+                  <span className={`text-sm font-black ${metrics.fatigueIndex < 40 ? 'text-emerald-400' : metrics.fatigueIndex < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.fatigueIndex}%</span>
+                </div>
+              </div>
+
+              {alerts.length > 0 && (
+                <div className="space-y-2 mb-6">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
+                      <AlertTriangle className="w-3.5 h-3.5" /> {alert}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-purple-600 hover:bg-purple-500 text-white uppercase tracking-widest text-[10px] font-black">
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Section 1: Emotional State */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">
-            Estado Emocional (0-10)
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Humor Geral" value={emotional.mood} onChange={(v) => setEmotional({...emotional, mood: v})} />
-            <Slider label="Nível de Estresse" value={emotional.stress} onChange={(v) => setEmotional({...emotional, stress: v})} invertColor />
-            <Slider label="Ansiedade" value={emotional.anxiety} onChange={(v) => setEmotional({...emotional, anxiety: v})} invertColor />
-          </div>
-        </div>
-
-        {/* Section 2: Cognition */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">
-            Cognição (0-10)
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Concentração" value={cognition.concentration} onChange={(v) => setCognition({...cognition, concentration: v})} />
-            <Slider label="Fadiga Mental" value={cognition.mentalFatigue} onChange={(v) => setCognition({...cognition, mentalFatigue: v})} invertColor />
-            <Slider label="Distração" value={cognition.distraction} onChange={(v) => setCognition({...cognition, distraction: v})} invertColor />
-          </div>
-        </div>
-
-        {/* Section 3: Motivation */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">
-            Motivação (0-10)
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Motivação para Treinar" value={motivation.train} onChange={(v) => setMotivation({...motivation, train: v})} />
-            <Slider label="Prazer na Prática" value={motivation.enjoyment} onChange={(v) => setMotivation({...motivation, enjoyment: v})} />
-            <Slider label="Vontade de Competir" value={motivation.compete} onChange={(v) => setMotivation({...motivation, compete: v})} />
-          </div>
-        </div>
-
-        {/* Section 4: Confidence & Fear */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">
-            Confiança e Medo (0-10)
-          </h3>
-          <div className="space-y-3">
-            <Slider label="Autoconfiança" value={confidence.confidence} onChange={(v) => setConfidence({...confidence, confidence: v})} />
-            <Slider label="Medo de Lesão" value={confidence.fearInjury} onChange={(v) => setConfidence({...confidence, fearInjury: v})} invertColor />
-            <Slider label="Medo de Errar" value={confidence.fearMistakes} onChange={(v) => setConfidence({...confidence, fearMistakes: v})} invertColor />
-          </div>
-        </div>
-
-        {/* Section 5: Pressure */}
-        <div className="space-y-4 md:col-span-2">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2">
-            Pressão Percebida (0-10)
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Slider label="Pressão Escolar/Acadêmica" value={pressure.school} onChange={(v) => setPressure({...pressure, school: v})} invertColor />
-            <Slider label="Pressão Familiar" value={pressure.family} onChange={(v) => setPressure({...pressure, family: v})} invertColor />
-            <Slider label="Pressão por Resultados" value={pressure.competition} onChange={(v) => setPressure({...pressure, competition: v})} invertColor />
-          </div>
-        </div>
-      </div>
-
-      {/* Footer Actions */}
-      <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
-          Cancelar
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-500 hover:bg-cyan-400 text-[#050B14] font-black uppercase text-xxs tracking-widest px-8">
-          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
-        </Button>
-      </div>
-    </motion.div>
+    </div>
   );
 }
+

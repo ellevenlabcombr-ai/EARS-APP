@@ -16,7 +16,10 @@ import {
   Zap,
   Target,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  MoveUpRight,
+  ArrowsUpFromLine,
+  BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +52,7 @@ interface ClearingTest {
 }
 
 export default function FunctionalScreening({ athleteId, onCancel, onSave }: FunctionalScreeningProps) {
+  const [step, setStep] = useState(1);
   const [scores, setScores] = useState<Record<string, TestScore>>({
     deep_squat: { score: 3, compensations: [] },
     hurdle_step: { left: 3, right: 3, score: 3, compensations: [] },
@@ -82,7 +86,6 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
         newScore = value;
       }
 
-      // Final score is the lower of the two sides for asymmetrical tests
       const isAsymmetrical = ['hurdle_step', 'inline_lunge', 'shoulder_mobility', 'active_straight_leg_raise', 'rotary_stability'].includes(testId);
       if (isAsymmetrical) {
         newScore = Math.min(newLeft ?? 3, newRight ?? 3);
@@ -114,11 +117,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     setClearingTests(prev => ({ ...prev, [id]: { pain } }));
   };
 
-  // Derived Values & Alerts
   const processedScores = useMemo(() => {
     const updated = { ...scores };
     
-    // Apply pain overrides
     if (clearingTests.shoulder.pain) updated.shoulder_mobility.score = 0;
     if (clearingTests.spine_extension.pain) updated.trunk_stability_push_up.score = 0;
     if (clearingTests.spine_flexion.pain) updated.rotary_stability.score = 0;
@@ -170,7 +171,8 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
   const tests = [
     { 
       id: 'deep_squat', 
-      label: 'Agachamento Profundo', 
+      label: 'Agachamento Profundo',
+      category: 'control', 
       asymmetric: false,
       info: {
         indication: "Avalia mobilidade bilateral dos quadris, joelhos e tornozelos, e estabilidade do core.",
@@ -188,6 +190,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'hurdle_step', 
       label: 'Passo sobre Barreira', 
+      category: 'stability',
       asymmetric: true,
       info: {
         indication: "Avalia controle motor, mobilidade e estabilidade em passada assimétrica.",
@@ -205,6 +208,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'inline_lunge', 
       label: 'Avanço em Linha', 
+      category: 'stability',
       asymmetric: true,
       info: {
         indication: "Simula rotação, flexão e movimento assimétrico lateral.",
@@ -222,6 +226,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'shoulder_mobility', 
       label: 'Mobilidade de Ombros', 
+      category: 'mobility',
       asymmetric: true,
       clearing: 'shoulder',
       info: {
@@ -239,6 +244,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'active_straight_leg_raise', 
       label: 'Elevação Ativa da Perna', 
+      category: 'mobility',
       asymmetric: true,
       info: {
         indication: "Testa flexibilidade dos isquiotibiais e estabilidade pélvica.",
@@ -256,6 +262,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'trunk_stability_push_up', 
       label: 'Flexão para Estabilidade do Tronco', 
+      category: 'control',
       asymmetric: false,
       clearing: 'spine_extension',
       info: {
@@ -273,6 +280,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
     { 
       id: 'rotary_stability', 
       label: 'Estabilidade Rotacional', 
+      category: 'control',
       asymmetric: true,
       clearing: 'spine_flexion',
       info: {
@@ -294,20 +302,20 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    await onSave({
-      type: "functional",
-      score_total: totalScore,
-      risk_level: alerts.risk,
-      pain_override: alerts.pain_override,
-      asymmetry_alert: alerts.asymmetry_alert,
-      severe_dysfunction: alerts.severe_dysfunction,
-      focus: categories.focus,
-      movements: processedScores,
-      clearing_tests: clearingTests,
-      notes,
-      athleteId,
-      date: new Date().toISOString()
-    });
+      await onSave({
+        type: "functional",
+        score_total: totalScore,
+        risk_level: alerts.risk,
+        pain_override: alerts.pain_override,
+        asymmetry_alert: alerts.asymmetry_alert,
+        severe_dysfunction: alerts.severe_dysfunction,
+        focus: categories.focus,
+        movements: processedScores,
+        clearing_tests: clearingTests,
+        notes,
+        athleteId,
+        date: new Date().toISOString()
+      });
     } finally {
       setIsSaving(false);
     }
@@ -322,6 +330,16 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
 
   const riskColor = alerts.risk === 'high' ? 'text-rose-400' : alerts.risk === 'moderate' ? 'text-amber-400' : 'text-emerald-400';
   const riskBg = alerts.risk === 'high' ? 'bg-rose-500/10' : alerts.risk === 'moderate' ? 'bg-amber-500/10' : 'bg-emerald-500/10';
+
+  const formSteps = [
+    { id: 1, title: 'Mobilidade', icon: MoveUpRight, filter: 'mobility' },
+    { id: 2, title: 'Estabilidade', icon: ArrowsUpFromLine, filter: 'stability' },
+    { id: 3, title: 'Controle Motor', icon: Target, filter: 'control' },
+    { id: 4, title: 'Resumo FMS', icon: BarChart3, filter: 'summary' },
+  ];
+
+  const currentCategory = formSteps.find(s => s.id === step)?.filter;
+  const currentTests = tests.filter(t => t.category === currentCategory);
 
   return (
     <div className="space-y-6">
@@ -340,126 +358,168 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
         </Button>
       </div>
 
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between px-4 max-w-2xl mx-auto">
+        {formSteps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
+              </div>
+              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+            </div>
+            {i < formSteps.length - 1 && (
+              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-emerald-500' : 'bg-slate-800'}`}></div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Tests */}
         <div className="lg:col-span-8 space-y-6">
-          {tests.map((test) => (
-            <Card key={test.id} className="bg-slate-900/40 border-slate-800/50 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Test Info & Scoring */}
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <TestInfoModal 
-                        title={test.label} 
-                        indication={test.info?.indication || ""} 
-                        application={test.info?.application || ""}
-                        positiveIndicators={test.info?.positiveIndicators || []}
-                        negativeIndicators={test.info?.negativeIndicators || []}
-                      >
-                        <h3 className="text-xs font-black text-white uppercase tracking-widest">{test.label}</h3>
-                      </TestInfoModal>
-                      <div className="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xxs font-bold uppercase flex items-center gap-2">
-                        <span className={getScoreColor(processedScores[test.id].score)}>Score: {processedScores[test.id].score}</span>
-                        {processedScores[test.id].score === 0 && <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />}
-                      </div>
-                    </div>
+          {step !== 4 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+               {currentTests.map((test) => (
+                 <Card key={test.id} className="bg-slate-900/40 border-slate-800/50 overflow-hidden">
+                   <CardContent className="p-6">
+                     <div className="flex flex-col md:flex-row gap-6">
+                       {/* Test Info & Scoring */}
+                       <div className="flex-1 space-y-4">
+                         <div className="flex items-center justify-between">
+                           <TestInfoModal 
+                             title={test.label} 
+                             indication={test.info?.indication || ""} 
+                             application={test.info?.application || ""}
+                             positiveIndicators={test.info?.positiveIndicators || []}
+                             negativeIndicators={test.info?.negativeIndicators || []}
+                           >
+                             <h3 className="text-xs font-black text-white uppercase tracking-widest">{test.label}</h3>
+                           </TestInfoModal>
+                           <div className="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xxs font-bold uppercase flex items-center gap-2">
+                             <span className={getScoreColor(processedScores[test.id].score)}>Score: {processedScores[test.id].score}</span>
+                             {processedScores[test.id].score === 0 && <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />}
+                           </div>
+                         </div>
+     
+                         {test.asymmetric ? (
+                           <div className="grid grid-cols-2 gap-4">
+                             {['left', 'right'].map((side) => (
+                               <div key={side} className="space-y-2">
+                                 <div className="flex items-center justify-center gap-2">
+                                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? 'Esquerda' : 'Direita'}</p>
+                                   {test.asymmetric && side === 'right' && Math.abs((scores[test.id].left ?? 0) - (scores[test.id].right ?? 0)) >= 2 && (
+                                     <AlertCircle className="w-3 h-3 text-amber-400" />
+                                   )}
+                                 </div>
+                                 <div className="flex items-center justify-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                                   {[0, 1, 2, 3].map((val) => (
+                                     <button
+                                       key={val}
+                                       onClick={() => handleScoreChange(test.id, side as 'left' | 'right', val)}
+                                       className={`w-8 h-8 rounded flex items-center justify-center text-xs font-black transition-all ${
+                                         scores[test.id][side as 'left' | 'right'] === val 
+                                           ? 'bg-emerald-500 text-[#050B14]' 
+                                           : 'text-slate-500 hover:text-slate-300'
+                                       }`}
+                                     >
+                                       {val}
+                                     </button>
+                                   ))}
+                                 </div>
+                               </div>
+                             ))}
+                           </div>
+                         ) : (
+                           <div className="flex items-center justify-center gap-2 bg-slate-950 p-1 rounded-lg border border-slate-800 w-fit mx-auto">
+                             {[0, 1, 2, 3].map((val) => (
+                               <button
+                                 key={val}
+                                 onClick={() => handleScoreChange(test.id, 'both', val)}
+                                 className={`w-10 h-10 rounded flex items-center justify-center text-xs font-black transition-all ${
+                                   scores[test.id].score === val 
+                                     ? 'bg-emerald-500 text-[#050B14]' 
+                                     : 'text-slate-500 hover:text-slate-300'
+                                 }`}
+                               >
+                                 {val}
+                               </button>
+                             ))}
+                           </div>
+                         )}
+     
+                         {/* Clearing Test if applicable */}
+                         {test.clearing && (
+                           <div className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${clearingTests[test.clearing!].pain ? 'bg-rose-500/10 border-rose-500/50' : 'bg-slate-950 border-slate-800'}`}>
+                             <div className="flex items-center gap-2">
+                               <Activity className={`w-3 h-3 ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`} />
+                               <span className={`text-[10px] font-bold uppercase tracking-widest ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>Teste de Dor</span>
+                             </div>
+                             <div className="flex gap-2">
+                               <button 
+                                 onClick={() => handleClearingTest(test.clearing!, false)}
+                                 className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${!clearingTests[test.clearing!].pain ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500 hover:bg-slate-800'}`}
+                               >
+                                 Sem Dor
+                               </button>
+                               <button 
+                                 onClick={() => handleClearingTest(test.clearing!, true)}
+                                 className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${clearingTests[test.clearing!].pain ? 'bg-rose-500 text-white' : 'text-slate-500 hover:bg-slate-800'}`}
+                               >
+                                 Com Dor
+                               </button>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+     
+                       {/* Compensations Checklist */}
+                       <div className="w-full md:w-64 space-y-3">
+                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Compensações</p>
+                         <div className="space-y-1">
+                           {test.compensations.map((comp) => (
+                             <button
+                               key={comp}
+                               onClick={() => toggleCompensation(test.id, comp)}
+                               className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-between ${
+                                 scores[test.id].compensations.includes(comp)
+                                   ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                   : 'bg-slate-950/50 text-slate-500 border border-transparent hover:border-slate-800'
+                               }`}
+                             >
+                               {comp}
+                               {scores[test.id].compensations.includes(comp) && <CheckCircle2 className="w-3 h-3" />}
+                             </button>
+                           ))}
+                         </div>
+                       </div>
+                     </div>
+                   </CardContent>
+                 </Card>
+               ))}
+            </motion.div>
+          )}
 
-                    {test.asymmetric ? (
-                      <div className="grid grid-cols-2 gap-4">
-                        {['left', 'right'].map((side) => (
-                          <div key={side} className="space-y-2">
-                            <div className="flex items-center justify-center gap-2">
-                              <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">{side === 'left' ? 'Esquerda' : 'Direita'}</p>
-                              {test.asymmetric && side === 'right' && Math.abs((scores[test.id].left ?? 0) - (scores[test.id].right ?? 0)) >= 2 && (
-                                <AlertCircle className="w-3 h-3 text-amber-400" />
-                              )}
-                            </div>
-                            <div className="flex items-center justify-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
-                              {[0, 1, 2, 3].map((val) => (
-                                <button
-                                  key={val}
-                                  onClick={() => handleScoreChange(test.id, side as 'left' | 'right', val)}
-                                  className={`w-8 h-8 rounded flex items-center justify-center text-xxs font-black transition-all ${
-                                    scores[test.id][side as 'left' | 'right'] === val 
-                                      ? 'bg-emerald-500 text-[#050B14]' 
-                                      : 'text-slate-500 hover:text-slate-300'
-                                  }`}
-                                >
-                                  {val}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2 bg-slate-950 p-1 rounded-lg border border-slate-800 w-fit mx-auto">
-                        {[0, 1, 2, 3].map((val) => (
-                          <button
-                            key={val}
-                            onClick={() => handleScoreChange(test.id, 'both', val)}
-                            className={`w-10 h-10 rounded flex items-center justify-center text-xs font-black transition-all ${
-                              scores[test.id].score === val 
-                                ? 'bg-emerald-500 text-[#050B14]' 
-                                : 'text-slate-500 hover:text-slate-300'
-                            }`}
-                          >
-                            {val}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Clearing Test if applicable */}
-                    {test.clearing && (
-                      <div className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${clearingTests[test.clearing!].pain ? 'bg-rose-500/10 border-rose-500/50' : 'bg-slate-950 border-slate-800'}`}>
-                        <div className="flex items-center gap-2">
-                          <Activity className={`w-3 h-3 ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`} />
-                          <span className={`text-xxs font-bold uppercase ${clearingTests[test.clearing!].pain ? 'text-rose-400' : 'text-slate-500'}`}>Teste de Dor Auxiliar</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => handleClearingTest(test.clearing!, false)}
-                            className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${!clearingTests[test.clearing!].pain ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500'}`}
-                          >
-                            Sem Dor
-                          </button>
-                          <button 
-                            onClick={() => handleClearingTest(test.clearing!, true)}
-                            className={`px-3 py-1 rounded text-xxs font-black uppercase transition-all ${clearingTests[test.clearing!].pain ? 'bg-rose-500 text-white' : 'text-slate-500'}`}
-                          >
-                            Com Dor
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Compensations Checklist */}
-                  <div className="w-full md:w-64 space-y-3">
-                    <p className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Compensações Notadas</p>
-                    <div className="space-y-1">
-                      {test.compensations.map((comp) => (
-                        <button
-                          key={comp}
-                          onClick={() => toggleCompensation(test.id, comp)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-xxs font-medium transition-all flex items-center justify-between ${
-                            scores[test.id].compensations.includes(comp)
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                              : 'bg-slate-950/50 text-slate-500 border border-transparent hover:border-slate-800'
-                          }`}
-                        >
-                          {comp}
-                          {scores[test.id].compensations.includes(comp) && <CheckCircle2 className="w-3 h-3" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {step === 4 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+               <Card className="bg-slate-900/40 border-slate-800/50">
+                 <CardHeader>
+                   <CardTitle className="text-sm font-black text-white uppercase tracking-widest">Observações Finais</CardTitle>
+                 </CardHeader>
+                 <CardContent>
+                   <textarea 
+                     value={notes}
+                     onChange={(e) => setNotes(e.target.value)}
+                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[120px] resize-none text-sm font-medium"
+                     placeholder="Anote considerações sobre o score do FMS..."
+                   />
+                 </CardContent>
+               </Card>
+            </motion.div>
+          )}
         </div>
 
         {/* Right Column: Summary & Analysis */}
@@ -468,9 +528,9 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
             <div className={`h-1 ${riskBg} w-full`} />
             <CardContent className="p-6">
               <div className="text-center mb-6">
-                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-2">Score Total de Triagem</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Score Total</p>
                 <div className={`text-7xl font-black mb-1 ${riskColor}`}>{totalScore}</div>
-                <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest">Máximo: 21</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Máximo: 21</p>
               </div>
 
               {/* Radar Chart */}
@@ -491,44 +551,44 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
+                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xxs font-black text-white uppercase tracking-widest">Análise de Risco</h4>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Análise de Risco</h4>
                     <ShieldCheck className={`w-4 h-4 ${riskColor}`} />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xxs font-bold text-slate-500 uppercase">Status de Risco</span>
-                      <span className={`text-xxs font-black uppercase ${riskColor}`}>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status de Risco</span>
+                      <span className={`text-[10px] font-black uppercase ${riskColor}`}>
                         {alerts.risk === 'high' ? 'Alto Risco' : alerts.risk === 'moderate' ? 'Risco Moderado' : 'Baixo Risco'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xxs font-bold text-slate-500 uppercase">Foco Corretivo Base</span>
-                      <span className="text-xxs font-black text-cyan-400 uppercase">{categories.focus}</span>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Foco Corretivo</span>
+                      <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{categories.focus}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Clinical Alerts */}
                 {(alerts.pain_override || alerts.asymmetry_alert || alerts.severe_dysfunction) && (
-                  <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-2">
-                    <h4 className="text-xxs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                  <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-2">
+                    <h4 className="text-[10px] font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
                       <AlertCircle className="w-3 h-3" /> Fatores Críticos Localizados
                     </h4>
                     <div className="space-y-1">
                       {alerts.pain_override && (
-                        <div className="flex items-center gap-2 text-xxs font-bold text-rose-400 uppercase">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-rose-400 uppercase tracking-widest">
                           <Zap className="w-3 h-3" /> Dor Reportada
                         </div>
                       )}
                       {alerts.asymmetry_alert && (
-                        <div className="flex items-center gap-2 text-xxs font-bold text-amber-400 uppercase">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-amber-400 uppercase tracking-widest">
                           <AlertTriangle className="w-3 h-3" /> Assimetria Grosseira Crítica
                         </div>
                       )}
                       {alerts.severe_dysfunction && (
-                        <div className="flex items-center gap-2 text-xxs font-bold text-rose-500 uppercase">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-rose-500 uppercase tracking-widest">
                           <AlertCircle className="w-3 h-3" /> Incapacidade / Pontuação 0
                         </div>
                       )}
@@ -536,11 +596,11 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   </div>
                 )}
 
-                <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-                  <h4 className="text-xxs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                  <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                     <Target className="w-3 h-3" /> Sugestões de Mitigação
                   </h4>
-                  <p className="text-xxs text-slate-400 leading-relaxed font-medium">
+                  <p className="text-[10px] text-slate-400 leading-relaxed font-bold tracking-wide">
                     {alerts.risk === 'high' 
                       ? 'Requerem foco em reabilitação. Controle motor bloqueado.'
                       : alerts.risk === 'moderate'
@@ -549,14 +609,7 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
                   </p>
                 </div>
 
-                <textarea 
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Observações complementares..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors min-h-[5rem] resize-none text-xxs font-medium"
-                />
-
-                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase text-xxs tracking-widest py-6 rounded-xl shadow-lg shadow-emerald-500/20"
+                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-[10px] tracking-widest py-3 rounded-lg shadow-lg shadow-emerald-500/20"
                 >
                   {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
                 </Button>

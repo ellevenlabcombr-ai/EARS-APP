@@ -511,6 +511,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
             case 'orthopedic-assessment':
               return (
                 <OrthopedicAssessment 
+                  athleteId={selectedAthleteForEval?.id || ""}
                   athleteName={selectedAthleteForEval?.name}
                   onBack={() => handleNavigation('evaluations')}
                   onSave={async (score, data) => {
