@@ -1908,13 +1908,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       />
 
             {/* Top App Bar */}
-      <div className="max-w-6xl mx-auto w-full px-6 pt-10 pb-4 overflow-x-auto custom-scrollbar">
-        <div className="flex justify-between items-center mb-8">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 pt-10 pb-4 flex flex-col gap-8">
+        <div className="flex justify-between items-center mb-0">
           <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
         </div>
 
         {/* Large Profile Header block restored */}
-        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group mb-8`}>
+        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
           <div className="relative w-full h-[350px] sm:h-[450px]">
             {athletePhoto ? (
               <Image 
@@ -1987,42 +1987,41 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           </div>
         </Card>
 
-        {/* Progress Steps / Tabs */}
-        <div className="flex items-center justify-between min-w-[600px] mb-8">
-          {[
-            { id: 'overview', label: 'Visão Geral', icon: Activity },
-            { id: 'ficha', label: 'Cadastro', icon: User },
-            { id: 'clinical', label: 'Avaliações', icon: Stethoscope },
-            { id: 'prontuario', label: 'Prontuário', icon: FileText },
-            { id: 'attachments', label: 'Anexos', icon: ClipboardList },
-            { id: 'history', label: 'Histórico', icon: Clock },
-          ].map((tab, i, arr) => {
-            const activeIndex = arr.findIndex(t => t.id === activeTab);
-            const isPast = activeIndex > i;
-            const isActive = activeIndex === i;
-            
-            return (
-            <React.Fragment key={tab.id}>
-              <div 
-                className={`flex flex-col items-center gap-3 cursor-pointer transition-all ${isActive ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
-                onClick={() => setActiveTab(tab.id as any)}
-              >
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center border-[3px] ${isActive ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]' : 'border-slate-700 bg-slate-900/50 text-slate-400'}`}>
-                  <tab.icon className="w-6 h-6" />
+        <div className="overflow-x-auto custom-scrollbar pb-4 pt-2">
+          <div className="flex items-center justify-between min-w-[600px]">
+            {[
+              { id: 'overview', label: 'Visão Geral', icon: Activity },
+              { id: 'ficha', label: 'Cadastro', icon: User },
+              { id: 'clinical', label: 'Avaliações', icon: Stethoscope },
+              { id: 'prontuario', label: 'Prontuário', icon: FileText },
+              { id: 'attachments', label: 'Anexos', icon: ClipboardList },
+              { id: 'history', label: 'Histórico', icon: Clock },
+            ].map((tab, i, arr) => {
+              const activeIndex = arr.findIndex(t => t.id === activeTab);
+              const isPast = activeIndex > i;
+              const isActive = activeIndex === i;
+              
+              return (
+              <React.Fragment key={tab.id}>
+                <div 
+                  className={`flex flex-col items-center gap-3 cursor-pointer transition-all ${isActive ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
+                  onClick={() => setActiveTab(tab.id as any)}
+                >
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-[3px] ${isActive ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]' : 'border-slate-700 bg-slate-900/50 text-slate-400'}`}>
+                    <tab.icon className="w-6 h-6" />
+                  </div>
+                  <span className={`text-[0.65rem] font-black uppercase tracking-widest text-center max-w-[6rem] leading-tight ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{tab.label}</span>
                 </div>
-                <span className={`text-[0.65rem] font-black uppercase tracking-widest text-center max-w-[6rem] leading-tight ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{tab.label}</span>
-              </div>
-              {i < arr.length - 1 && (
-                <div className={`flex-1 h-[3px] mx-4 mb-8 rounded-full ${activeIndex > i ? 'bg-cyan-500/50' : 'bg-slate-800'}`}></div>
-              )}
-            </React.Fragment>
-          )})}
+                {i < arr.length - 1 && (
+                  <div className={`flex-1 h-[3px] mx-4 mb-8 rounded-full ${activeIndex > i ? 'bg-cyan-500/50' : 'bg-slate-800'}`}></div>
+                )}
+              </React.Fragment>
+            )})}
+          </div>
         </div>
-      </div>
 
-      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3 space-y-10">
+        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3 space-y-10 order-2 lg:order-1 min-w-0">
         {activeTab === 'overview' && (
           <div className="space-y-10 pb-32">
             {/* Session Mode Toggle Container */}
@@ -4164,7 +4163,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           </div> {/* End Left Column */}
 
           {/* RIGHT COLUMN: Summary Sidebar */}
-          <div className="space-y-6 lg:col-span-1 border-l border-slate-800/50 pl-6 sticky top-24 h-max">
+          <div className="space-y-6 lg:col-span-1 lg:border-l border-slate-800/50 lg:pl-6 sticky top-24 h-max order-1 lg:order-2">
              {/* Clinical Risk Summary */}
              <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 w-full`}>
                 <div className={`w-3 h-3 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.5)]`}></div>
