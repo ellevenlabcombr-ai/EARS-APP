@@ -1908,18 +1908,18 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       />
 
             {/* Top App Bar */}
-      <div className="px-6 py-4 flex justify-between items-center bg-transparent sticky top-0 z-40">
-        <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
-      </div>
+      <div className="max-w-6xl mx-auto w-full px-6 pt-10 pb-4 overflow-x-auto custom-scrollbar">
+        <div className="flex justify-between items-center mb-8">
+          <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
+        </div>
 
-      <div className="max-w-6xl mx-auto w-full px-6 pt-2 pb-4 overflow-x-auto custom-scrollbar">
         {/* Large Profile Header block restored */}
         <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group mb-8`}>
           <div className="relative w-full h-[350px] sm:h-[450px]">
             {athletePhoto ? (
               <Image 
                 src={athletePhoto} 
-                alt={athlete.name} 
+                alt={athlete.nickname || athlete.name || 'Avatar'} 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized
@@ -1953,7 +1953,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             <div className="absolute bottom-6 left-6 right-6 z-10">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
-                  {athlete.name}
+                  {athlete.nickname || athlete.name}
                 </h2>
                 {athlete.athlete_code && (
                   <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xxs font-bold rounded-lg uppercase tracking-widest border border-cyan-500/30 shadow-lg hidden sm:inline-block">

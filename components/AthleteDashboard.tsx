@@ -1847,12 +1847,12 @@ export function AthleteDashboard({
         </div>
 
         {/* Large Profile Header block restored */}
-        <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
+        <Card className={`overflow-hidden rounded-3xl border ${theme.borderAlpha} shadow-2xl relative bg-[#0A1120] group`}>
           <div className="relative w-full h-[350px] sm:h-[450px]">
             {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
               <Image 
                 src={athleteData.avatar_url} 
-                alt={athleteData.name} 
+                alt={athleteData.nickname || athleteData.name || 'Avatar'} 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized
@@ -1886,7 +1886,7 @@ export function AthleteDashboard({
             <div className="absolute bottom-6 left-6 right-6 z-10">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
-                  {athleteData?.name}
+                  {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
                 </h2>
                 {athleteCode && (
                   <span className={`px-2.5 py-1 ${theme.bgAlpha} ${theme.text} text-xxs font-bold rounded-lg uppercase tracking-widest border ${theme.borderAlpha} shadow-lg hidden sm:inline-block`}>

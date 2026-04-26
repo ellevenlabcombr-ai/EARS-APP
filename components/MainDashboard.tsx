@@ -857,14 +857,15 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
         'bg-[#050B14]'
       }`}>
         {/* Global Header */}
-        <header className={`sticky top-0 z-40 h-[calc(80px+env(safe-area-inset-top))] pt-safe backdrop-blur-xl border-b border-slate-800/50 flex items-center justify-between px-5 lg:px-8 shrink-0 transition-colors duration-500 ${
+        <header className={`sticky top-0 z-40 h-[calc(80px+env(safe-area-inset-top))] pt-safe backdrop-blur-xl border-b border-slate-800/50 flex items-center px-5 lg:px-8 shrink-0 transition-colors duration-500 ${
           activeMode === 'clinical' ? 'bg-blue-950/20' :
           activeMode === 'eagles' ? 'bg-cyan-950/20' :
           'bg-[#0A1120]/80'
         }`}>
-          <div className="flex items-center gap-4">
-            <div className="w-12 lg:hidden"></div>
-            <div className="flex items-center gap-3">
+          {/* Left Area */}
+          <div className="flex flex-1 items-center gap-4 justify-start overflow-hidden">
+            <div className="w-12 lg:hidden shrink-0"></div>
+            <div className="flex items-center gap-3 shrink-0">
               {branding.logo_url ? (
                 <div className="relative w-9 h-9">
                   <Image 
@@ -877,7 +878,7 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
                   />
                 </div>
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white font-black text-base border border-white/10 shadow-lg shadow-white/5">
+                <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white font-black text-base border border-white/10 shadow-lg shadow-white/5 shrink-0">
                   {branding.company_name.charAt(0)}
                 </div>
               )}
@@ -885,24 +886,24 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
           </div>
 
           {/* Central Operational Menu */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-            <div className="flex items-center gap-2 sm:gap-6 bg-slate-950/50 p-1.5 rounded-2xl border border-slate-800/50 backdrop-blur-md max-w-[28.125rem] overflow-x-auto no-scrollbar">
+          <div className="flex justify-center flex-[2] sm:flex-none mx-2">
+            <div className="flex items-center gap-1 sm:gap-6 bg-slate-950/50 p-1.5 rounded-2xl border border-slate-800/50 backdrop-blur-md overflow-x-auto no-scrollbar w-full sm:w-auto justify-center">
               {operationalItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeMode === item.id;
                 
                 return (
-                  <div key={item.id} className="relative group">
+                  <div key={item.id} className="relative group shrink-0">
                     <button
                       onClick={() => handleNavigation(item.id as View)}
-                      className={`flex items-center gap-2 px-3 sm:px-4 h-11 min-w-[2.75rem] rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap active:scale-95 ${
+                      className={`flex items-center justify-center gap-2 px-3 sm:px-4 h-11 min-w-[2.75rem] rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap active:scale-95 ${
                         isActive 
                           ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.1)]" 
                           : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
                       }`}
                     >
                       <span className="text-lg leading-none">{item.emoji}</span>
-                      <span className="hidden md:block">{item.shortLabel}</span>
+                      <span className="hidden lg:block">{item.shortLabel}</span>
                     </button>
 
                     {/* Tooltip for Mobile/Compact */}
@@ -915,17 +916,18 @@ export function MainDashboard({ onLogout }: MainDashboardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Right Area */}
+          <div className="flex flex-1 items-center gap-3 sm:gap-4 justify-end overflow-hidden">
             <div className="hidden xl:flex flex-col items-end mr-2">
-              <h2 className="text-xxs font-black text-white uppercase tracking-[0.2em] opacity-50">{getPageTitle()}</h2>
+              <h2 className="text-xxs font-black text-white uppercase tracking-[0.2em] opacity-50 truncate">{getPageTitle()}</h2>
             </div>
-            <div className="flex items-center gap-2 bg-emerald-500/5 px-2 py-1 rounded-full border border-emerald-500/10">
+            <div className="hidden sm:flex items-center gap-2 bg-emerald-500/5 px-2 py-1 rounded-full border border-emerald-500/10 shrink-0">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
               <span className="text-xxs font-black text-emerald-500 uppercase tracking-widest hidden sm:block">Online</span>
             </div>
             <button 
               onClick={() => setIsProfileModalOpen(true)}
-              className="w-8 h-8 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors overflow-hidden relative"
+              className="w-8 h-8 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors overflow-hidden relative shrink-0"
             >
               {userProfile.avatar_url ? (
                 <Image 
