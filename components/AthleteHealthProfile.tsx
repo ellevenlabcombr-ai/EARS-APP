@@ -123,80 +123,6 @@ import {
 import { SafeRender } from "@/components/SafeRender";
 import { QRCodeSVG } from "qrcode.react";
 
-// --- Custom Clinical Tags UI ---
-function ClinicalTagsManager({ tags, setTags }: { tags: ClinicalTag[], setTags: React.Dispatch<React.SetStateAction<ClinicalTag[]>> }) {
-  const [newTagText, setNewTagText] = useState("");
-  const [newTagSource, setNewTagSource] = useState<'clinical' | 'field_observation'>('clinical');
-
-  const handleAdd = () => {
-    if (!newTagText.trim()) return;
-    const newTag: ClinicalTag = {
-      id: Math.random().toString(36).substr(2, 9),
-      tag: newTagText.trim(),
-      created_at: new Date().toISOString(),
-      weight: newTagSource === 'clinical' ? 1.5 : 1.0, 
-      source: newTagSource
-    };
-    setTags(prev => [...prev, newTag]);
-    setNewTagText("");
-  };
-
-  const handleRemove = (id: string) => {
-    setTags(prev => prev.filter(t => t.id !== id));
-  };
-
-  return (
-    <Card className="bg-slate-900/40 border-slate-800 shadow-2xl relative overflow-hidden h-full">
-      <CardHeader className="border-b border-slate-800/50 flex flex-row items-center justify-between pb-4">
-        <CardTitle className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-          <Info className="w-4 h-4 text-purple-500" />
-          Tags Clínicas
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 flex flex-col h-[calc(100%-4rem)] justify-between">
-        <div className="flex flex-wrap gap-2 mb-6 overflow-y-auto custom-scrollbar max-h-32">
-          {tags.map((tag) => (
-            <div key={tag.id} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border shadow-sm ${tag.source === 'field_observation' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
-              <span className="text-[10px] font-black uppercase tracking-widest">{tag.tag}</span>
-              <button onClick={() => handleRemove(tag.id)} className="hover:text-rose-400 hover:bg-rose-500/10 p-1 rounded transition-colors ml-1 focus:outline-none">
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-          {tags.length === 0 && (
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic py-2">
-              Nenhuma tag ativa
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 mt-auto">
-          <input 
-            type="text" 
-            placeholder="Nova Tag..." 
-            className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-purple-500/50 transition-colors"
-            value={newTagText}
-            onChange={(e) => setNewTagText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          />
-          <div className="flex items-center gap-2">
-            <select 
-              value={newTagSource} 
-              onChange={(e) => setNewTagSource(e.target.value as any)}
-              className="flex-1 bg-slate-950/50 border border-slate-800 rounded-lg px-2 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none"
-            >
-              <option value="clinical">Clínico</option>
-              <option value="field_observation">Campo</option>
-            </select>
-            <Button onClick={handleAdd} className="bg-purple-500 hover:bg-purple-400 text-white rounded-lg h-8 w-8 p-0 shrink-0">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 interface Athlete {
   id: string;
   athlete_code?: string;
@@ -1914,9 +1840,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         </div>
 
         {/* Large Profile Header block restored */}
-        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-2 order-1 min-w-0 flex flex-col">
-          <Card className={`overflow-hidden rounded-3xl border border-slate-800 shadow-2xl relative bg-[#0A1120] group`}>
-            <div className="relative w-full h-[250px] sm:h-[350px] lg:h-[400px]">
+        <div className="lg:col-span-full lg:row-start-2 order-1 min-w-0 flex flex-col gap-4">
+          <div className="overflow-hidden rounded-3xl relative bg-slate-900/40 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/5 group sm:flex">
+            <div className="relative w-full sm:w-[250px] lg:w-[320px] shrink-0 aspect-square">
             {athletePhoto ? (
               <Image 
                 src={athletePhoto} 
@@ -1933,31 +1859,27 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             )}
             
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050B14] via-[#050B14]/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#050B14]/80 to-transparent pointer-events-none" />
-            
+            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0A1120] to-transparent hidden sm:block pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A1120] to-transparent sm:hidden pointer-events-none" />
+            </div>
+
+            <div className="relative p-6 sm:p-8 flex flex-col justify-between flex-1 z-10 w-full min-w-0">
             {/* Top badges */}
-            <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-10">
+            <div className="flex justify-between items-start w-full mb-8">
               <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg ${athlete.status === 'active' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : athlete.status === 'injured' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-slate-500/20 border-slate-500/50 text-slate-400'}`}>
                  <CheckCircle className="w-4 h-4" />
                  {athlete.status === 'active' ? "APTO" : athlete.status === 'injured' ? "LESIONADO" : "INATIVO"}
               </div>
-              <div className="flex flex-col items-end">
-                <div className="bg-[#050B14]/80 backdrop-blur-md rounded-2xl p-3 border border-slate-800 shadow-xl flex flex-col items-center">
-                   <span className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
-                   <span className={`text-3xl font-black leading-none ${(athlete.readiness || 0) >= 80 ? 'text-emerald-400' : (athlete.readiness || 0) >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{athlete.readiness !== undefined ? `${athlete.readiness}%` : '--%'}</span>
-                </div>
-              </div>
             </div>
 
             {/* Bottom Info */}
-            <div className="absolute bottom-6 left-6 right-6 z-10">
+            <div className="w-full">
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
+                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none truncate">
                   {athlete.nickname || athlete.name}
                 </h2>
                 {athlete.athlete_code && (
-                  <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xxs font-bold rounded-lg uppercase tracking-widest border border-cyan-500/30 shadow-lg hidden sm:inline-block">
+                  <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xxs font-bold rounded-lg uppercase tracking-widest border border-cyan-500/30 shadow-lg hidden sm:inline-block shrink-0">
                     #{athlete.athlete_code}
                   </span>
                 )}
@@ -1986,8 +1908,93 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </div>
             </div>
           </div>
-        </Card>
         </div>
+
+        {/* HUD PERFORMANCE BAR (One-Line Futuristic Interface) */}
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-y-6 gap-x-8 shadow-2xl">
+            
+            {/* Integrated Metrics Line */}
+            <div className="flex flex-wrap items-center gap-x-12 gap-y-6 w-full">
+              
+              {/* 1. RISCO CLÍNICO ATUAL */}
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 rotate-45 transform hover:rotate-0 transition-transform duration-500 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} bg-slate-900/50`}>
+                  <ShieldCheck className={`-rotate-45 group-hover:rotate-0 transition-transform duration-500 w-6 h-6 ${riskCfg.color}`} />
+                </div>
+                <div>
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">{lang === 'pt' ? 'Risco Clínico Atual' : 'Current Clinical Risk'}</p>
+                  <div className={`text-lg font-black uppercase tracking-widest ${riskCfg.color} flex items-center gap-2`}>
+                    {riskCfg.label}
+                    <div className={`w-2 h-2 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse`} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Vertical Divider */}
+              <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+              {/* 2. STATUS */}
+              <div className="flex flex-col">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><StatusIcon className="w-3 h-3" /> Status</p>
+                <span className={`text-base font-black uppercase tracking-tighter ${statusCfg.color}`}>
+                  {statusCfg.label}
+                </span>
+              </div>
+
+              {/* 3. PRONTIDÃO */}
+              <div className="flex flex-col">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Prontidão</p>
+                <div className="flex items-center gap-3">
+                  <span className={`text-lg font-black ${clinicalSessionData?.readiness.score && clinicalSessionData.readiness.score < 65 ? 'text-rose-400' : 'text-white'}`}>
+                    {clinicalSessionData?.readiness.score || 0}%
+                  </span>
+                  <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${clinicalSessionData?.readiness.score && clinicalSessionData.readiness.score < 65 ? 'bg-rose-500' : 'bg-cyan-500'}`}
+                      style={{ width: `${clinicalSessionData?.readiness.score || 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Vertical Divider */}
+              <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+              {/* 4. TAGS ATIVAS */}
+              <div className="flex flex-col min-w-[120px]">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Tag className="w-3 h-3 text-purple-500" /> Tags Ativas</p>
+                <div className="flex flex-wrap gap-1">
+                  {clinicalTags.slice(0, 3).map((t, i) => (
+                    <span key={i} className="text-[8px] font-black bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded uppercase">{t.tag}</span>
+                  ))}
+                  {clinicalTags.length === 0 && <span className="text-[9px] text-slate-600 font-bold italic">-</span>}
+                </div>
+              </div>
+
+              {/* Vertical Divider */}
+              <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+              {/* 5. FOCO DE RECUPERAÇÃO */}
+              <div className="flex flex-col min-w-0 flex-1">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Target className="w-3 h-3 text-rose-500" /> Foco de Recuperação</p>
+                 <div className="flex flex-wrap gap-3">
+                   {athleteAlerts.filter(a => a.status === 'active').slice(0, 2).map(alert => (
+                     <div key={alert.id} className="flex gap-2 items-center bg-rose-500/5 border border-rose-500/10 px-2 py-0.5 rounded-lg">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-slate-300 truncate max-w-[150px]">{alert.message}</span>
+                     </div>
+                   ))}
+                   {athleteAlerts.filter(a => a.status === 'active').length === 0 && (
+                      <span className="text-[9px] text-slate-600 font-bold italic">Nenhum foco de risco.</span>
+                   )}
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
         <div className="lg:col-start-1 lg:col-span-3 lg:row-start-3 order-3 overflow-x-auto custom-scrollbar pb-4 pt-2">
           <div className="flex items-center justify-between min-w-[600px]">
@@ -2052,11 +2059,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </button>
             </div>
 
-            {/* Clinical Tags Manager */}
-            <div className="w-full relative z-10 transition-all duration-300">
-               <ClinicalTagsManager tags={clinicalTags} setTags={setClinicalTags} />
-            </div>
-
             {isSessionMode ? (
               <SessionModePanel 
                  visibleBlocks={clinicalSessionData?.priorityOutput.visibleBlocks || []}
@@ -2095,15 +2097,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               bg: (clinicalSessionData?.readiness.score || 100) < 60 ? 'bg-rose-500/10' : (clinicalSessionData?.readiness.score || 100) < 80 ? 'bg-amber-500/10' : 'bg-cyan-500/10', 
               trend: clinicalSessionData?.trends.readinessTrend === "improving" ? 'up' : clinicalSessionData?.trends.readinessTrend === "worsening" ? 'down' : 'stable',
               alert: (clinicalSessionData?.readiness.score || 100) < 60 ? 'Queda Crítica' : null 
-            },
-            { 
-              label: 'Nível de Risco', 
-              value: clinicalSessionData?.priorityOutput.riskScore != null ? (clinicalSessionData.priorityOutput.riskScore > 75 ? 'Crítico' : clinicalSessionData.priorityOutput.riskScore > 45 ? 'Moderado' : 'Baixo') : (athlete.riskLevel || 'Baixo'), 
-              icon: AlertCircle, 
-              color: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'text-rose-400' : (clinicalSessionData?.priorityOutput.riskScore || 0) > 45 ? 'text-amber-400' : 'text-emerald-400', 
-              bg: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'bg-rose-500/10' : (clinicalSessionData?.priorityOutput.riskScore || 0) > 45 ? 'bg-amber-500/10' : 'bg-emerald-500/10', 
-              trend: 'stable', 
-              alert: (clinicalSessionData?.priorityOutput.riskScore || 0) > 75 ? 'Ação Imediata' : null 
             },
             { 
               label: 'Status de Dor', 

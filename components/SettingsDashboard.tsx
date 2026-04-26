@@ -2,17 +2,18 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, Palette, Calendar, HeartPulse, Database, Code } from 'lucide-react';
+import { ChevronDown, Palette, Calendar, HeartPulse, Database, Code, Tag } from 'lucide-react';
 import { BrandingSettings } from './BrandingSettings';
 import { AgendaSettings } from './AgendaSettings';
 import { ClinicalSettings } from './ClinicalSettings';
+import { ClinicalTagsSettings } from './ClinicalTagsSettings';
 import { SportsSettings } from './SportsSettings';
 import { DatabaseSeeder } from './DatabaseSeeder';
 
-type SettingsSection = 'branding' | 'agenda' | 'clinical' | 'data' | 'dev' | null;
+type SettingsSection = 'branding' | 'agenda' | 'clinical' | 'tags' | 'data' | 'dev' | null;
 
 export function SettingsDashboard() {
-  const [activeSection, setActiveSection] = useState<SettingsSection>('branding');
+  const [activeSection, setActiveSection] = useState<SettingsSection | 'tags'>(null);
 
   const toggleSection = (section: SettingsSection) => {
     setActiveSection(prev => prev === section ? null : section);
@@ -42,6 +43,14 @@ export function SettingsDashboard() {
       color: 'bg-rose-500',
       textColor: 'text-rose-500',
       component: <ClinicalSettings />
+    },
+    {
+      id: 'tags' as const,
+      title: 'Tags Clínicas',
+      icon: Tag,
+      color: 'bg-purple-500',
+      textColor: 'text-purple-500',
+      component: <ClinicalTagsSettings />
     },
     {
       id: 'data' as const,

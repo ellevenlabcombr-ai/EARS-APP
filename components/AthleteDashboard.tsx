@@ -1846,79 +1846,148 @@ export function AthleteDashboard({
           </div>
         </div>
 
-        {/* Large Profile Header block restored */}
-        <Card className={`overflow-hidden rounded-3xl border ${theme.borderAlpha} shadow-2xl relative bg-[#0A1120] group`}>
-          <div className="relative w-full h-[350px] sm:h-[450px]">
-            {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
-              <Image 
-                src={athleteData.avatar_url} 
-                alt={athleteData.nickname || athleteData.name || 'Avatar'} 
-                fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                unoptimized
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className={`w-full h-full bg-slate-900 flex items-center justify-center`}>
-                <User className="w-32 h-32 text-slate-800" />
+        {/* Futuristic Profile Header */}
+        <div className="lg:col-span-full order-1 min-w-0 flex flex-col gap-6">
+          <div className="relative group sm:flex items-center gap-8">
+            {/* Square Photo with Futuristic Frame */}
+            <div className="relative w-full sm:w-[280px] lg:w-[320px] shrink-0 aspect-square rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 bg-slate-900/40 backdrop-blur-xl">
+              {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
+                <Image 
+                  src={athleteData.avatar_url} 
+                  alt={athleteData.nickname || athleteData.name || 'Avatar'} 
+                  fill 
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  unoptimized
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className={`w-full h-full bg-slate-900/50 flex items-center justify-center`}>
+                  <User className="w-32 h-32 text-slate-800" />
+                </div>
+              )}
+              {/* Scanline Effect */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent h-[200%] -top-full animate-[scan_4s_linear_infinite] pointer-events-none" />
+            </div>
+
+            <div className="relative flex-1 py-4">
+              {/* Status Badge Floating */}
+              <div className="mb-6 flex justify-start">
+                <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-xl ${currentReadiness >= 80 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10' : currentReadiness >= 50 ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-amber-500/10' : 'bg-red-500/20 border-red-500/50 text-red-400 shadow-red-500/10'}`}>
+                   <div className={`w-1.5 h-1.5 rounded-full ${currentReadiness >= 80 ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : currentReadiness >= 50 ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]'}`} />
+                   {currentReadiness >= 80 ? "SISTEMA OPERACIONAL: OTIMIZADO" : currentReadiness >= 50 ? "SISTEMA OPERACIONAL: ALERTA" : "SISTEMA OPERACIONAL: REPARO"}
+                </div>
               </div>
-            )}
-            
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050B14] via-[#050B14]/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#050B14]/70 to-transparent pointer-events-none" />
-            
-            {/* Top badges */}
-            <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-10">
-              <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg ${currentReadiness >= 80 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : currentReadiness >= 50 ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-red-500/20 border-red-500/50 text-red-400'}`}>
-                 <CheckCircle className="w-4 h-4" />
-                 {currentReadiness >= 80 ? "Apto" : currentReadiness >= 50 ? "Atenção" : "Em Risco"}
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="bg-[#050B14]/80 backdrop-blur-md rounded-2xl p-3 border border-slate-800 shadow-xl flex flex-col items-center">
-                   <span className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
-                   <span className={`text-3xl font-black leading-none ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{currentReadiness}%</span>
+
+              {/* Identity HUD */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tighter drop-shadow-2xl leading-none">
+                    {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "").split(", ")[1] || t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
+                  </h2>
+                  {athleteCode && (
+                    <div className="px-3 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-black rounded-lg uppercase tracking-widest border border-cyan-500/20 shadow-lg hidden sm:inline-block">
+                      #{athleteCode}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-4 text-slate-500 font-bold">
+                   {athleteData?.sport && (
+                     <div className="flex flex-col">
+                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Modalidade' : 'Sport'}</span>
+                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.sport}</span>
+                     </div>
+                   )}
+                   {athleteData?.position && (
+                     <div className="flex flex-col border-l border-slate-800 pl-4">
+                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Posição' : 'Position'}</span>
+                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.position}</span>
+                     </div>
+                   )}
+                   {athleteData?.category && (
+                     <div className="flex flex-col border-l border-slate-800 pl-4">
+                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Categoria' : 'Category'}</span>
+                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.category}</span>
+                     </div>
+                   )}
+                   {athleteData?.birth_date && (
+                     <div className="flex flex-col border-l border-slate-800 pl-4">
+                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Idade' : 'Age'}</span>
+                       <span className="text-xs text-slate-200 uppercase tracking-wider">{new Date().getFullYear() - new Date(athleteData.birth_date).getFullYear()} ANOS</span>
+                     </div>
+                   )}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Bottom Info */}
-            <div className="absolute bottom-6 left-6 right-6 z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none">
-                  {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
-                </h2>
-                {athleteCode && (
-                  <span className={`px-2.5 py-1 ${theme.bgAlpha} ${theme.text} text-xxs font-bold rounded-lg uppercase tracking-widest border ${theme.borderAlpha} shadow-lg hidden sm:inline-block`}>
-                    #{athleteCode}
+          {/* HUD PERFORMANCE BAR (One-Line Futuristic Interface) */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+            <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-y-6 gap-x-8 shadow-2xl">
+              
+              {/* Integrated Metrics Line */}
+              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 w-full">
+                
+                {/* 1. RISCO CLÍNICO ATUAL */}
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 rotate-45 transform hover:rotate-0 transition-transform duration-500 ${currentReadiness >= 80 ? 'border-emerald-500/30' : currentReadiness >= 50 ? 'border-amber-500/30' : 'border-rose-500/30'} bg-slate-900/50`}>
+                    <ShieldCheck className={`-rotate-45 group-hover:rotate-0 transition-transform duration-500 w-6 h-6 ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'}`} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">{lang === 'pt' ? 'Risco Clínico Atual' : 'Current Clinical Risk'}</p>
+                    <div className={`text-lg font-black uppercase tracking-widest ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'} flex items-center gap-2`}>
+                      {currentReadiness >= 80 ? 'Baixo Risco' : 'Atenção'}
+                      <div className={`w-2 h-2 rounded-full ${currentReadiness >= 80 ? 'bg-emerald-400' : currentReadiness >= 50 ? 'bg-amber-400' : 'bg-rose-400'} animate-pulse`} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vertical Divider */}
+                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+                {/* 2. STATUS */}
+                <div className="flex flex-col">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Status</p>
+                  <span className={`text-base font-black uppercase tracking-tighter ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+                    {currentReadiness >= 80 ? (lang === 'pt' ? "APTO" : "OPTIMAL") : currentReadiness >= 50 ? (lang === 'pt' ? "ESTÁVEL" : "STABLE") : (lang === 'pt' ? "CRÍTICO" : "CRITICAL")}
                   </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs font-bold">
-                 {athleteData?.sport && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">MODALIDADE</span> {athleteData.sport}
+                </div>
+
+                {/* 3. PRONTIDÃO */}
+                <div className="flex flex-col">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Prontidão</p>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-lg font-black ${currentReadiness < 65 ? 'text-rose-400' : 'text-white'}`}>
+                      {currentReadiness}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Vertical Divider */}
+                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+                {/* 4. TAGS ATIVAS */}
+                <div className="flex flex-col">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Tag className="w-3 h-3 text-purple-500" /> Tags Ativas</p>
+                  <div className="flex flex-wrap gap-1">
+                    <span className="text-[8px] font-black bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded uppercase">Postural</span>
+                  </div>
+                </div>
+
+                {/* Vertical Divider */}
+                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
+
+                {/* 5. FOCO DE RECUPERAÇÃO */}
+                <div className="flex flex-col min-w-0 flex-1">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Target className="w-3 h-3 text-rose-500" /> Foco de Recuperação</p>
+                   <div className="flex flex-wrap gap-3">
+                      <span className="text-[9px] text-slate-600 font-bold italic">Nenhum foco de risco.</span>
                    </div>
-                 )}
-                 {athleteData?.position && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">POSIÇÃO</span> {athleteData.position}
-                   </div>
-                 )}
-                 {athleteData?.category && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">CATEGORIA</span> {athleteData.category}
-                   </div>
-                 )}
-                 {athleteData?.birth_date && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">IDADE</span> {new Date().getFullYear() - new Date(athleteData.birth_date).getFullYear()} ANOS
-                   </div>
-                 )}
+                </div>
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Motivational Quote */}
         <div className={`bg-slate-900/40 p-6 rounded-2xl border ${theme.borderAlpha} relative ${theme.shadowStrong} overflow-hidden max-w-sm mx-auto`}>
