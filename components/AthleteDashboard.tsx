@@ -1350,7 +1350,6 @@ export function AthleteDashboard({
   };
 
   const resetForm = () => {
-    setAnswers({});
     setPainMap({});
     setNotes("");
     setView("history");
