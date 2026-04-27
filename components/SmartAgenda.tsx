@@ -27,6 +27,7 @@ export function SmartAgenda() {
   const [error, setError] = useState<string | null>(null);
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [initialEventForEdit, setInitialEventForEdit] = useState<AgendaEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<AgendaEvent | null>(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   
@@ -73,17 +74,32 @@ export function SmartAgenda() {
     if (!supabase) return;
 
     try {
-      const { error } = await supabase
-        .from('agenda_events')
-        .insert([eventData]);
+      if (eventData.id) {
+        const { error } = await supabase
+          .from('agenda_events')
+          .update(eventData)
+          .eq('id', eventData.id);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('agenda_events')
+          .insert([eventData]);
+
+        if (error) throw error;
+      }
       
       setIsCreateModalOpen(false);
+      setInitialEventForEdit(null);
       fetchEvents();
     } catch (err: any) {
       alert("Erro ao salvar evento: " + err.message);
     }
+  };
+
+  const handleEditEvent = (event: AgendaEvent) => {
+    setInitialEventForEdit(event);
+    setIsCreateModalOpen(true);
   };
 
   const handleDeleteEvent = async (id: string) => {
@@ -120,24 +136,27 @@ export function SmartAgenda() {
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-slate-900/50 border border-slate-800 rounded-xl p-1">
-            {(['all', 'clinical', 'professional', 'personal'] as const).map((cat) => (
+          <div className="flex flex-wrap items-center bg-slate-900/50 border border-slate-800 rounded-xl p-1 gap-1">
+            {(['all', 'clinical', 'competition', 'travel', 'professional', 'personal'] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}
-                className={`px-4 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
+                className={`px-3 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
                   filter === cat 
                     ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20' 
                     : 'text-slate-500 hover:text-slate-300'
                 }`}
               >
-                {cat === 'all' ? 'Todos' : cat === 'clinical' ? 'Clínico' : cat === 'professional' ? 'Profissional' : 'Pessoal'}
+                {cat === 'all' ? 'Todos' : cat === 'clinical' ? 'Clínico' : cat === 'competition' ? 'Competição' : cat === 'travel' ? 'Viagem' : cat === 'professional' ? 'Profissional' : 'Pessoal'}
               </button>
             ))}
           </div>
 
           <button 
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => {
+              setInitialEventForEdit(null);
+              setIsCreateModalOpen(true);
+            }}
             className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-xl transition-all font-black text-xs uppercase tracking-widest shadow-xl shadow-cyan-500/20 active:scale-95"
           >
             <Plus className="w-4 h-4" />
@@ -210,6 +229,7 @@ export function SmartAgenda() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSave={handleSaveEvent}
+        initialEvent={initialEventForEdit}
       />
 
       <EventModal 
@@ -217,6 +237,7 @@ export function SmartAgenda() {
         isOpen={isEventModalOpen}
         onClose={() => setIsEventModalOpen(false)}
         onDelete={handleDeleteEvent}
+        onEdit={handleEditEvent}
       />
     </div>
   );

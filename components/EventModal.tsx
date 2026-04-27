@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Clock, Tag, User, AlertTriangle, Trash2 } from "lucide-react";
+import { X, Clock, Tag, User, AlertTriangle, Trash2, MapPin } from "lucide-react";
 import { AgendaEvent, getCategoryColor } from "@/types/agenda";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface EventModalProps {
@@ -12,14 +13,35 @@ interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDelete?: (id: string) => void;
+  onEdit?: (event: AgendaEvent) => void;
 }
 
-export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps) {
+export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventModalProps) {
+  const [athleteName, setAthleteName] = useState<string>("");
+
+  useEffect(() => {
+    const fetchAthlete = async () => {
+      if (event?.athlete_id) {
+        const { data } = await supabase.from('athletes').select('name').eq('id', event.athlete_id).single();
+        if (data) {
+          setAthleteName(data.name);
+        }
+      }
+    };
+    if (isOpen && event?.athlete_id) {
+      fetchAthlete();
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAthleteName("");
+    }
+  }, [event?.athlete_id, isOpen]);
+
   if (!event) return null;
 
   const colorClass = getCategoryColor(event);
   const startTime = new Date(event.start_time);
   const endTime = new Date(event.end_time);
+  const isMultiDay = !isSameDay(startTime, endTime) || event.is_all_day;
 
   return (
     <AnimatePresence>
@@ -38,13 +60,8 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`px-2 py-0.5 rounded text-xxs font-black uppercase border ${colorClass}`}>
-                      {event.category}
+                      {event.category === 'competition' ? 'competição' : event.category === 'clinical' ? 'clínico' : event.category === 'professional' ? 'profissional' : event.category === 'travel' ? 'viagem' : 'pessoal'}
                     </span>
-                    {event.subcategory && (
-                      <span className="px-2 py-0.5 rounded text-xxs font-black uppercase border border-slate-700 text-slate-400">
-                        {event.subcategory}
-                      </span>
-                    )}
                   </div>
                   <h2 className="text-xl font-black text-white leading-tight">
                     {event.title}
@@ -59,12 +76,40 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-slate-400">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-xs font-bold">
-                    {format(startTime, "dd 'de' MMMM", { locale: ptBR })} • {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
-                  </span>
+                <div className="flex items-start gap-3 text-slate-400">
+                  <Clock className="w-4 h-4 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold">
+                      {isMultiDay && !event.is_all_day ? (
+                        `${format(startTime, "dd 'de' MMM, h:mm a", { locale: ptBR })} - ${format(endTime, "dd 'de' MMM, h:mm a", { locale: ptBR })}`
+                      ) : event.is_all_day ? (
+                        isSameDay(startTime, endTime) 
+                          ? `${format(startTime, "dd 'de' MMMM", { locale: ptBR })} (Dia Todo)`
+                          : `${format(startTime, "dd 'de' MMM", { locale: ptBR })} - ${format(endTime, "dd 'de' MMM", { locale: ptBR })} (Dia Todo)`
+                      ) : (
+                        `${format(startTime, "dd 'de' MMMM", { locale: ptBR })} • ${format(startTime, "h:mm a")} - ${format(endTime, "h:mm a")}`
+                      )}
+                    </span>
+                  </div>
                 </div>
+
+                {event.location && (
+                  <div className="flex items-start gap-3 text-slate-400">
+                    <MapPin className="w-4 h-4 mt-0.5" />
+                    <div className="flex flex-col">
+                      <p className="text-xs font-bold leading-relaxed">{event.location}</p>
+                      {event.address && (
+                        <p className="text-[10px] text-slate-500">{event.address}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {!event.location && event.address && (
+                  <div className="flex items-start gap-3 text-slate-400">
+                    <MapPin className="w-4 h-4 mt-0.5" />
+                    <p className="text-[10px] text-slate-500 leading-relaxed">{event.address}</p>
+                  </div>
+                )}
 
                 {event.description && (
                   <div className="flex items-start gap-3 text-slate-400">
@@ -76,7 +121,7 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
                 {event.athlete_id && (
                   <div className="flex items-center gap-3 text-slate-400">
                     <User className="w-4 h-4" />
-                    <span className="text-xs font-bold">ID do Atleta: {event.athlete_id}</span>
+                    <span className="text-xs font-bold">Atleta Associado: {athleteName || event.athlete_id}</span>
                   </div>
                 )}
 
@@ -99,12 +144,17 @@ export function EventModal({ event, isOpen, onClose, onDelete }: EventModalProps
               </div>
 
               <div className="flex gap-3">
-                <button 
-                  className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
-                  onClick={onClose}
-                >
-                  Editar Evento
-                </button>
+                {onEdit && (
+                  <button 
+                    className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
+                    onClick={() => {
+                      onClose();
+                      onEdit(event);
+                    }}
+                  >
+                    Editar Evento
+                  </button>
+                )}
                 {onDelete && (
                   <button 
                     onClick={() => onDelete(event.id)}

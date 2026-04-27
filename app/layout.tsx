@@ -18,7 +18,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'ELLEVEN Wellness | EARS',
+  title: 'EARS • ELLEVEN',
   description: 'Sistema de monitoramento de wellness para atletas da EARS (7 a 19 anos).',
   manifest: '/manifest.json',
   appleWebApp: {

@@ -8,29 +8,39 @@ import { ptBR } from "date-fns/locale";
 interface EventCardProps {
   event: AgendaEvent;
   onClick: (event: AgendaEvent) => void;
+  isMultiDay?: boolean;
 }
 
-export function EventCard({ event, onClick }: EventCardProps) {
+export function EventCard({ event, onClick, isMultiDay }: EventCardProps) {
   const colorClass = getCategoryColor(event);
   const startTime = new Date(event.start_time);
   
+  if (isMultiDay) {
+    return (
+      <div 
+        onClick={() => onClick(event)}
+        className={`px-2 py-1 rounded border text-left cursor-pointer transition-all hover:brightness-110 active:scale-95 ${colorClass} h-full overflow-hidden flex items-center shrink-0`}
+      >
+        <span className="text-[10px] font-black leading-none truncate block w-full">{event.title}</span>
+      </div>
+    );
+  }
+
   return (
     <div 
       onClick={() => onClick(event)}
-      className={`p-2 rounded-lg border text-left cursor-pointer transition-all hover:brightness-110 active:scale-95 ${colorClass} h-full overflow-hidden`}
+      className={`px-2 py-1 rounded border text-left cursor-pointer transition-all hover:brightness-110 active:scale-95 ${colorClass} h-full overflow-hidden flex flex-col justify-center relative`}
     >
-      <p className="text-xxs font-black uppercase tracking-tighter opacity-70">
-        {format(startTime, "HH:mm")}
-      </p>
-      <h4 className="text-xxs font-black leading-tight truncate">
-        {event.title}
-      </h4>
-      {event.category === 'clinical' && event.risk_score !== null && (
-        <div className="mt-1 flex items-center gap-1">
-          <div className="w-1 h-1 rounded-full bg-current" />
-          <span className="text-xxs font-bold uppercase">Risco: {event.risk_score}</span>
-        </div>
-      )}
+      <div className="flex items-center justify-between gap-1.5 w-full">
+        <span className="text-[10px] font-black leading-none truncate flex-1 min-w-0">
+          {event.title}
+        </span>
+        {!event.is_all_day && (
+          <span className="text-[9px] font-black uppercase tracking-tighter opacity-70 shrink-0">
+            {format(startTime, "h:mm a")}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

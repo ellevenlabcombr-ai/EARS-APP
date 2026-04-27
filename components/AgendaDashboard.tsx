@@ -332,8 +332,13 @@ export function AgendaDashboard({ onOpenProfile }: AgendaDashboardProps) {
 
   const formatTime = (timeStr: string) => {
     if (!timeStr) return '';
-    if (timeStr.includes('T')) return format(parseISO(timeStr), 'HH:mm');
-    return timeStr.substring(0, 5); // Assuming HH:mm:ss format
+    try {
+      if (timeStr.includes('T')) return format(parseISO(timeStr), 'h:mm a');
+      const dummyDate = new Date(`2000-01-01T${timeStr}`);
+      return format(dummyDate, 'h:mm a');
+    } catch {
+      return timeStr.substring(0, 5);
+    }
   };
 
   const getClinicalColor = (readiness?: number, pain?: number) => {

@@ -53,6 +53,35 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
         </div>
       </div>
 
+      {/* All-Day / Multi-Day Section */}
+      <div className="grid grid-cols-[80px_1fr] border-b border-slate-800 bg-slate-900/40 min-h-[40px]">
+        <div className="p-2 border-r border-slate-800 flex items-center justify-end">
+          <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest text-right leading-tight">Dia<br/>Todo</span>
+        </div>
+        <div className="grid grid-cols-7">
+          {weekDays.map((day, dayIdx) => {
+            const currentD = startOfDay(day);
+            const allDayEvents = events.filter(e => {
+              const originalStart = startOfDay(new Date(e.start_time));
+              const originalEnd = startOfDay(new Date(e.end_time));
+              // Event spans multiple days, or explicitly marked as all_day, and overlaps with current day
+              const isMultiDayEvent = !isSameDay(originalStart, originalEnd) || e.is_all_day;
+              return isMultiDayEvent && currentD >= originalStart && currentD <= originalEnd;
+            });
+
+            return (
+              <div key={dayIdx} className="border-r border-slate-800/50 last:border-r-0 p-1 flex flex-col gap-1 min-h-[40px]">
+                {allDayEvents.map(event => (
+                  <div key={event.id} className="h-[28px] shrink-0">
+                    <EventCard event={event} onClick={onEventClick} isMultiDay={true} />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Body */}
       <div className="relative h-[50rem] overflow-y-auto custom-scrollbar">
         <div className="grid grid-cols-[80px_1fr]">
@@ -61,7 +90,7 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
             {hours.map(hour => (
               <div key={hour} className="h-20 p-2 text-right border-b border-slate-800/50">
                 <span className="text-xxs font-black text-slate-600 uppercase">
-                  {hour.toString().padStart(2, '0')}:00
+                  {hour === 12 ? '12:00 PM' : hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`}
                 </span>
               </div>
             ))}
@@ -77,21 +106,50 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
             </div>
 
             {weekDays.map((day, dayIdx) => {
-              const dayEvents = events.filter(e => isSameDay(new Date(e.start_time), day));
+              const currentD = startOfDay(day);
+              
+              const dayEvents = events.filter(e => {
+                const originalStart = startOfDay(new Date(e.start_time));
+                const originalEnd = startOfDay(new Date(e.end_time));
+                
+                // Exclude multi-day events and all_day events from the time grid
+                if (!isSameDay(originalStart, originalEnd) || e.is_all_day) return false;
+                
+                return currentD >= originalStart && currentD <= originalEnd;
+              });
               
               return (
                 <div key={dayIdx} className="relative border-r border-slate-800/50 last:border-r-0 min-h-full">
                   {dayEvents.map(event => {
-                    const start = new Date(event.start_time);
-                    const end = new Date(event.end_time);
+                    const originalStart = new Date(event.start_time);
+                    const originalEnd = new Date(event.end_time);
                     
-                    const startHour = start.getHours();
-                    const startMin = start.getMinutes();
-                    const durationMin = (end.getTime() - start.getTime()) / (1000 * 60);
+                    let eventStart = new Date(originalStart);
+                    let eventEnd = new Date(originalEnd);
+                    
+                    // Constrain start time to today at 07:00 if starting before today's grid
+                    if (originalStart < startOfDay(day) || originalStart.getHours() < 7) {
+                      eventStart = new Date(day);
+                      eventStart.setHours(7, 0, 0, 0);
+                    }
+                    
+                    // Constrain end time to today at 21:00 if ending after today's grid
+                    const gridEndHour = 21;
+                    if (originalEnd > endOfDay(day) || originalEnd.getHours() >= gridEndHour) {
+                      eventEnd = new Date(day);
+                      eventEnd.setHours(gridEndHour, 0, 0, 0);
+                    }
+                    
+                    const startHour = eventStart.getHours();
+                    const startMin = eventStart.getMinutes();
+                    const durationMin = (eventEnd.getTime() - eventStart.getTime()) / (1000 * 60);
+                    
+                    // Skip if duration is negative or zero (e.g., event ended before 07:00 today)
+                    if (durationMin <= 0) return null;
                     
                     // Calculate position (each hour is 80px / 5rem)
                     const top = (startHour - 7) * 80 + (startMin / 60) * 80;
-                    const height = (durationMin / 60) * 80;
+                    const height = Math.max((durationMin / 60) * 80, 20); // Min height of 20px for visibility
 
                     return (
                       <div 
@@ -99,7 +157,7 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
                         className="absolute left-1 right-1 z-10"
                         style={{ top: `${top}px`, height: `${height}px` }}
                       >
-                        <EventCard event={event} onClick={onEventClick} />
+                        <EventCard event={event} onClick={onEventClick} isMultiDay={originalStart < startOfDay(day) || originalEnd > endOfDay(day)} />
                       </div>
                     );
                   })}

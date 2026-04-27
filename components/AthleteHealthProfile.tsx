@@ -2552,42 +2552,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           )}
         </div>
 
-        {/* 3.5 Actions & Reminders */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden">
-            <CardHeader className="border-b border-slate-800/50 bg-slate-900/20 px-6 py-4">
-              <CardTitle className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <ClipboardList className="w-4 h-4 text-cyan-500" />
-                Checklist de Recuperação
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <ClipboardList className="w-8 h-8 text-slate-800 mb-3" />
-                <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Nenhuma tarefa pendente</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
-              <Trophy className="w-20 h-20 text-amber-500" />
-            </div>
-            <CardHeader className="border-b border-slate-800/50 bg-slate-900/20 px-6 py-4">
-              <CardTitle className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-amber-500" />
-                Próxima Competição
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[11.25rem]">
-              <div className="text-center space-y-2">
-                <p className="text-xxs font-black text-slate-500 uppercase tracking-widest">Sem competições agendadas</p>
-                <p className="text-2xl font-black text-slate-700 tracking-tighter">-- DIAS</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* 4. Monitoring trends */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden">
@@ -2811,22 +2775,6 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             </CardContent>
           </Card>
         </div>
-
-        {/* Pending Assessments Card (Moved down) */}
-        <Card className="bg-slate-900/40 border-slate-800/50 shadow-2xl overflow-hidden mt-6">
-          <CardHeader className="border-b border-slate-800/50 bg-slate-900/20 px-6 py-4">
-            <CardTitle className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-              <ClipboardList className="w-4 h-4 text-cyan-500" />
-              Avaliações Pendentes
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <ClipboardList className="w-6 h-6 text-slate-800 mb-2" />
-              <p className="text-xxs font-black text-slate-600 uppercase tracking-widest">Nenhuma avaliação agendada</p>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* AI Alerts and Condutas */}
         <Card className="bg-slate-900/40 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.05)] overflow-hidden mt-6">

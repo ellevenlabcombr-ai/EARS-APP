@@ -251,8 +251,10 @@ BEGIN
             description TEXT,
             start_time TIMESTAMP WITH TIME ZONE NOT NULL,
             end_time TIMESTAMP WITH TIME ZONE NOT NULL,
-            category TEXT NOT NULL, -- clinical | professional | personal
+            category TEXT NOT NULL, -- clinical | professional | personal | competition | travel
             subcategory TEXT,
+            location TEXT,
+            is_all_day BOOLEAN DEFAULT FALSE,
             athlete_id UUID REFERENCES athletes(id) ON DELETE SET NULL,
             risk_score NUMERIC,
             priority NUMERIC NOT NULL,
@@ -266,6 +268,17 @@ BEGIN
         -- Criar políticas de acesso (Público para simplificar)
         DROP POLICY IF EXISTS "Permitir tudo para todos" ON agenda_events;
         CREATE POLICY "Permitir tudo para todos" ON agenda_events FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+
+    -- Add columns to agenda_events if it already exists
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='agenda_events' AND column_name='location') THEN
+        ALTER TABLE agenda_events ADD COLUMN location TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='agenda_events' AND column_name='address') THEN
+        ALTER TABLE agenda_events ADD COLUMN address TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='agenda_events' AND column_name='is_all_day') THEN
+        ALTER TABLE agenda_events ADD COLUMN is_all_day BOOLEAN DEFAULT FALSE;
     END IF;
 END $$;
 
