@@ -44,6 +44,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'is_all_day') THEN
         ALTER TABLE public.agenda_events ADD COLUMN is_all_day BOOLEAN DEFAULT FALSE;
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'status') THEN
+        ALTER TABLE public.agenda_events ADD COLUMN status TEXT DEFAULT 'pending';
+    END IF;
 
     -- Garantir que o ID tenha default automático
     ALTER TABLE public.agenda_events ALTER COLUMN id SET DEFAULT gen_random_uuid();

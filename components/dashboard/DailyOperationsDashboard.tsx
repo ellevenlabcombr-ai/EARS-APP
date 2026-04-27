@@ -57,17 +57,18 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
 
 
 
-  const updateAppointmentStatus = async (id: string, status: string) => {
+  const updateAppointmentStatus = async (id: string, status: string, source: string = 'appointment') => {
     try {
+      const table = source === 'smart_agenda' ? 'agenda_events' : 'appointments';
       const { error } = await supabase
-        .from('appointments')
+        .from(table)
         .update({ status })
         .eq('id', id);
       
       if (error) throw error;
       fetchData(); // Refresh data
     } catch (error) {
-      console.error("Error updating appointment:", error);
+      console.error(`Error updating ${source}:`, error);
     }
   };
 
@@ -77,17 +78,23 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
       if (!supabase) return;
 
       const today = getLocalDateString();
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
 
       // Fetch all data in parallel
       const [
         athletesRes, 
         appointmentsRes, 
+        agendaEventsRes,
         wellnessRes, 
         painRes,
         settingsRes
       ] = await Promise.all([
         supabase.from('athletes').select('id, name, status').limit(200),
         supabase.from('appointments').select('id, athlete_id, date, start_time, end_time, status, type, title, athletes (id, name)').eq('date', today).order('start_time', { ascending: true }).limit(100),
+        supabase.from('agenda_events').select('*, athletes (id, name)').gte('start_time', startOfToday.toISOString()).lte('start_time', endOfToday.toISOString()).order('start_time', { ascending: true }).limit(100),
         supabase.from('wellness_records').select('athlete_id, readiness_score').eq('record_date', today).limit(200),
         supabase.from('pain_reports').select('athlete_id, pain_level').gte('created_at', today).limit(200),
         supabase.from('clinical_settings').select('*').maybeSingle()
@@ -95,12 +102,16 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
 
       if (athletesRes.error) throw athletesRes.error;
       if (appointmentsRes.error && appointmentsRes.error.code !== '42703') throw appointmentsRes.error;
+      if (agendaEventsRes.error) {
+        console.warn("Agenda events error:", agendaEventsRes.error.message);
+      }
       if (wellnessRes.error) throw wellnessRes.error;
       if (painRes.error) throw painRes.error;
 
       const settings: ClinicalSettings = settingsRes.data || defaultSettings;
 
-      let apptData = appointmentsRes.data;
+      let apptData = appointmentsRes.data || [];
+      const agendaData = agendaEventsRes.data || [];
       
       // Fallback for appointments if 'date' column doesn't exist
       if (appointmentsRes.error?.code === '42703') {
@@ -111,15 +122,30 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           .order('start_time', { ascending: true });
         
         if (fallbackError) throw fallbackError;
-        apptData = fallbackData;
+        apptData = fallbackData || [];
       }
 
       const athletesData = athletesRes.data || [];
       const wellnessData = wellnessRes.data || [];
       const painData = painRes.data || [];
 
-      const todayAppointments = apptData?.filter(a => a.type !== 'competition' && a.type !== 'event') || [];
-      const todayEvents = apptData?.filter(a => a.type === 'competition' || a.type === 'event') || [];
+      // Combine both sources
+      const allEvents = [
+        ...apptData.map(a => ({ ...a, source: 'appointment' })),
+        ...agendaData.map(e => ({ 
+          ...e, 
+          source: 'smart_agenda',
+          date: today,
+          // Normalize time strings for display
+          start_time: format(new Date(e.start_time), "HH:mm"),
+          end_time: format(new Date(e.end_time), "HH:mm"),
+          type: e.category,
+          status: e.status || 'pending'
+        }))
+      ].sort((a, b) => (a.start_time || "").localeCompare(b.start_time || ""));
+
+      const todayAppointments = allEvents?.filter(a => a.type !== 'competition' && a.type !== 'event') || [];
+      const todayEvents = allEvents?.filter(a => a.type === 'competition' || a.type === 'event') || [];
 
       const wellnessMap = new Map();
       wellnessData.forEach(w => wellnessMap.set(w.athlete_id, w));
@@ -168,17 +194,12 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           });
         }
       });
-
-      const allAgendaItems = (apptData || []).sort((a, b) => (a.start_time || "").localeCompare(b.start_time || ""));
       
-      // Find next appointment (first pending one)
-      const now = new Date();
-      const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
-      const next = allAgendaItems.find(a => a.status !== 'completed' && a.status !== 'cancelled');
+      // Find next event (first pending one)
+      const next = allEvents.find(a => a.status !== 'completed' && a.status !== 'cancelled');
       
       setNextAppointment(next || null);
-      setFullAgenda(allAgendaItems);
+      setFullAgenda(allEvents);
       setAppointments(todayAppointments);
       setEvents(todayEvents);
       setRiskAlerts(newRiskAlerts);
@@ -288,7 +309,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
 
               <div className="flex items-center gap-3">
                 <Button 
-                  onClick={() => updateAppointmentStatus(nextAppointment.id, 'completed')}
+                  onClick={() => updateAppointmentStatus(nextAppointment.id, 'completed', nextAppointment.source)}
                   className="bg-emerald-500 hover:bg-emerald-600 text-[#050B14] font-black uppercase tracking-widest text-xxs px-6 h-11"
                 >
                   <Check size={16} className="mr-2" /> Concluir
@@ -383,7 +404,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                             className="h-8 w-8 text-emerald-500 hover:bg-emerald-500/10"
                             onClick={(e) => {
                               e.stopPropagation();
-                              updateAppointmentStatus(appt.id, 'completed');
+                              updateAppointmentStatus(appt.id, 'completed', appt.source);
                             }}
                           >
                             <Check size={14} />
@@ -394,7 +415,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                             className="h-8 w-8 text-rose-500 hover:bg-rose-500/10"
                             onClick={(e) => {
                               e.stopPropagation();
-                              updateAppointmentStatus(appt.id, 'cancelled');
+                              updateAppointmentStatus(appt.id, 'cancelled', appt.source);
                             }}
                           >
                             <X size={14} />

@@ -12,16 +12,18 @@ import {
   AlertCircle
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { format, addDays, startOfWeek, endOfWeek } from "date-fns";
+import { format, addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AgendaEvent, AgendaCategory } from "@/types/agenda";
 import { SmartDaySummary } from "./SmartDaySummary";
 import { CalendarGrid } from "./CalendarGrid";
+import { MonthCalendarGrid } from "./MonthCalendarGrid";
 import { EventModal } from "./EventModal";
 import { CreateEventModal } from "./CreateEventModal";
 
 export function SmartAgenda() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'week' | 'month'>('month');
   const [events, setEvents] = useState<AgendaEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,14 +40,21 @@ export function SmartAgenda() {
     
     try {
       setLoading(true);
-      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-      const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+      let rangeStart, rangeEnd;
+
+      if (viewMode === 'week') {
+        rangeStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+        rangeEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+      } else {
+        rangeStart = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 });
+        rangeEnd = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 });
+      }
 
       const { data, error } = await supabase
         .from('agenda_events')
         .select('*')
-        .gte('start_time', weekStart.toISOString())
-        .lte('start_time', weekEnd.toISOString())
+        .gte('start_time', rangeStart.toISOString())
+        .lte('start_time', rangeEnd.toISOString())
         .order('start_time', { ascending: true });
 
       if (error) {
@@ -64,7 +73,7 @@ export function SmartAgenda() {
     } finally {
       setLoading(false);
     }
-  }, [currentDate]);
+  }, [currentDate, viewMode]);
 
   useEffect(() => {
     fetchEvents();
@@ -168,28 +177,58 @@ export function SmartAgenda() {
       <SmartDaySummary events={events} />
 
       <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => setCurrentDate(addDays(currentDate, -7))}
+              onClick={() => {
+                if (viewMode === 'week') {
+                  setCurrentDate(addDays(currentDate, -7));
+                } else {
+                  setCurrentDate(subMonths(currentDate, 1));
+                }
+              }}
               className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <h2 className="text-lg font-black text-white uppercase tracking-tight min-w-[12.5rem] text-center">
-              {format(startOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })} - {format(endOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })}
+              {viewMode === 'week' ? (
+                `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), "dd MMM", { locale: ptBR })}`
+              ) : (
+                format(currentDate, "MMMM yyyy", { locale: ptBR })
+              )}
             </h2>
             <button 
-              onClick={() => setCurrentDate(addDays(currentDate, 7))}
+              onClick={() => {
+                if (viewMode === 'week') {
+                  setCurrentDate(addDays(currentDate, 7));
+                } else {
+                  setCurrentDate(addMonths(currentDate, 1));
+                }
+              }}
               className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-slate-500">
-            <CalendarIcon className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-widest">Visão Semanal</span>
+          <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700">
+            <button
+              onClick={() => setViewMode('month')}
+              className={`px-4 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
+                viewMode === 'month' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Mês
+            </button>
+            <button
+              onClick={() => setViewMode('week')}
+              className={`px-4 py-2 rounded-lg text-xxs font-black uppercase tracking-widest transition-all ${
+                viewMode === 'week' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Semana
+            </button>
           </div>
         </div>
 
@@ -213,6 +252,15 @@ export function SmartAgenda() {
           <div className="py-40 flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : viewMode === 'month' ? (
+          <MonthCalendarGrid 
+            events={filteredEvents} 
+            currentDate={currentDate}
+            onEventClick={(event) => {
+              setSelectedEvent(event);
+              setIsEventModalOpen(true);
+            }}
+          />
         ) : (
           <CalendarGrid 
             events={filteredEvents} 
