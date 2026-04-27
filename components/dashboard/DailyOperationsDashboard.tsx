@@ -367,7 +367,9 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                 fullAgenda.map((appt) => (
                   <div 
                     key={appt.id} 
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-all cursor-pointer group border-l-4 border-transparent hover:border-cyan-500/50 gap-4"
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all group border-l-4 border-transparent gap-4 ${
+                      appt.athlete_id ? 'cursor-pointer hover:bg-slate-800/30 hover:border-cyan-500/50' : 'hover:bg-slate-800/10'
+                    }`}
                     onClick={() => appt.athlete_id && onViewAthlete(appt.athlete_id)}
                   >
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6">
@@ -396,42 +398,38 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                       </div>
                     </div>
                     <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 mt-2 sm:mt-0">
-                      {appt.status !== 'completed' && (
-                        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            className="h-8 w-8 text-emerald-500 bg-emerald-500/5 sm:bg-transparent hover:bg-emerald-500/10"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAppointmentStatus(appt.id, 'completed', appt.source);
-                            }}
+                      {appt.status === 'cancelled' ? (
+                        <div className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-xxs font-black uppercase tracking-widest border transition-all bg-rose-500/10 text-rose-500 border-rose-500/20">
+                          Cancelado
+                        </div>
+                      ) : (
+                        <div 
+                          className="flex items-center gap-2 cursor-pointer bg-slate-900/50 p-1.5 pr-3 rounded-full hover:bg-slate-800 transition-colors border border-slate-800"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateAppointmentStatus(appt.id, appt.status === 'completed' ? 'pending' : 'completed', appt.source);
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                              appt.status === 'completed' ? 'bg-emerald-500' : 'bg-slate-700'
+                            }`}
                           >
-                            <Check size={14} />
-                          </Button>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            className="h-8 w-8 text-rose-500 bg-rose-500/5 sm:bg-transparent hover:bg-rose-500/10"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAppointmentStatus(appt.id, 'cancelled', appt.source);
-                            }}
-                          >
-                            <X size={14} />
-                          </Button>
+                            <span
+                              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                appt.status === 'completed' ? 'translate-x-4' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                          <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${appt.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                            {appt.status === 'completed' ? 'Concluído' : 'Pendente'}
+                          </span>
                         </div>
                       )}
-                      <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-xxs font-black uppercase tracking-widest border transition-all ${
-                        appt.status === 'completed' 
-                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
-                          : appt.status === 'cancelled'
-                          ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                          : 'bg-slate-800/50 text-slate-400 border-slate-700'
-                      }`}>
-                        {appt.status === 'completed' ? 'Concluído' : appt.status === 'cancelled' ? 'Cancelado' : 'Pendente'}
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-cyan-500 transition-colors hidden sm:block" />
+                      {appt.athlete_id && (
+                        <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-cyan-500 transition-colors hidden sm:block" />
+                      )}
                     </div>
                   </div>
                 ))
