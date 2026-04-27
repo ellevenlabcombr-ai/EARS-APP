@@ -303,3 +303,26 @@ CREATE POLICY "Public Access" ON public.postural_assessments FOR ALL USING (true
 
 DROP POLICY IF EXISTS "Public Access" ON public.sports;
 CREATE POLICY "Public Access" ON public.sports FOR ALL USING (true);
+
+CREATE TABLE IF NOT EXISTS public.agenda_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    description TEXT,
+    category TEXT NOT NULL,
+    subcategory TEXT,
+    location TEXT,
+    address TEXT,
+    is_all_day BOOLEAN DEFAULT FALSE,
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
+    athlete_id UUID REFERENCES public.athletes(id),
+    risk_score INTEGER DEFAULT 0,
+    priority TEXT DEFAULT 'medium',
+    origin TEXT DEFAULT 'manual',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.agenda_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Access" ON public.agenda_events;
+CREATE POLICY "Public Access" ON public.agenda_events FOR ALL USING (true);
