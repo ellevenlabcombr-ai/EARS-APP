@@ -145,9 +145,8 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
       category: formData.category,
     });
 
-    onSave({
+    const savePayload: any = {
       ...formData,
-      id: initialEvent?.id,
       start_time: startISO,
       end_time: endISO,
       location: formData.location.trim() || null,
@@ -157,7 +156,13 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
       risk_score: null,
       priority,
       origin: 'manual',
-    });
+    };
+
+    if (initialEvent?.id) {
+      savePayload.id = initialEvent.id;
+    }
+
+    onSave(savePayload);
     
     // Default config gets reset when opening
   };

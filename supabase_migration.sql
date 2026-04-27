@@ -323,6 +323,22 @@ CREATE TABLE IF NOT EXISTS public.agenda_events (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Garantir colunas se já existir
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'location') THEN
+        ALTER TABLE public.agenda_events ADD COLUMN location TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'address') THEN
+        ALTER TABLE public.agenda_events ADD COLUMN address TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'is_all_day') THEN
+        ALTER TABLE public.agenda_events ADD COLUMN is_all_day BOOLEAN DEFAULT FALSE;
+    END IF;
+    -- Garantir default ID
+    ALTER TABLE public.agenda_events ALTER COLUMN id SET DEFAULT gen_random_uuid();
+END $$;
+
 ALTER TABLE public.agenda_events ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public Access" ON public.agenda_events;
 CREATE POLICY "Public Access" ON public.agenda_events FOR ALL USING (true);
