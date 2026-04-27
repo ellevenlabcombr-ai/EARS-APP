@@ -78,10 +78,12 @@ import {
   Download,
   Share2,
   Shield,
+  ShieldCheck,
   Stethoscope,
   Bell,
   PhoneCall,
-  WifiOff
+  WifiOff,
+  Tag
 } from "lucide-react";
 import Image from "next/image";
 import { PainMap } from "@/components/PainMap";
@@ -1846,145 +1848,77 @@ export function AthleteDashboard({
           </div>
         </div>
 
-        {/* Futuristic Profile Header */}
-        <div className="lg:col-span-full order-1 min-w-0 flex flex-col gap-6">
-          <div className="relative group sm:flex items-center gap-8">
-            {/* Square Photo with Futuristic Frame */}
-            <div className="relative w-full sm:w-[280px] lg:w-[320px] shrink-0 aspect-square rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 bg-slate-900/40 backdrop-blur-xl">
-              {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
-                <Image 
-                  src={athleteData.avatar_url} 
-                  alt={athleteData.nickname || athleteData.name || 'Avatar'} 
-                  fill 
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  unoptimized
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className={`w-full h-full bg-slate-900/50 flex items-center justify-center`}>
-                  <User className="w-32 h-32 text-slate-800" />
-                </div>
-              )}
-              {/* Scanline Effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent h-[200%] -top-full animate-[scan_4s_linear_infinite] pointer-events-none" />
-            </div>
-
-            <div className="relative flex-1 py-4">
-              {/* Status Badge Floating */}
-              <div className="mb-6 flex justify-start">
-                <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-xl ${currentReadiness >= 80 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10' : currentReadiness >= 50 ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-amber-500/10' : 'bg-red-500/20 border-red-500/50 text-red-400 shadow-red-500/10'}`}>
-                   <div className={`w-1.5 h-1.5 rounded-full ${currentReadiness >= 80 ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : currentReadiness >= 50 ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]'}`} />
-                   {currentReadiness >= 80 ? "SISTEMA OPERACIONAL: OTIMIZADO" : currentReadiness >= 50 ? "SISTEMA OPERACIONAL: ALERTA" : "SISTEMA OPERACIONAL: REPARO"}
-                </div>
-              </div>
-
-              {/* Identity HUD */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tighter drop-shadow-2xl leading-none">
-                    {t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "").split(", ")[1] || t[lang].greeting.replace("{name}", athleteData?.nickname || athleteData?.name || "")}
-                  </h2>
-                  {athleteCode && (
-                    <div className="px-3 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-black rounded-lg uppercase tracking-widest border border-cyan-500/20 shadow-lg hidden sm:inline-block">
-                      #{athleteCode}
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-4 text-slate-500 font-bold">
-                   {athleteData?.sport && (
-                     <div className="flex flex-col">
-                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Modalidade' : 'Sport'}</span>
-                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.sport}</span>
-                     </div>
-                   )}
-                   {athleteData?.position && (
-                     <div className="flex flex-col border-l border-slate-800 pl-4">
-                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Posição' : 'Position'}</span>
-                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.position}</span>
-                     </div>
-                   )}
-                   {athleteData?.category && (
-                     <div className="flex flex-col border-l border-slate-800 pl-4">
-                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Categoria' : 'Category'}</span>
-                       <span className="text-xs text-slate-200 uppercase tracking-wider">{athleteData.category}</span>
-                     </div>
-                   )}
-                   {athleteData?.birth_date && (
-                     <div className="flex flex-col border-l border-slate-800 pl-4">
-                       <span className="text-[9px] uppercase tracking-widest opacity-50 mb-0.5">{lang === 'pt' ? 'Idade' : 'Age'}</span>
-                       <span className="text-xs text-slate-200 uppercase tracking-wider">{new Date().getFullYear() - new Date(athleteData.birth_date).getFullYear()} ANOS</span>
-                     </div>
-                   )}
-                </div>
-              </div>
-            </div>
+        {/* Ultra-Technological Luxurious Profile Header */}
+        <div className="relative w-full rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-[#0c111c] to-[#04060a] border border-slate-800/60 p-1 mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_0_0_1px_rgba(255,255,255,0.05)] overflow-hidden">
+          {/* Background Ambient Glow */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-3xl lg:rounded-[2.5rem] pointer-events-none">
+            <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-cyan-500/10 via-transparent to-transparent blur-[100px] mix-blend-screen mix-blend-overlay"></div>
+            <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-purple-500/5 via-transparent to-transparent blur-[120px] mix-blend-screen"></div>
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
           </div>
 
-          {/* HUD PERFORMANCE BAR (One-Line Futuristic Interface) */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-y-6 gap-x-8 shadow-2xl">
-              
-              {/* Integrated Metrics Line */}
-              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 w-full">
-                
-                {/* 1. RISCO CLÍNICO ATUAL */}
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 rotate-45 transform hover:rotate-0 transition-transform duration-500 ${currentReadiness >= 80 ? 'border-emerald-500/30' : currentReadiness >= 50 ? 'border-amber-500/30' : 'border-rose-500/30'} bg-slate-900/50`}>
-                    <ShieldCheck className={`-rotate-45 group-hover:rotate-0 transition-transform duration-500 w-6 h-6 ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'}`} />
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">{lang === 'pt' ? 'Risco Clínico Atual' : 'Current Clinical Risk'}</p>
-                    <div className={`text-lg font-black uppercase tracking-widest ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'} flex items-center gap-2`}>
-                      {currentReadiness >= 80 ? 'Baixo Risco' : 'Atenção'}
-                      <div className={`w-2 h-2 rounded-full ${currentReadiness >= 80 ? 'bg-emerald-400' : currentReadiness >= 50 ? 'bg-amber-400' : 'bg-rose-400'} animate-pulse`} />
+          <div className="relative bg-slate-950/40 backdrop-blur-3xl rounded-[22px] lg:rounded-[2.3rem] p-6 lg:p-10 flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12 z-10">
+            
+            {/* Hex/Tech Avatar Frame */}
+            <div className="relative group shrink-0">
+              <div className="absolute -inset-2 bg-gradient-to-tr from-cyan-500/30 to-purple-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border border-white/10 bg-slate-900/50 shadow-[0_0_40px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,0.5)] p-2">
+                <div className="w-full h-full rounded-full overflow-hidden relative">
+                  {(athleteData?.avatar_url && athleteData.avatar_url.trim() !== '') ? (
+                    <Image 
+                      src={athleteData.avatar_url} 
+                      alt={athleteData?.nickname || athleteData?.name || 'Avatar'} 
+                      fill 
+                      className="object-cover scale-100 group-hover:scale-110 transition-transform duration-1000 ease-out"
+                      unoptimized
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-900/80 flex items-center justify-center">
+                      <User className="w-24 h-24 text-slate-800" />
                     </div>
-                  </div>
-                </div>
-
-                {/* Vertical Divider */}
-                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
-
-                {/* 2. STATUS */}
-                <div className="flex flex-col">
-                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Status</p>
-                  <span className={`text-base font-black uppercase tracking-tighter ${currentReadiness >= 80 ? 'text-emerald-400' : currentReadiness >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
-                    {currentReadiness >= 80 ? (lang === 'pt' ? "APTO" : "OPTIMAL") : currentReadiness >= 50 ? (lang === 'pt' ? "ESTÁVEL" : "STABLE") : (lang === 'pt' ? "CRÍTICO" : "CRITICAL")}
-                  </span>
-                </div>
-
-                {/* 3. PRONTIDÃO */}
-                <div className="flex flex-col">
-                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Prontidão</p>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-lg font-black ${currentReadiness < 65 ? 'text-rose-400' : 'text-white'}`}>
-                      {currentReadiness}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Vertical Divider */}
-                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
-
-                {/* 4. TAGS ATIVAS */}
-                <div className="flex flex-col">
-                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Tag className="w-3 h-3 text-purple-500" /> Tags Ativas</p>
-                  <div className="flex flex-wrap gap-1">
-                    <span className="text-[8px] font-black bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded uppercase">Postural</span>
-                  </div>
-                </div>
-
-                {/* Vertical Divider */}
-                <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
-
-                {/* 5. FOCO DE RECUPERAÇÃO */}
-                <div className="flex flex-col min-w-0 flex-1">
-                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Target className="w-3 h-3 text-rose-500" /> Foco de Recuperação</p>
-                   <div className="flex flex-wrap gap-3">
-                      <span className="text-[9px] text-slate-600 font-bold italic">Nenhum foco de risco.</span>
-                   </div>
+                  )}
+                  {/* Subtle Tech Overlay */}
+                  <div className="absolute inset-0 ring-1 ring-inset ring-white/5 rounded-full pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent h-[200%] -top-full animate-[scan_6s_linear_infinite] pointer-events-none mix-blend-overlay" />
                 </div>
               </div>
+              {/* Floating Level Badge */}
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/80 backdrop-blur-md rounded-full border border-slate-700/50 shadow-xl flex items-center gap-2">
+                <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                <span className="text-xs font-black text-white tracking-widest uppercase">LVL {athleteLevel}</span>
+              </div>
+            </div>
+
+            {/* Profile Info & Stats */}
+            <div className="flex-1 w-full text-center lg:text-left flex flex-col justify-center py-4 lg:py-6">
+              
+              {/* Top Tech Indicators */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6">
+                <div className={`px-4 py-1.5 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-[9px] flex items-center gap-2 shadow-lg ${currentReadiness >= 80 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : currentReadiness >= 50 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${currentReadiness >= 80 ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : currentReadiness >= 50 ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-rose-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]'} animate-pulse`} />
+                  SYS: {currentReadiness >= 80 ? "OPTIMIZED" : currentReadiness >= 50 ? "MONITORING" : "ATTENTION"}
+                </div>
+                {athleteCode && (
+                  <div className="px-3 py-1.5 bg-white/5 text-slate-400 text-[9px] font-mono font-bold rounded-full uppercase tracking-[0.3em] border border-white/5 flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-cyan-500 opacity-50" />
+                    ID-{athleteCode}
+                  </div>
+                )}
+              </div>
+
+              {/* Name Display */}
+              <div className="mb-8">
+                <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white uppercase tracking-tighter drop-shadow-2xl leading-[1.1]">
+                  <span className="font-thin text-slate-300 mr-4">
+                    {lang === 'pt' ? 'Olá,' : 'Hello,'}
+                  </span>
+                  <span className="font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+                    {athleteData?.nickname || athleteData?.name?.split(' ')[0] || ""}
+                  </span>
+                </h2>
+              </div>
+
             </div>
           </div>
         </div>

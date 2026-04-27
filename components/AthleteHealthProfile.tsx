@@ -65,7 +65,10 @@ import {
   Filter,
   Target,
   BarChart3,
-  Tag
+  Tag,
+  Globe,
+  Award,
+  CalendarDays
 } from "lucide-react";
 import { GoogleGenAI, Type } from "@google/genai";
 import { Button } from "@/components/ui/button";
@@ -1841,90 +1844,115 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
         {/* Large Profile Header block restored */}
         <div className="lg:col-span-full lg:row-start-2 order-1 min-w-0 flex flex-col gap-4">
-          <div className="overflow-hidden rounded-3xl relative bg-slate-900/40 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/5 group sm:flex">
-            <div className="relative w-full sm:w-[250px] lg:w-[320px] shrink-0 aspect-square">
-            {athletePhoto ? (
-              <Image 
-                src={athletePhoto} 
-                alt={athlete.nickname || athlete.name || 'Avatar'} 
-                fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                unoptimized
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className={`w-full h-full bg-slate-900 flex items-center justify-center`}>
-                <User className="w-32 h-32 text-slate-800" />
-              </div>
-            )}
+          {/* Ultra-Technological Luxurious Profile Header */}
+          <div className="relative w-full rounded-3xl lg:rounded-[2.5rem] bg-gradient-to-br from-[#0c111c] to-[#04060a] border border-slate-800/60 p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_0_0_1px_rgba(255,255,255,0.05)] overflow-hidden">
+            {/* Background Ambient Glow */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-3xl lg:rounded-[2.5rem] pointer-events-none">
+            <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-cyan-500/10 via-transparent to-transparent blur-[100px] mix-blend-screen mix-blend-overlay"></div>
+            <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-purple-500/5 via-transparent to-transparent blur-[120px] mix-blend-screen"></div>
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
+          </div>
+
+          <div className="relative bg-slate-950/40 backdrop-blur-3xl rounded-[22px] lg:rounded-[2.3rem] p-6 lg:p-10 flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12 z-10">
             
-            {/* Gradient Overlay */}
-            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0A1120] to-transparent hidden sm:block pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A1120] to-transparent sm:hidden pointer-events-none" />
-            </div>
-
-            <div className="relative p-6 sm:p-8 flex flex-col justify-between flex-1 z-10 w-full min-w-0">
-            {/* Top badges */}
-            <div className="flex justify-between items-start w-full mb-8">
-              <div className={`px-4 py-2 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg ${athlete.status === 'active' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : athlete.status === 'injured' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-slate-500/20 border-slate-500/50 text-slate-400'}`}>
-                 <CheckCircle className="w-4 h-4" />
-                 {athlete.status === 'active' ? "APTO" : athlete.status === 'injured' ? "LESIONADO" : "INATIVO"}
+            {/* Hex/Tech Avatar Frame */}
+            <div className="relative group shrink-0">
+              <div className="absolute -inset-2 bg-gradient-to-tr from-cyan-500/30 to-purple-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border border-white/10 bg-slate-900/50 shadow-[0_0_40px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,0.5)] p-2">
+                <div className="w-full h-full rounded-full overflow-hidden relative">
+                  {athletePhoto ? (
+                    <Image 
+                      src={athletePhoto} 
+                      alt={athlete.nickname || athlete.name || 'Avatar'} 
+                      fill 
+                      className="object-cover scale-100 group-hover:scale-110 transition-transform duration-1000 ease-out"
+                      unoptimized
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-900/80 flex items-center justify-center">
+                      <User className="w-24 h-24 text-slate-800" />
+                    </div>
+                  )}
+                  {/* Subtle Tech Overlay */}
+                  <div className="absolute inset-0 ring-1 ring-inset ring-white/5 rounded-full pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent h-[200%] -top-full animate-[scan_6s_linear_infinite] pointer-events-none mix-blend-overlay" />
+                </div>
               </div>
             </div>
 
-            {/* Bottom Info */}
-            <div className="w-full">
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-none truncate">
-                  {athlete.nickname || athlete.name}
-                </h2>
+            {/* Profile Info & Stats */}
+            <div className="flex-1 w-full text-center lg:text-left flex flex-col justify-center py-4 lg:py-6">
+              
+              {/* Top Tech Indicators */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6">
+                <div className={`px-4 py-1.5 rounded-full border backdrop-blur-md font-black uppercase tracking-widest text-[9px] flex items-center gap-2 shadow-lg ${athlete.status === 'active' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : athlete.status === 'injured' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-slate-500/10 border-slate-500/30 text-slate-400'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${athlete.status === 'active' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : athlete.status === 'injured' ? 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.8)]' : 'bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.8)]'} animate-pulse`} />
+                  SYS: {athlete.status === 'active' ? "APTO" : athlete.status === 'injured' ? "LESIONADO" : "INATIVO"}
+                </div>
                 {athlete.athlete_code && (
-                  <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xxs font-bold rounded-lg uppercase tracking-widest border border-cyan-500/30 shadow-lg hidden sm:inline-block shrink-0">
-                    #{athlete.athlete_code}
-                  </span>
+                  <div className="px-3 py-1.5 bg-white/5 text-slate-400 text-[9px] font-mono font-bold rounded-full uppercase tracking-[0.3em] border border-white/5 flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-cyan-500 opacity-50" />
+                    ID-{athlete.athlete_code}
+                  </div>
                 )}
               </div>
-              <div className="flex flex-wrap gap-2 text-xs font-bold">
-                 {athlete.sport && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">MODALIDADE</span> {athlete.sport}
-                   </div>
-                 )}
-                 {athlete.position && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">POSIÇÃO</span> {athlete.position}
-                   </div>
-                 )}
-                 {athlete.category && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">CATEGORIA</span> {athlete.category}
-                   </div>
-                 )}
-                 {athlete.birth_date && (
-                   <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-lg text-white font-sans uppercase tracking-widest text-[10px] sm:text-xs">
-                     <span className="text-slate-500 mr-2">IDADE</span> {new Date().getFullYear() - new Date(athlete.birth_date).getFullYear()} ANOS
-                   </div>
-                 )}
+
+              {/* Name Display */}
+              <div className="mb-8">
+                <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white uppercase tracking-tighter drop-shadow-2xl leading-[1.1]">
+                  <span className="font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+                    {athlete.nickname || athlete.name?.split(' ')[0] || ""}
+                  </span>
+                </h2>
+              </div>
+
+              {/* Athlete Specs Grid */}
+              <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center justify-center lg:justify-start gap-y-6 gap-x-12">
+                {athlete.sport && (
+                  <div className="flex flex-col gap-1 items-center lg:items-start">
+                    <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-slate-500 flex items-center gap-1.5"><Globe className="w-2.5 h-2.5" /> {language === 'pt' ? 'Modalidade' : 'Sport'}</span>
+                    <span className="text-sm font-black text-slate-200 uppercase tracking-wider">{athlete.sport}</span>
+                  </div>
+                )}
+                {athlete.position && (
+                  <div className="flex flex-col gap-1 items-center lg:items-start lg:border-l border-slate-800 lg:pl-12">
+                    <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-slate-500 flex items-center gap-1.5"><Target className="w-2.5 h-2.5" /> {language === 'pt' ? 'Posição' : 'Position'}</span>
+                    <span className="text-sm font-black text-slate-200 uppercase tracking-wider">{athlete.position}</span>
+                  </div>
+                )}
+                {athlete.category && (
+                  <div className="flex flex-col gap-1 items-center lg:items-start lg:border-l border-slate-800 lg:pl-12">
+                    <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-slate-500 flex items-center gap-1.5"><Award className="w-2.5 h-2.5" /> {language === 'pt' ? 'Categoria' : 'Category'}</span>
+                    <span className="text-sm font-black text-slate-200 uppercase tracking-wider">{athlete.category}</span>
+                  </div>
+                )}
+                {athlete.birth_date && (
+                  <div className="flex flex-col gap-1 items-center lg:items-start lg:border-l border-slate-800 lg:pl-12">
+                    <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-slate-500 flex items-center gap-1.5"><CalendarDays className="w-2.5 h-2.5" /> {language === 'pt' ? 'Idade' : 'Age'}</span>
+                    <span className="text-sm font-black text-slate-200 uppercase tracking-wider">{new Date().getFullYear() - new Date(athlete.birth_date).getFullYear()} <span className="text-[10px] text-slate-500">YRS</span></span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* HUD PERFORMANCE BAR (One-Line Futuristic Interface) */}
-        <div className="relative group">
+        <div className="relative group lg:col-span-full order-2">
           <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-y-6 gap-x-8 shadow-2xl">
+          <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 shadow-2xl">
             
             {/* Integrated Metrics Line */}
-            <div className="flex flex-wrap items-center gap-x-12 gap-y-6 w-full">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap lg:items-center justify-between gap-6 lg:gap-8 w-full">
               
               {/* 1. RISCO CLÍNICO ATUAL */}
-              <div className="flex items-center gap-4">
+              <div className="w-full sm:w-auto flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 rotate-45 transform hover:rotate-0 transition-transform duration-500 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} bg-slate-900/50`}>
                   <ShieldCheck className={`-rotate-45 group-hover:rotate-0 transition-transform duration-500 w-6 h-6 ${riskCfg.color}`} />
                 </div>
                 <div>
-                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">{lang === 'pt' ? 'Risco Clínico Atual' : 'Current Clinical Risk'}</p>
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">{language === 'pt' ? 'Risco Clínico Atual' : 'Current Clinical Risk'}</p>
                   <div className={`text-lg font-black uppercase tracking-widest ${riskCfg.color} flex items-center gap-2`}>
                     {riskCfg.label}
                     <div className={`w-2 h-2 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse`} />
@@ -1947,13 +1975,13 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="flex flex-col">
                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Prontidão</p>
                 <div className="flex items-center gap-3">
-                  <span className={`text-lg font-black ${clinicalSessionData?.readiness.score && clinicalSessionData.readiness.score < 65 ? 'text-rose-400' : 'text-white'}`}>
-                    {clinicalSessionData?.readiness.score || 0}%
+                  <span className={`text-lg font-black ${clinicalSessionData?.readiness?.score && clinicalSessionData?.readiness?.score < 65 ? 'text-rose-400' : 'text-white'}`}>
+                    {clinicalSessionData?.readiness?.score || 0}%
                   </span>
                   <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
                     <div 
-                      className={`h-full rounded-full transition-all duration-500 ${clinicalSessionData?.readiness.score && clinicalSessionData.readiness.score < 65 ? 'bg-rose-500' : 'bg-cyan-500'}`}
-                      style={{ width: `${clinicalSessionData?.readiness.score || 0}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${clinicalSessionData?.readiness?.score && clinicalSessionData?.readiness?.score < 65 ? 'bg-rose-500' : 'bg-cyan-500'}`}
+                      style={{ width: `${clinicalSessionData?.readiness?.score || 0}%` }}
                     />
                   </div>
                 </div>
@@ -1963,7 +1991,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
 
               {/* 4. TAGS ATIVAS */}
-              <div className="flex flex-col min-w-[120px]">
+              <div className="flex flex-col w-full sm:w-auto">
                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Tag className="w-3 h-3 text-purple-500" /> Tags Ativas</p>
                 <div className="flex flex-wrap gap-1">
                   {clinicalTags.slice(0, 3).map((t, i) => (
@@ -1977,7 +2005,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               <div className="hidden lg:block w-px h-10 bg-gradient-to-b from-transparent via-slate-800 to-transparent" />
 
               {/* 5. FOCO DE RECUPERAÇÃO */}
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col w-full sm:w-auto lg:flex-1">
                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Target className="w-3 h-3 text-rose-500" /> Foco de Recuperação</p>
                  <div className="flex flex-wrap gap-3">
                    {athleteAlerts.filter(a => a.status === 'active').slice(0, 2).map(alert => (
@@ -1996,7 +2024,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         </div>
       </div>
 
-        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-3 order-3 overflow-x-auto custom-scrollbar pb-4 pt-2">
+        <div className="col-span-full lg:row-start-3 order-3 overflow-x-auto custom-scrollbar pb-4 pt-2">
           <div className="flex items-center justify-between min-w-[600px]">
             {[
               { id: 'overview', label: 'Visão Geral', icon: Activity },
@@ -2029,7 +2057,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
           </div>
         </div>
 
-        <div className="lg:col-start-1 lg:col-span-3 lg:row-start-4 order-4 space-y-10 min-w-0 pb-32">
+        <div className="col-span-full lg:row-start-4 order-4 space-y-10 min-w-0 pb-32">
         {activeTab === 'overview' && (
           <div className="space-y-10 pb-32">
             {/* Session Mode Toggle Container */}
@@ -2087,7 +2115,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             ) : (
               <>
                 {/* 2. Decision cards row */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
             { 
               label: 'Prontidão', 
@@ -3910,6 +3938,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             </div>
           </div>
         )}
+      </div>
 
       {/* Assessment Detail Modal */}
       <AnimatePresence>
@@ -4154,64 +4183,9 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         )}
       </AnimatePresence>
       
-          </div> {/* End Left Column */}
 
-          {/* RIGHT COLUMN: Summary Sidebar */}
-          <div className="space-y-6 lg:col-span-1 lg:border-l border-slate-800/50 lg:pl-6 sticky top-24 h-max order-1 lg:order-2">
-             {/* Clinical Risk Summary */}
-             <div className={`p-6 rounded-3xl border-2 ${riskCfg.color.replace('text-', 'border-').replace('400', '500/30')} ${riskCfg.bg} backdrop-blur-xl shadow-2xl flex flex-col items-center gap-2 w-full`}>
-                <div className={`w-3 h-3 rounded-full ${riskCfg.color.replace('text-', 'bg-')} animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.5)]`}></div>
-                <p className="text-xxs font-black text-slate-500 uppercase tracking-[0.2em]">Risco Clínico Atual</p>
-                <span className={`text-2xl font-black uppercase tracking-widest ${riskCfg.color}`}>
-                  {riskCfg.label}
-                </span>
-             </div>
 
-             <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800 flex flex-col items-center justify-center text-center">
-                    <span className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Status</span>
-                    <span className={`text-xs font-black uppercase tracking-tighter ${statusCfg.color}`}>{statusCfg.label}</span>
-                 </div>
-                 <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800 flex flex-col items-center justify-center text-center">
-                    <span className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Prontidão</span>
-                    <span className={`text-xl font-black ${athlete.readiness < 70 ? 'text-rose-500' : 'text-cyan-400'}`}>{athlete.readiness}%</span>
-                 </div>
-             </div>
 
-             {/* Recent Tags */}
-             <div className="bg-slate-900/40 rounded-2xl border border-slate-800 p-5 space-y-4">
-                <h3 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                   <Tag className="w-3.5 h-3.5 text-purple-400" /> Tags Ativas
-                </h3>
-                <div className="flex flex-wrap gap-1.5">
-                   {clinicalTags.length > 0 ? (
-                      clinicalTags.map(tag => (
-                         <span key={tag.id} className="text-[9px] px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase font-black tracking-widest">{tag.tag}</span>
-                      ))
-                   ) : (
-                      <span className="text-[10px] text-slate-600 font-bold italic">Nenhuma tag ativa.</span>
-                   )}
-                </div>
-             </div>
-
-             {/* Focus Action Planner */}
-             <div className="bg-slate-900/40 rounded-2xl border border-slate-800 p-5 space-y-4">
-                <h3 className="text-xxs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                   <Target className="w-3.5 h-3.5 text-rose-500" /> Foco de Recuperação
-                </h3>
-                <div className="space-y-3">
-                   {athleteAlerts.filter(a => a.status === 'active').slice(0, 3).map(alert => (
-                     <div key={alert.id} className="flex gap-2">
-                        <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                        <span className="text-[10px] font-bold text-slate-300 leading-tight">{alert.message}</span>
-                     </div>
-                   ))}
-                   {athleteAlerts.filter(a => a.status === 'active').length === 0 && (
-                      <span className="text-[10px] text-slate-600 font-bold italic">Nenhum foco de risco.</span>
-                   )}
-                </div>
-             </div>
-          </div>
       </main>
 
       {/* Postural Assessment Modal */}
