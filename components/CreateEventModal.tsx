@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Calendar, Clock, Tag, User, AlertTriangle, Stethoscope, Trophy, Briefcase, UserCircle, AlignLeft, Activity, Plane, MapPin } from "lucide-react";
+import { X, Calendar, Clock, Tag, User, AlertTriangle, Stethoscope, Trophy, Briefcase, UserCircle, AlignLeft, Activity, Plane, MapPin, Scale } from "lucide-react";
 import { AgendaCategory, calculatePriority, AgendaEvent } from "@/types/agenda";
 
 interface CreateEventModalProps {
@@ -16,6 +16,7 @@ interface CreateEventModalProps {
 const CATEGORIES_CONFIG = [
   { value: 'clinical', label: 'Clínico', icon: Stethoscope, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/30', activeBg: 'bg-rose-500/20', activeBorder: 'border-rose-500' },
   { value: 'competition', label: 'Competição', icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', activeBg: 'bg-amber-500/20', activeBorder: 'border-amber-500' },
+  { value: 'arbitration', label: 'Arbitragem', icon: Scale, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', activeBg: 'bg-fuchsia-500/20', activeBorder: 'border-fuchsia-500' },
   { value: 'travel', label: 'Viagem', icon: Plane, color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/30', activeBg: 'bg-violet-500/20', activeBorder: 'border-violet-500' },
   { value: 'professional', label: 'Profissional', icon: Briefcase, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', activeBg: 'bg-cyan-500/20', activeBorder: 'border-cyan-500' },
   { value: 'personal', label: 'Pessoal', icon: UserCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', activeBg: 'bg-emerald-500/20', activeBorder: 'border-emerald-500' },
@@ -141,6 +142,15 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
 
     setErrorMsg("");
     
+    // Auto-complete address if location is "Consultório" or "ELLEVEN"
+    let finalLocation = formData.location.trim();
+    let finalAddress = formData.address.trim();
+
+    if (finalLocation.toLowerCase().includes('consultório') || finalLocation.toLowerCase().includes('elleven')) {
+      finalLocation = 'ELLEVEN';
+      finalAddress = 'Alameda Santos, 211 - Cj. 1604';
+    }
+
     const priority = calculatePriority({
       category: formData.category,
     });
@@ -149,8 +159,8 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
       ...formData,
       start_time: startISO,
       end_time: endISO,
-      location: formData.location.trim() || null,
-      address: formData.address.trim() || null,
+      location: finalLocation || null,
+      address: finalAddress || null,
       subcategory: null,
       athlete_id: formData.athlete_id.trim() || null,
       risk_score: null,
@@ -172,37 +182,39 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-6 bg-slate-950/80 backdrop-blur-md">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]"
+            className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col h-full max-h-[90vh] overflow-hidden"
           >
-            <div className="p-6 sm:p-8 flex-1 overflow-y-auto no-scrollbar">
-              <div className="flex justify-between items-start mb-8">
-                <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
-                    {initialEvent ? "Editar Evento" : "Novo Evento"}
-                  </h2>
-                  <p className="text-sm text-slate-500 font-medium">
-                    {initialEvent ? "Edite as informações do seu compromisso." : "Adicione um novo compromisso na sua agenda inteligente."}
-                  </p>
-                </div>
-                <button 
-                  onClick={onClose}
-                  className="p-2.5 bg-slate-800/50 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+            {/* Header - Fixed */}
+            <div className="p-6 sm:p-8 border-b border-slate-800 flex justify-between items-start shrink-0">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight mb-2">
+                  {initialEvent ? "Editar Evento" : "Novo Evento"}
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  {initialEvent ? "Edite as informações do seu compromisso." : "Adicione um novo compromisso na sua agenda inteligente."}
+                </p>
               </div>
+              <button 
+                onClick={onClose}
+                className="p-2 sm:p-2.5 bg-slate-800/50 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar p-6 sm:p-8">
               <form id="create-event-form" onSubmit={handleSubmit} className="space-y-6" noValidate>
                 
                 {/* Category Selection */}
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest block">Tipo de Evento</label>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                     {CATEGORIES_CONFIG.map((cat) => {
                       const Icon = cat.icon;
                       const isActive = formData.category === cat.value;
@@ -211,14 +223,14 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                           key={cat.value}
                           type="button"
                           onClick={() => setFormData({ ...formData, category: cat.value as AgendaCategory })}
-                          className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
+                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl border transition-all ${
                             isActive 
-                              ? `${cat.activeBg} ${cat.activeBorder} ${cat.color} shadow-lg` 
+                              ? `${cat.activeBg} ${cat.activeBorder} ${cat.color} shadow-lg scale-105 z-10` 
                               : `bg-slate-950/50 border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300`
                           }`}
                         >
-                          <Icon className={`w-6 h-6 mb-2 ${isActive ? cat.color : ''}`} />
-                          <span className="text-[10px] font-black uppercase tracking-widest">{cat.label}</span>
+                          <Icon className={`w-5 h-5 sm:w-6 sm:h-6 mb-2 ${isActive ? cat.color : ''}`} />
+                          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-center leading-tight">{cat.label}</span>
                         </button>
                       );
                     })}
@@ -246,7 +258,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                         <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> Nome do Local</span>
                         <button
                           type="button"
-                          onClick={() => setFormData({ ...formData, location: "Consultório", address: "Local principal de atendimento" })}
+                          onClick={() => setFormData({ ...formData, location: "ELLEVEN", address: "Alameda Santos, 211 - Cj. 1604" })}
                           className="text-[#050B14] bg-cyan-500 hover:bg-cyan-400 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1"
                         >
                           <MapPin className="w-3 h-3" /> No Consultório
@@ -257,7 +269,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                         value={formData.location}
                         onChange={e => setFormData({...formData, location: e.target.value})}
                         className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600 font-medium"
-                        placeholder="Ex: Morumbi"
+                        placeholder="Ex: ELLEVEN ou Consultório"
                       />
                     </div>
                     <div>
@@ -393,29 +405,32 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
               </form>
             </div>
             
-            {errorMsg && (
-              <div className="px-6 sm:px-8 py-3 bg-rose-500/10 border-t border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                {errorMsg}
-              </div>
-            )}
+            {/* Error Message & Action - Fixed */}
+            <div className="shrink-0">
+              {errorMsg && (
+                <div className="px-6 sm:px-8 py-3 bg-rose-500/10 border-t border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  {errorMsg}
+                </div>
+              )}
 
-            <div className="p-6 sm:p-8 bg-slate-900 border-t border-slate-800 rounded-b-3xl flex gap-4">
-              <button 
-                type="button"
-                onClick={onClose}
-                className="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black uppercase tracking-widest rounded-2xl transition-all"
-              >
-                Cancelar
-              </button>
-              <button 
-                type="submit"
-                form="create-event-form"
-                className={`flex-1 py-4 ${activeCategory.activeBg} hover:opacity-80 text-white border ${activeCategory.activeBorder} text-xs font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2`}
-              >
-                <Calendar className="w-4 h-4" />
-                {initialEvent ? "Salvar Alterações" : "Agendar Evento"}
-              </button>
+              <div className="p-6 sm:p-8 bg-slate-900 border-t border-slate-800 rounded-b-3xl flex gap-4">
+                <button 
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black uppercase tracking-widest rounded-2xl transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  form="create-event-form"
+                  className={`flex-1 py-4 ${activeCategory.activeBg} hover:opacity-80 text-white border ${activeCategory.activeBorder} text-xs font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  {initialEvent ? "Salvar Alterações" : "Agendar Evento"}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

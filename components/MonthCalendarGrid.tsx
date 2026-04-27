@@ -76,7 +76,6 @@ export function MonthCalendarGrid({ events, onEventClick, currentDate }: MonthCa
               <div className="space-y-0.5 md:space-y-1 overflow-y-auto max-h-[50px] md:max-h-[80px] custom-scrollbar">
                 {dayEvents.map((event) => {
                   const colorClass = getCategoryColor(event);
-                  const isPersonalOrTravel = event.category === 'personal' || event.category === 'travel';
                   
                   return (
                     <button
@@ -85,14 +84,10 @@ export function MonthCalendarGrid({ events, onEventClick, currentDate }: MonthCa
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`w-full text-left px-1 md:px-2 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-bold truncate transition-all active:scale-95 border ${
-                        isPersonalOrTravel 
-                          ? 'border-slate-700 bg-slate-800/50 text-slate-300'
-                          : `border-transparent ${colorClass.split(' ')[0]} text-slate-950`
-                      }`}
+                      className={`w-full text-left px-1 md:px-2 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black truncate transition-all active:scale-95 border ${colorClass}`}
                       title={event.title}
                     >
-                      <span className="hidden md:inline">
+                      <span className="hidden md:inline font-bold opacity-80">
                         {!event.is_all_day && format(new Date(event.start_time), "HH:mm")}{" "}
                       </span>
                       {event.title}

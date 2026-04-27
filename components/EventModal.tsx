@@ -142,8 +142,12 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
                 <div className="flex gap-4">
                   <Clock className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                      {event.category}
+                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
+                      {event.category === 'arbitration' ? 'Arbitragem' : 
+                       event.category === 'clinical' ? 'Clínico' : 
+                       event.category === 'competition' ? 'Competição' : 
+                       event.category === 'professional' ? 'Profissional' : 
+                       event.category === 'travel' ? 'Viagem' : 'Pessoal'}
                     </span>
                     {event.subcategory && (
                       <span className="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider">
