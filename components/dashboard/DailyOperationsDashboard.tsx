@@ -367,41 +367,41 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                 fullAgenda.map((appt) => (
                   <div 
                     key={appt.id} 
-                    className="flex items-center justify-between p-5 hover:bg-slate-800/30 transition-all cursor-pointer group border-l-4 border-transparent hover:border-cyan-500/50"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-all cursor-pointer group border-l-4 border-transparent hover:border-cyan-500/50 gap-4"
                     onClick={() => appt.athlete_id && onViewAthlete(appt.athlete_id)}
                   >
-                    <div className="flex items-center gap-6">
-                      <div className="text-center w-16 shrink-0">
-                        <p className="text-sm font-black text-white">{appt.start_time?.substring(0, 5)}</p>
-                        <p className="text-xxs text-slate-500 font-bold uppercase">{appt.end_time?.substring(0, 5)}</p>
+                    <div className="flex items-start sm:items-center gap-4 sm:gap-6">
+                      <div className="text-center w-12 sm:w-16 shrink-0 pt-1 sm:pt-0">
+                        <p className="text-xs sm:text-sm font-black text-white">{appt.start_time?.substring(0, 5)}</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">{appt.end_time?.substring(0, 5)}</p>
                       </div>
                       <div className="w-px h-10 bg-slate-800/50 hidden sm:block"></div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 pr-2">
                         <div className="flex items-center gap-2 mb-1">
                           {getEventIcon(appt.type)}
-                          <h4 className="text-base font-black text-white group-hover:text-cyan-400 transition-colors truncate">
+                          <h4 className="text-sm sm:text-base font-black text-white group-hover:text-cyan-400 transition-colors truncate">
                             {appt.title || appt.type}
                           </h4>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                           {appt.athletes?.name && (
-                            <span className="text-xxs font-black uppercase text-slate-400 flex items-center gap-1">
+                            <span className="text-[9px] sm:text-xxs font-black uppercase text-slate-400 flex items-center gap-1">
                               <Users size={10} /> {appt.athletes.name}
                             </span>
                           )}
-                          <span className="text-xxs font-black uppercase px-2 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-800/50">
+                          <span className="text-[9px] sm:text-xxs font-black uppercase px-2 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-800/50 capitalize">
                             {appt.type}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 mt-2 sm:mt-0">
                       {appt.status !== 'completed' && (
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <Button 
                             size="icon" 
                             variant="ghost" 
-                            className="h-8 w-8 text-emerald-500 hover:bg-emerald-500/10"
+                            className="h-8 w-8 text-emerald-500 bg-emerald-500/5 sm:bg-transparent hover:bg-emerald-500/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               updateAppointmentStatus(appt.id, 'completed', appt.source);
@@ -412,7 +412,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                           <Button 
                             size="icon" 
                             variant="ghost" 
-                            className="h-8 w-8 text-rose-500 hover:bg-rose-500/10"
+                            className="h-8 w-8 text-rose-500 bg-rose-500/5 sm:bg-transparent hover:bg-rose-500/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               updateAppointmentStatus(appt.id, 'cancelled', appt.source);
@@ -422,14 +422,14 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                           </Button>
                         </div>
                       )}
-                      <div className={`px-3 py-1.5 rounded-lg text-xxs font-black uppercase tracking-widest border transition-all ${
+                      <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-xxs font-black uppercase tracking-widest border transition-all ${
                         appt.status === 'completed' 
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
                           : appt.status === 'cancelled'
                           ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
                           : 'bg-slate-800/50 text-slate-400 border-slate-700'
                       }`}>
-                        {appt.status === 'completed' ? 'Realizado' : appt.status === 'cancelled' ? 'Cancelado' : 'Pendente'}
+                        {appt.status === 'completed' ? 'Concluído' : appt.status === 'cancelled' ? 'Cancelado' : 'Pendente'}
                       </div>
                       <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-cyan-500 transition-colors hidden sm:block" />
                     </div>
