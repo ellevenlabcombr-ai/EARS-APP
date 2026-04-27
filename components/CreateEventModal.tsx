@@ -50,6 +50,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
     start_time: "",
     end_time: "",
     athlete_id: "",
+    reminder_minutes: null as number | null,
   });
 
   const [errorMsg, setErrorMsg] = useState("");
@@ -72,6 +73,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         start_time: toLocalInputFormat(new Date(initialEvent.start_time)),
         end_time: toLocalInputFormat(new Date(initialEvent.end_time)),
         athlete_id: initialEvent.athlete_id || "",
+        reminder_minutes: initialEvent.reminder_minutes ?? null,
       });
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setErrorMsg("");
@@ -94,6 +96,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         start_time: startStr,
         end_time: endStr,
         athlete_id: "",
+        reminder_minutes: null,
       });
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setErrorMsg("");
@@ -391,15 +394,41 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                   </div>
                 </div>
 
-                {/* Description */}
-                <div>
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">Anotações / Descrição</label>
-                  <textarea 
-                    value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
-                    className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors h-28 resize-none placeholder:text-slate-600 font-medium"
-                    placeholder="Adicione notas relevantes para o evento..."
-                  />
+                {/* Description and Reminders */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-1">
+                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">Anotações / Descrição</label>
+                    <textarea 
+                      value={formData.description}
+                      onChange={e => setFormData({...formData, description: e.target.value})}
+                      className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors h-28 resize-none placeholder:text-slate-600 font-medium"
+                      placeholder="Adicione notas relevantes para o evento..."
+                    />
+                  </div>
+                  
+                  <div className="col-span-1">
+                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2 block">
+                      <Clock className="w-4 h-4" /> Lembrete / Alerta
+                    </label>
+                    <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 h-28 flex flex-col justify-center">
+                      <select
+                        value={formData.reminder_minutes === null ? "" : formData.reminder_minutes.toString()}
+                        onChange={e => setFormData({...formData, reminder_minutes: e.target.value ? parseInt(e.target.value, 10) : null})}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors font-medium appearance-none [color-scheme:dark]"
+                      >
+                        <option value="">Sem lembrete</option>
+                        <option value="0">No horário do evento</option>
+                        <option value="5">5 minutos antes</option>
+                        <option value="15">15 minutos antes</option>
+                        <option value="30">30 minutos antes</option>
+                        <option value="60">1 hora antes</option>
+                        <option value="1440">1 dia antes</option>
+                      </select>
+                      <p className="mt-2 text-[10px] text-slate-500 font-medium text-center">
+                        Você será notificado quando o app estiver aberto
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
               </form>

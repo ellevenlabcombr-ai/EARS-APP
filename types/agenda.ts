@@ -16,6 +16,7 @@ export interface AgendaEvent {
   priority: number;
   origin: 'manual' | 'system' | 'sync';
   created_at: string;
+  reminder_minutes?: number | null;
 }
 
 export const calculatePriority = (event: Partial<AgendaEvent>): number => {

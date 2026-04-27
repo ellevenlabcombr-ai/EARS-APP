@@ -5,6 +5,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AgendaNotifier } from '@/components/AgendaNotifier';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -59,6 +60,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <ErrorBoundary>
           <LanguageProvider>
             {children}
+            <AgendaNotifier />
             <ScrollToTop />
             <InstallPrompt />
           </LanguageProvider>

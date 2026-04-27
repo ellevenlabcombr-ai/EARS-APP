@@ -338,6 +338,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'status') THEN
         ALTER TABLE public.agenda_events ADD COLUMN status TEXT DEFAULT 'pending';
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'agenda_events' AND column_name = 'reminder_minutes') THEN
+        ALTER TABLE public.agenda_events ADD COLUMN reminder_minutes INTEGER DEFAULT NULL;
+    END IF;
     -- Garantir default ID
     ALTER TABLE public.agenda_events ALTER COLUMN id SET DEFAULT gen_random_uuid();
 END $$;
