@@ -17,6 +17,9 @@ export interface AgendaEvent {
   origin: 'manual' | 'system' | 'sync';
   created_at: string;
   reminder_minutes?: number | null;
+  recurrence_rule?: string;
+  recurrence_group_id?: string;
+  recurrence_days?: number[];
 }
 
 export const calculatePriority = (event: Partial<AgendaEvent>): number => {

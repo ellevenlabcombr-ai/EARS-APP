@@ -51,9 +51,13 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
     end_time: "",
     athlete_id: "",
     reminder_minutes: null as number | null,
+    recurrence_rule: 'none' as 'none' | 'daily' | 'weekly' | 'weekly_custom' | 'biweekly' | 'monthly',
+    recurrence_days: [] as number[],
   });
 
   const [errorMsg, setErrorMsg] = useState("");
+  const [conflictWarning, setConflictWarning] = useState<string | null>(null);
+  const [ignoreConflict, setIgnoreConflict] = useState(false);
 
   useEffect(() => {
     const toLocalInputFormat = (date: Date) => {
@@ -74,9 +78,13 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         end_time: toLocalInputFormat(new Date(initialEvent.end_time)),
         athlete_id: initialEvent.athlete_id || "",
         reminder_minutes: initialEvent.reminder_minutes ?? null,
+        recurrence_rule: initialEvent.recurrence_rule as any || 'none',
+        recurrence_days: initialEvent.recurrence_days || [],
       });
        
       setErrorMsg("");
+      setConflictWarning(null);
+      setIgnoreConflict(false);
     } else if (isOpen && !initialEvent) {
       const now = new Date();
       now.setHours(now.getHours() + 1);
@@ -97,14 +105,19 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         end_time: endStr,
         athlete_id: "",
         reminder_minutes: null,
+        recurrence_rule: 'none',
+        recurrence_days: [],
       });
        
       setErrorMsg("");
+      setConflictWarning(null);
+      setIgnoreConflict(false);
     }
   }, [isOpen, initialEvent]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     
     if (!formData.title.trim()) {
       setErrorMsg("O título é obrigatório");
@@ -138,14 +151,47 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
     const startISO = parseToLocalISO(finalStart);
     const endISO = parseToLocalISO(finalEnd);
 
-    if (new Date(startISO) > new Date(endISO)) {
-      setErrorMsg("O término não pode ser antes do início");
+    if (new Date(startISO) >= new Date(endISO)) {
+      setErrorMsg("O término não pode ser antes ou igual ao início");
       return;
     }
 
-    setErrorMsg("");
+    if (formData.recurrence_rule === 'weekly_custom' && formData.recurrence_days.length === 0) {
+      setErrorMsg("Selecione pelo menos um dia para a repetição");
+      return;
+    }
+
+    // Checking for conflicts
+    if (!ignoreConflict) {
+      try {
+        let conflictQuery = supabase
+          .from('agenda_events')
+          .select('id, title, start_time, end_time')
+          .lt('start_time', endISO)
+          .gt('end_time', startISO);
+        
+        if (initialEvent?.id) {
+          conflictQuery = conflictQuery.neq('id', initialEvent.id);
+        }
+
+        const { data: conflicts, error: conflictError } = await conflictQuery;
+        
+        if (conflictError) throw conflictError;
+
+        if (conflicts && conflicts.length > 0) {
+          const confTitles = conflicts.map((c: any) => c.title).join(', ');
+          setConflictWarning(`Atenção: Este horário possui conflito com: ${confTitles}. Clique em salvar novamente para agendar mesmo assim.`);
+          setIgnoreConflict(true);
+          return;
+        }
+      } catch (err) {
+        console.error("Erro ao verificar conflitos:", err);
+      }
+    }
+
+    setConflictWarning(null);
     
-    // Auto-complete address if location is "Consultório" or "ELLEVEN"
+    // Auto-complete address if location is "Consultório" ou "ELLEVEN"
     let finalLocation = formData.location.trim();
     let finalAddress = formData.address.trim();
 
@@ -169,15 +215,19 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
       risk_score: null,
       priority,
       origin: 'manual',
+      recurrence_rule: formData.recurrence_rule,
+      recurrence_days: formData.recurrence_rule === 'weekly_custom' ? formData.recurrence_days : null,
     };
 
     if (initialEvent?.id) {
       savePayload.id = initialEvent.id;
     }
 
-    onSave(savePayload);
-    
-    // Default config gets reset when opening
+    try {
+      await onSave(savePayload);
+    } catch (err: any) {
+      setErrorMsg("Erro ao salvar: " + err.message);
+    }
   };
 
   const activeCategory = CATEGORIES_CONFIG.find(c => c.value === formData.category) || CATEGORIES_CONFIG[0];
@@ -401,16 +451,16 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                     <textarea 
                       value={formData.description}
                       onChange={e => setFormData({...formData, description: e.target.value})}
-                      className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors h-28 resize-none placeholder:text-slate-600 font-medium"
+                      className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors h-[8.5rem] resize-none placeholder:text-slate-600 font-medium"
                       placeholder="Adicione notas relevantes para o evento..."
                     />
                   </div>
                   
-                  <div className="col-span-1">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2 block">
-                      <Clock className="w-4 h-4" /> Lembrete / Alerta
-                    </label>
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 h-28 flex flex-col justify-center">
+                  <div className="col-span-1 space-y-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2 block">
+                        <Clock className="w-4 h-4" /> Lembrete
+                      </label>
                       <select
                         value={formData.reminder_minutes === null ? "" : formData.reminder_minutes.toString()}
                         onChange={e => setFormData({...formData, reminder_minutes: e.target.value ? parseInt(e.target.value, 10) : null})}
@@ -424,9 +474,56 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                         <option value="60">1 hora antes</option>
                         <option value="1440">1 dia antes</option>
                       </select>
-                      <p className="mt-2 text-[10px] text-slate-500 font-medium text-center">
-                        Você será notificado quando o app estiver aberto
-                      </p>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2 block">
+                        <Calendar className="w-4 h-4" /> Repetição
+                      </label>
+                      <select
+                        value={formData.recurrence_rule}
+                        onChange={e => setFormData({...formData, recurrence_rule: e.target.value as any})}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors font-medium appearance-none [color-scheme:dark]"
+                      >
+                        <option value="none">Não se repete</option>
+                        <option value="daily">Todos os dias</option>
+                        <option value="weekly">Semanalmente (Mesmo dia)</option>
+                        <option value="weekly_custom">Semanalmente (Escolher dias)</option>
+                        <option value="biweekly">Quinzenalmente</option>
+                        <option value="monthly">Mensalmente</option>
+                      </select>
+                      
+                      {formData.recurrence_rule === 'weekly_custom' && (
+                        <div className="mt-3 flex justify-between gap-1">
+                          {[
+                            { id: 0, label: 'D' },
+                            { id: 1, label: 'S' },
+                            { id: 2, label: 'T' },
+                            { id: 3, label: 'Q' },
+                            { id: 4, label: 'Q' },
+                            { id: 5, label: 'S' },
+                            { id: 6, label: 'S' }
+                          ].map(day => (
+                            <button
+                              key={day.id}
+                              type="button"
+                              onClick={() => {
+                                const newDays = formData.recurrence_days.includes(day.id)
+                                  ? formData.recurrence_days.filter(d => d !== day.id)
+                                  : [...formData.recurrence_days, day.id].sort();
+                                setFormData({ ...formData, recurrence_days: newDays });
+                              }}
+                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                                formData.recurrence_days.includes(day.id)
+                                  ? 'bg-cyan-500 text-slate-900'
+                                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                              }`}
+                            >
+                              {day.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -440,6 +537,12 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
                 <div className="px-6 sm:px-8 py-3 bg-rose-500/10 border-t border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
                   {errorMsg}
+                </div>
+              )}
+              {conflictWarning && !errorMsg && (
+                <div className="px-6 sm:px-8 py-3 bg-amber-500/10 border-t border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  {conflictWarning}
                 </div>
               )}
 

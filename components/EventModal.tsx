@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Clock, Tag, User, AlertTriangle, Trash2, MapPin, Bell } from "lucide-react";
+import { X, Clock, Tag, User, AlertTriangle, Trash2, MapPin, Bell, Repeat } from "lucide-react";
 import { AgendaEvent, getCategoryColor } from "@/types/agenda";
 import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -158,6 +158,16 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
                       <span className="px-2 py-1 bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                         <Bell className="w-3 h-3" />
                         Lembrete {event.reminder_minutes === 0 ? 'no horário' : `${event.reminder_minutes} min antes`}
+                      </span>
+                    )}
+                    {event.recurrence_rule && event.recurrence_rule !== 'none' && (
+                      <span className="px-2 py-1 bg-violet-100 text-violet-700 border border-violet-200 rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <Repeat className="w-3 h-3" />
+                        {event.recurrence_rule === 'daily' ? 'Diário' : 
+                         event.recurrence_rule === 'weekly' ? 'Semanal' : 
+                         event.recurrence_rule === 'biweekly' ? 'Quinzenal' : 
+                         event.recurrence_rule === 'weekly_custom' ? 'Seman. (Personalizado)' : 
+                         'Mensal'}
                       </span>
                     )}
                   </div>

@@ -530,7 +530,68 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
       <CreateEventModal 
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        onEventCreated={fetchData}
+        onSave={async (eventData) => {
+          if (!supabase) return;
+          try {
+            if (eventData.id) {
+              const { error } = await supabase.from('agenda_events').update(eventData).eq('id', eventData.id);
+              if (error) throw error;
+            } else {
+              // Note: If creating recurring from dashboard, similar logic as SmartAgenda should apply, but logic is only for edit here.
+              // Wait, CreateEventModal here is used for Edit only?
+              // "Edit Event Modal" -> initialEvent={eventToEdit}
+              // It's mainly used for edit right now. We'll just update or insert single for now to match.
+              if (eventData.recurrence_rule && eventData.recurrence_rule !== 'none') {
+                const groupId = crypto.randomUUID();
+                const eventsToInsert = [];
+                const rule = eventData.recurrence_rule;
+                let currentStart = new Date(eventData.start_time);
+                let currentEnd = new Date(eventData.end_time);
+                const endDateLimit = new Date();
+                endDateLimit.setFullYear(endDateLimit.getFullYear() + 1);
+                while (currentStart < endDateLimit) {
+                  eventsToInsert.push({...eventData, start_time: currentStart.toISOString(), end_time: currentEnd.toISOString(), recurrence_group_id: groupId});
+                  if (rule === 'daily') {
+                    currentStart.setDate(currentStart.getDate() + 1);
+                    currentEnd.setDate(currentEnd.getDate() + 1);
+                  } else if (rule === 'weekly') {
+                    currentStart.setDate(currentStart.getDate() + 7);
+                    currentEnd.setDate(currentEnd.getDate() + 7);
+                  } else if (rule === 'biweekly') {
+                    currentStart.setDate(currentStart.getDate() + 14);
+                    currentEnd.setDate(currentEnd.getDate() + 14);
+                  } else if (rule === 'weekly_custom') {
+                    const days = eventData.recurrence_days || [];
+                    if (days.length === 0) break;
+                    let added = false;
+                    let loops = 0;
+                    while (!added && loops < 14) {
+                      currentStart.setDate(currentStart.getDate() + 1);
+                      currentEnd.setDate(currentEnd.getDate() + 1);
+                      if (days.includes(currentStart.getDay())) added = true;
+                      loops++;
+                    }
+                    if (!added) break;
+                  } else if (rule === 'monthly') {
+                    currentStart.setMonth(currentStart.getMonth() + 1);
+                    currentEnd.setMonth(currentEnd.getMonth() + 1);
+                  }
+                  if (eventsToInsert.length >= 365) break;
+                }
+                const { error } = await supabase.from('agenda_events').insert(eventsToInsert);
+                if (error) throw error;
+              } else {
+                const { error } = await supabase.from('agenda_events').insert([eventData]);
+                if (error) throw error;
+              }
+            }
+            setIsEditModalOpen(false);
+            fetchData();
+          } catch (err: any) {
+            console.error("Erro ao salvar:", err);
+            throw err;
+          }
+        }}
         initialEvent={eventToEdit}
       />
     </div>

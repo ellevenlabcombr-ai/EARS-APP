@@ -84,6 +84,9 @@ export function SmartAgenda() {
 
     try {
       if (eventData.id) {
+        // Just update single event for simplicity (or we could ask if they want to update all).
+        // Standard approach for MVP: edit edits just this one, unless they want all? 
+        // We'll just edit this single one.
         const { error } = await supabase
           .from('agenda_events')
           .update(eventData)
@@ -91,18 +94,82 @@ export function SmartAgenda() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('agenda_events')
-          .insert([eventData]);
+        if (eventData.recurrence_rule && eventData.recurrence_rule !== 'none') {
+          // Generate multiple events
+          const groupId = crypto.randomUUID();
+          const eventsToInsert = [];
+          const rule = eventData.recurrence_rule;
+          
+          let currentStart = new Date(eventData.start_time);
+          let currentEnd = new Date(eventData.end_time);
+          
+          // Generate for up to 1 year
+          const endDateLimit = new Date();
+          endDateLimit.setFullYear(endDateLimit.getFullYear() + 1);
 
-        if (error) throw error;
+          while (currentStart < endDateLimit) {
+            eventsToInsert.push({
+              ...eventData,
+              start_time: currentStart.toISOString(),
+              end_time: currentEnd.toISOString(),
+              recurrence_group_id: groupId,
+            });
+
+            // Advance date based on rule
+            if (rule === 'daily') {
+              currentStart.setDate(currentStart.getDate() + 1);
+              currentEnd.setDate(currentEnd.getDate() + 1);
+            } else if (rule === 'weekly') {
+              currentStart.setDate(currentStart.getDate() + 7);
+              currentEnd.setDate(currentEnd.getDate() + 7);
+            } else if (rule === 'biweekly') {
+              currentStart.setDate(currentStart.getDate() + 14);
+              currentEnd.setDate(currentEnd.getDate() + 14);
+            } else if (rule === 'weekly_custom') {
+              const days = eventData.recurrence_days || [];
+              if (days.length === 0) break; // Defensive
+              let added = false;
+              let loops = 0;
+              while (!added && loops < 14) {
+                currentStart.setDate(currentStart.getDate() + 1);
+                currentEnd.setDate(currentEnd.getDate() + 1);
+                if (days.includes(currentStart.getDay())) added = true;
+                loops++;
+              }
+              if (!added) break;
+            } else if (rule === 'monthly') {
+              currentStart.setMonth(currentStart.getMonth() + 1);
+              currentEnd.setMonth(currentEnd.getMonth() + 1);
+            }
+            
+            // Safety cap: max 365 events
+            if (eventsToInsert.length >= 365) break;
+          }
+
+          // Insert all in batch
+          // Supabase supports batch insert with max of ~1000 items usually
+          // We can slice it just in case, but 365 is safe.
+          const { error } = await supabase
+            .from('agenda_events')
+            .insert(eventsToInsert);
+
+          if (error) throw error;
+        } else {
+          // Single event
+          const { error } = await supabase
+            .from('agenda_events')
+            .insert([eventData]);
+
+          if (error) throw error;
+        }
       }
       
       setIsCreateModalOpen(false);
       setInitialEventForEdit(null);
       fetchEvents();
     } catch (err: any) {
-      alert("Erro ao salvar evento: " + err.message);
+      console.error(err);
+      throw err;
     }
   };
 

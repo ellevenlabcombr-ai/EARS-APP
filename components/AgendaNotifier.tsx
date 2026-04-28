@@ -111,6 +111,10 @@ export function AgendaNotifier() {
           }
         });
       } catch (err: any) {
+        if (err?.message === 'Load failed' || err?.message === 'Failed to fetch') {
+          // Ignore network errors in background polling
+          return;
+        }
         console.error("Error checking reminders:", err.message || err);
       }
     };
