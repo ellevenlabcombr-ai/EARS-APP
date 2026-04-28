@@ -110,7 +110,7 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center gap-4 overflow-x-auto no-scrollbar px-4 py-2 my-2">
+      <div className="flex items-center justify-start md:justify-between gap-4 md:gap-0 overflow-x-auto no-scrollbar px-4 py-4 my-2 w-full max-w-4xl mx-auto">
         {formSteps.map((s, i) => (
           <React.Fragment key={s.id}>
             <div 
@@ -120,10 +120,10 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-amber-500 bg-amber-500/10 text-amber-500' : 'border-slate-700 text-slate-500'}`}>
                 <s.icon className="w-4 h-4" />
               </div>
-              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+              <span className="text-[0.6rem] md:text-xs font-black uppercase tracking-widest text-center max-w-[5rem] md:max-w-[7rem] leading-tight mt-1">{s.title}</span>
             </div>
             {i < formSteps.length - 1 && (
-              <div className={`w-8 h-[2px] shrink-0 mb-8 ${step > s.id ? 'bg-amber-500' : 'bg-slate-800'}`}></div>
+              <div className={`w-8 md:flex-1 h-[2px] shrink-0 mb-8 mx-2 ${step > s.id ? 'bg-amber-500' : 'bg-slate-800'}`}></div>
             )}
           </React.Fragment>
         ))}

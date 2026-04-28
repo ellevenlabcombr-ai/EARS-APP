@@ -467,7 +467,7 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
           </Card>
 
           {/* Navigation Tabs (Progress Steps Style) */}
-          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar px-4 mb-8 py-2">
+          <div className="flex items-center justify-start md:justify-between gap-4 md:gap-0 overflow-x-auto no-scrollbar px-4 mb-4 py-4 w-full max-w-4xl mx-auto">
             {[
               { id: 'screening', label: 'Triagem (pGALS)', icon: Activity },
               { id: 'symptoms', label: 'Quadro de Dor', icon: Target },
@@ -484,10 +484,10 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${isActive ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'border-slate-700 bg-slate-900 text-slate-500'}`}>
                        <tab.icon className="w-4 h-4" />
                      </div>
-                     <span className={`text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight mt-1 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{tab.label}</span>
+                     <span className={`text-[0.6rem] md:text-xs font-black uppercase tracking-widest text-center max-w-[5rem] md:max-w-[7rem] leading-tight mt-1 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{tab.label}</span>
                    </div>
                    {i < arr.length - 1 && (
-                     <div className={`w-8 h-[2px] shrink-0 mb-8 ${activeIndex > i ? 'bg-cyan-500' : 'bg-slate-800'}`}></div>
+                     <div className={`w-8 md:flex-1 h-[2px] shrink-0 mb-8 mx-2 ${activeIndex > i ? 'bg-cyan-500' : 'bg-slate-800'}`}></div>
                    )}
                  </React.Fragment>
                );
