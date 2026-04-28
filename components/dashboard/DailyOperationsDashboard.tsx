@@ -29,7 +29,6 @@ interface ClinicalSettings {
   critical_readiness_threshold: number;
   critical_pain_threshold: number;
   attention_readiness_min: number;
-  attention_readiness_min: number;
   attention_readiness_max: number;
   attention_pain_min: number;
   attention_pain_max: number;
@@ -178,9 +177,9 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           ...e, 
           source: 'smart_agenda',
           date: dateStr,
-          // Normalize time strings for display
-          start_time: format(new Date(e.start_time), "HH:mm"),
-          end_time: format(new Date(e.end_time), "HH:mm"),
+          // Store original times and add normalized ones for UI list
+          display_start: format(new Date(e.start_time), "HH:mm"),
+          display_end: format(new Date(e.end_time), "HH:mm"),
           type: e.category,
           status: e.status || 'pending'
         }))
@@ -256,8 +255,15 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
 
   useEffect(() => {
     fetchData();
-    if (getLocalDateString(new Date()) === getLocalDateString(viewDate)) {
+    
+    // Update current time if viewing today
+    const isToday = getLocalDateString(new Date()) === getLocalDateString(viewDate);
+    if (isToday) {
       setCurrentTime(new Date());
+      const timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 60000); // Every minute
+      return () => clearInterval(timer);
     } else {
       setCurrentTime(null);
     }
@@ -438,8 +444,8 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                   >
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6">
                       <div className="text-center w-12 sm:w-16 shrink-0 pt-1 sm:pt-0">
-                        <p className="text-xs sm:text-sm font-black text-white">{appt.start_time?.substring(0, 5)}</p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase">{appt.end_time?.substring(0, 5)}</p>
+                        <p className="text-xs sm:text-sm font-black text-white">{(appt.display_start || appt.start_time)?.substring(0, 5)}</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">{(appt.display_end || appt.end_time)?.substring(0, 5)}</p>
                       </div>
                       <div className="w-px h-10 bg-slate-800/50 hidden sm:block"></div>
                       <div className="min-w-0 pr-2">
