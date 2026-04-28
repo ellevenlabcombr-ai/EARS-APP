@@ -7,12 +7,23 @@ interface TestInfoModalProps {
   title: string;
   indication: string;
   application: string;
-  positiveIndicators: string[];
-  negativeIndicators: string[];
-  children?: React.ReactNode; // Can wrap the label
+  positiveIndicators?: string[]; // Make these optional so they can serve other lists
+  negativeIndicators?: string[]; // Make these optional
+  referenceValues?: string[];
+  deficitGrades?: string[];
+  children?: React.ReactNode;
 }
 
-export function TestInfoModal({ title, indication, application, positiveIndicators, negativeIndicators, children }: TestInfoModalProps) {
+export function TestInfoModal({ 
+  title, 
+  indication, 
+  application, 
+  positiveIndicators, 
+  negativeIndicators, 
+  referenceValues,
+  deficitGrades,
+  children 
+}: TestInfoModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -68,29 +79,61 @@ export function TestInfoModal({ title, indication, application, positiveIndicato
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                    <h4 className="text-xxs font-black text-emerald-500 uppercase tracking-widest mb-3">Indicadores Positivos</h4>
-                    <ul className="space-y-2">
-                      {positiveIndicators.map((item, idx) => (
-                        <li key={idx} className="text-sm font-medium text-emerald-100/70 flex items-start gap-2">
-                          <span className="text-emerald-500 mt-0.5">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {positiveIndicators && positiveIndicators.length > 0 && (
+                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                      <h4 className="text-xxs font-black text-emerald-500 uppercase tracking-widest mb-3">Indicadores Positivos</h4>
+                      <ul className="space-y-2">
+                        {positiveIndicators.map((item, idx) => (
+                          <li key={idx} className="text-sm font-medium text-emerald-100/70 flex items-start gap-2">
+                            <span className="text-emerald-500 mt-0.5">•</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                  <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl">
-                    <h4 className="text-xxs font-black text-rose-500 uppercase tracking-widest mb-3">Indicadores Negativos (Falha)</h4>
-                    <ul className="space-y-2">
-                      {negativeIndicators.map((item, idx) => (
-                        <li key={idx} className="text-sm font-medium text-rose-100/70 flex items-start gap-2">
-                          <span className="text-rose-500 mt-0.5">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {negativeIndicators && negativeIndicators.length > 0 && (
+                    <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl">
+                      <h4 className="text-xxs font-black text-rose-500 uppercase tracking-widest mb-3">Indicadores Negativos (Falha)</h4>
+                      <ul className="space-y-2">
+                        {negativeIndicators.map((item, idx) => (
+                          <li key={idx} className="text-sm font-medium text-rose-100/70 flex items-start gap-2">
+                            <span className="text-rose-500 mt-0.5">•</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {referenceValues && referenceValues.length > 0 && (
+                    <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl md:col-span-2">
+                      <h4 className="text-xxs font-black text-blue-500 uppercase tracking-widest mb-3">Valores de Referência</h4>
+                      <ul className="space-y-2">
+                        {referenceValues.map((item, idx) => (
+                          <li key={idx} className="text-sm font-medium text-blue-100/70 flex items-start gap-2">
+                            <span className="text-blue-500 mt-0.5">•</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {deficitGrades && deficitGrades.length > 0 && (
+                    <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl md:col-span-2">
+                      <h4 className="text-xxs font-black text-amber-500 uppercase tracking-widest mb-3">Graus de Déficits</h4>
+                      <ul className="space-y-2">
+                        {deficitGrades.map((item, idx) => (
+                          <li key={idx} className="text-sm font-medium text-amber-100/70 flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

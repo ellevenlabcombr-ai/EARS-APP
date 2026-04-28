@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import { TestInfoModal } from "./TestInfoModal";
 
 interface SleepAssessmentProps {
   athleteId?: string;
@@ -180,10 +181,18 @@ export function SleepAssessment({ athleteId, athleteName, onBack, onSave }: Slee
           <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
             <Moon className="w-6 h-6 text-cyan-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação do Sono</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Qualidade do descanso</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação do Sono"
+            indication="Monitoramento da qualidade e quantidade do sono para otimizar a recuperação, função imune e cognição do atleta."
+            application="O atleta relata hábitos recentes de sono, incluindo duração, interrupções e percepção de descanso."
+            referenceValues={["Score > 80: Excelente Recuperação", "Score 60-79: Alerta Moderado, necessita atenção", "Score < 60: Baixa Recuperação (Risco elevado de fadiga/lesão)"]}
+            deficitGrades={["Leve (pequeno ajuste de higiene do sono necessário)", "Moderado (necessidade de intervenção na rotina)", "Severo (impacto agudo no desempenho, possível privação severa)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação do Sono</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Qualidade do descanso</p>
+            </div>
+          </TestInfoModal>
         </div>
         {onBack && (
           <Button variant="ghost" size="icon" onClick={onBack} className="text-slate-500 hover:text-white">

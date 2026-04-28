@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Scale, AlertTriangle, Save, ArrowLeft, Activity, Ruler, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface AnthropometricAssessmentProps {
   athleteId: string;
@@ -221,13 +222,23 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
           <Button variant="ghost" onClick={step === 'form' ? onCancel : () => setStep('form')} className="mb-4 text-slate-400 hover:text-white px-0">
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
           </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <Ruler className="w-6 h-6 text-indigo-500" />
-            Avaliação Antropométrica
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Perimetria e Simetria Muscular
-          </p>
+          <TestInfoModal
+            title="Avaliação Antropométrica"
+            indication="Monitoramento da composição corporal, massas musculares segmentares e adiposidade para otimização da performance desportiva."
+            application="O avaliador utiliza fita métrica, adipômetro ou bioimpedância para coletar as dobras e perímetros."
+            referenceValues={["Normalidade: Depende do esporte e posição", "Assimetria M. Inferiores < 1.5cm: Aceitável"]}
+            deficitGrades={["Alteração Crítica (Assimetria > 1.5 a 2cm)", "Excesso de Adiposidade ou Redução Muscular Aguda"]}
+          >
+            <div>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3 hover:text-cyan-400 transition-colors">
+                <Ruler className="w-6 h-6 text-indigo-500" />
+                Avaliação Antropométrica
+              </h2>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 text-left">
+                Perimetria e Simetria Muscular
+              </p>
+            </div>
+          </TestInfoModal>
         </div>
       </div>
 

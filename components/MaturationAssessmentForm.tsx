@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { PersonStanding, AlertTriangle, Save, Activity, Ruler, Target, Heart, Flame, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface MaturationAssessmentProps {
   athleteId: string;
@@ -157,10 +158,18 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
           <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
             <PersonStanding className="w-6 h-6 text-cyan-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação de Maturação</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Estágio de Maturação e PHV</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação de Maturação"
+            indication="Estimar a idade biológica e o Pico de Velocidade de Crescimento (PHV) para adequar as cargas de treino nas categorias de base."
+            application="Via método de Mirwald ou Khamis-Roche, coleta-se altura, peso, e altura sentado."
+            referenceValues={["Pré-PHV: Crescimento acelerando", "Circa-PHV: Pico de crescimento (estirão)", "Pós-PHV: Crescimento desacelerando, focar em força muscular"]}
+            deficitGrades={["Leve (pequeno desvio em relação à IG cronológica)", "Atenção: Atleta no estirão, vulnerável a dores nas epífises e trações musculares (Doença de Osgood-Schlatter, Sever)."]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação de Maturação</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Estágio de Maturação e PHV</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

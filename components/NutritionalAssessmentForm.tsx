@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { Apple, Heart, Utensils, AlertTriangle, Save, Activity, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface NutritionalAssessmentProps {
   athleteId: string;
@@ -223,10 +224,18 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
           <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
             <Apple className="w-6 h-6 text-emerald-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Nutricional (Smart)</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Baseado em Consensos Científicos (2025)</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação Nutricional (Smart)"
+            indication="Triagem de qualidade da dieta, hidratação, suplementação e sinais de deficiência nutricional (RED-S)."
+            application="Oleta preenche um Recordatório Qualitativo. O algoritmo cruza dados de macronutrientes, hidratação e sinais físicos."
+            referenceValues={["Score > 80: Status Nutricional Adequado", "Score 60-79: Necessita ajustes finos", "Score < 60: Risco Nutricional (Possível deficiência)"]}
+            deficitGrades={["Leve (pequenos ajustes de timing e macro)", "Moderado (Sintomas leves, baixa recuperação)", "Severo (Sinais clínicos de deficiência / perda de peso não intencional)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação Nutricional (Smart)</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Baseado em Consensos Científicos (2025)</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

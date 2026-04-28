@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { BrainCircuit, AlertTriangle, Save, ArrowLeft, Activity, Heart, Zap, Target, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface PsychologicalAssessmentProps {
   athleteId: string;
@@ -150,10 +151,18 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
           <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
             <BrainCircuit className="w-6 h-6 text-purple-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Psicológica</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Prontidão Mental e Risco</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação Psicológica"
+            indication="Monitorar níveis de estresse, prontidão mental, ansiedade e risco de burnout/overtraining."
+            application="O atleta responde a questionários validados sobre humor, motivação e qualidade de recuperação percebida."
+            referenceValues={["Score > 80: Prontidão Mental Ótima", "Score 60-79: Limítrofe / Acompanhamento", "Score < 60: Risco Psicológico (Burnout/Fadiga Mental)"]}
+            deficitGrades={["Leve (pequeno estresse reportado)", "Moderado (Sinais de burnout, alteração de humor)", "Severo (Fadiga crônica, risco clínico psíquico)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação Psicológica</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Prontidão Mental e Risco</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

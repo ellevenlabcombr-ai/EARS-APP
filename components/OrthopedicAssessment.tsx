@@ -69,9 +69,10 @@ const CLINICAL_PATTERNS = [
   'Sobrecarga provável'
 ];
 
-const SQUAT_ISSUES = ['Valgo de joelho', 'Inclinação excessiva de tronco', 'Assimetria'];
-const JUMP_ISSUES = ['Rigidez na aterrissagem', 'Assimetria', 'Instabilidade'];
-const BALANCE_ISSUES = ['Oscilação excessiva', 'Perda de controle'];
+const SQUAT_ISSUES = ['Valgo dinâmico de joelho', 'Inclinação excessiva de tronco', 'Assimetria lateral', 'Elevação de calcanhar'];
+const JUMP_ISSUES = ['Rigidez na aterrissagem', 'Déficit de controle de joelho', 'Assimetria', 'Instabilidade'];
+const BALANCE_ISSUES = ['Oscilação excessiva', 'Perda de controle', 'Déficit proprioceptivo'];
+const CORE_ISSUES = ['Incapacidade de manter prancha', 'Dor lombar', 'Rotação pélvica excessiva', 'Fraqueza abdominal'];
 
 interface OrthopedicAssessmentProps {
   athleteId: string;
@@ -93,7 +94,9 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
     jump: 10,
     jumpIssues: [] as string[],
     balance: 10,
-    balanceIssues: [] as string[]
+    balanceIssues: [] as string[],
+    core: 10,
+    coreIssues: [] as string[]
   });
   const [clinicalPatterns, setClinicalPatterns] = useState<string[]>([]);
   const [pgals, setPgals] = useState({
@@ -110,7 +113,14 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
   const [hasMaturationError, setHasMaturationError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<'screening' | 'symptoms' | 'functional'>('screening');
+  const [activeTab, setActiveTab] = useState<'history' | 'screening' | 'symptoms' | 'functional'>('history');
+  const [history, setHistory] = useState({
+    previousInjuries: false,
+    injuryDetails: '',
+    timeAwayFromSport: '',
+    hypermobility: false,
+    beightonScore: 0
+  });
 
   useEffect(() => {
     async function fetchMaturation() {
@@ -343,7 +353,15 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-slate-400 text-xxs sm:text-sm font-bold uppercase tracking-wider hidden xs:inline truncate">Avaliação Ortopédica</span>
+          <TestInfoModal
+            title="Avaliação Ortopédica"
+            indication="Rastreamento de dores, histórico de lesões e testes de restrição de mobilidade/força para prevenção secundária."
+            application="Oleta relata histórico de lesões e dores atuais via mapa. Testes clínicos básicos (adm, dor palpação) podem ser integrados."
+            referenceValues={["Score > 80: Sem restrições", "Score 60-79: Limitações leves", "Score < 60: Atenção clínica necessária"]}
+            deficitGrades={["Leve (apenas sintomas durante o esporte)", "Moderado (sintomas limitam o esporte)", "Severo (dor em repouso / atv diárias)"]}
+          >
+            <span className="text-slate-400 text-xxs sm:text-sm font-bold uppercase tracking-wider hidden xs:inline hover:text-cyan-400 transition-colors">Avaliação Ortopédica</span>
+          </TestInfoModal>
             <ChevronRight size={14} className="text-slate-600 hidden xs:inline shrink-0" />
             <span className="text-xs sm:text-sm font-black text-white uppercase tracking-widest text-cyan-400 truncate">
               {athleteName || 'Atleta'}
@@ -352,123 +370,51 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex flex-col items-end mr-4">
-            <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Score Ortopédico</span>
-            <span className={`text-2xl font-black ${assessmentResults.color}`}>
-              {assessmentResults.score}/100
-            </span>
-          </div>
-          <button 
-            onClick={handleSave}
-            disabled={isSaving || showSuccess}
-            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-xxs sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
-              showSuccess 
-                ? "bg-emerald-500 text-[#050B14]" 
-                : "bg-cyan-500 hover:bg-cyan-400 text-[#050B14] shadow-cyan-500/20"
-            } disabled:opacity-50`}
-          >
-            {isSaving ? (
-              <div className="w-4 h-4 border-2 border-[#050B14]/30 border-t-[#050B14] rounded-full animate-spin"></div>
-            ) : showSuccess ? (
-              <CheckCircle2 className="w-4 h-4" />
-            ) : (
-              <Save className="w-4 h-4" />
+          <AnimatePresence>
+            {activeTab === 'functional' && (
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+                className="flex items-center gap-4"
+              >
+                <div className="hidden md:flex flex-col items-end mr-4">
+                  <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Score Ortopédico</span>
+                  <span className={`text-2xl font-black ${assessmentResults.color}`}>
+                    {assessmentResults.score}/100
+                  </span>
+                </div>
+                <button 
+                  onClick={handleSave}
+                  disabled={isSaving || showSuccess}
+                  className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black uppercase tracking-widest text-xxs sm:text-sm transition-all shadow-lg flex items-center gap-2 ${
+                    showSuccess 
+                      ? "bg-emerald-500 text-[#050B14]" 
+                      : "bg-cyan-500 hover:bg-cyan-400 text-[#050B14] shadow-cyan-500/20"
+                  } disabled:opacity-50`}
+                >
+                  {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-[#050B14]/30 border-t-[#050B14] rounded-full animate-spin"></div>
+                  ) : showSuccess ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  <span>{showSuccess ? 'Salvo!' : 'Finalizar'}</span>
+                </button>
+              </motion.div>
             )}
-            <span>{showSuccess ? 'Salvo!' : 'Finalizar'}</span>
-          </button>
+          </AnimatePresence>
         </div>
       </header>
 
       <div className="flex-1 p-4 sm:p-8">
         <div className="max-w-5xl mx-auto space-y-8 pb-20">
           
-          {/* Score Summary Card */}
-          <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl overflow-hidden relative">
-            <div className={`absolute top-0 right-0 px-6 py-2 rounded-bl-2xl font-black uppercase tracking-widest text-xs ${assessmentResults.bgColor} ${assessmentResults.color}`}>
-              {assessmentResults.classification}
-            </div>
-
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800/50 flex flex-col gap-1">
-                <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Maturação Biológica</span>
-                {maturationStatus ? (
-                  <span className="text-sm font-black text-cyan-400">{maturationStatus}</span>
-                ) : (
-                  <span className="text-sm font-bold text-rose-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    Avaliação não encontrada ou desatualizada (&gt;90 dias)
-                  </span>
-                )}
-              </div>
-              <div className={`p-4 rounded-xl border flex flex-col gap-1 ${assessmentResults.bgColor} border-current/20`}>
-                <span className="text-xxs font-bold uppercase tracking-widest opacity-70" style={{ color: "inherit" }}>Status Funcional</span>
-                <span className={`text-sm font-black ${assessmentResults.color}`}>{assessmentResults.classification}</span>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="flex flex-col items-center justify-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800/50">
-                <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Ortho Score</span>
-                <div className="relative">
-                  <svg className="w-32 h-32 transform -rotate-90">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="58"
-                      stroke="currentColor"
-                      strokeWidth="8"
-                      fill="transparent"
-                      className="text-slate-800"
-                    />
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="58"
-                      stroke="currentColor"
-                      strokeWidth="8"
-                      fill="transparent"
-                      strokeDasharray={364.4}
-                      strokeDashoffset={364.4 - (364.4 * (assessmentResults.score || 0)) / 100}
-                      className={`${assessmentResults.color} transition-all duration-1000`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className={`text-3xl font-black ${assessmentResults.color}`}>{assessmentResults.score}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="md:col-span-2 space-y-6">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <Info size={16} className="text-cyan-500" />
-                    Interpretação Clínica
-                  </h3>
-                  <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">
-                    {assessmentResults.interpretation}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-slate-800/50">
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <Activity size={16} className="text-cyan-500" />
-                    Ações Recomendadas
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {assessmentResults.action.split(',').map((act, i) => (
-                      <span key={i} className="px-3 py-1 bg-slate-800 rounded-full text-xxs font-bold text-slate-300 uppercase tracking-wider">
-                        {act.trim()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
+          {/* Score Summary Card moved to the bottom of the assessment */}
 
           {/* Navigation Tabs (Progress Steps Style) */}
           <div className="flex items-center justify-start md:justify-between gap-4 md:gap-0 overflow-x-auto no-scrollbar px-4 mb-4 py-4 w-full max-w-4xl mx-auto">
             {[
+              { id: 'history', label: 'Histórico', icon: History },
               { id: 'screening', label: 'Triagem (pGALS)', icon: Activity },
               { id: 'symptoms', label: 'Quadro de Dor', icon: Target },
               { id: 'functional', label: 'Função', icon: Stethoscope },
@@ -495,6 +441,57 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
           </div>
 
           <div className="space-y-8">
+            {activeTab === 'history' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <section className="space-y-4">
+                  <h2 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
+                    <div className="w-2 h-6 bg-cyan-500 rounded-full"></div>
+                    1. Histórico de Lesões
+                  </h2>
+                  <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl space-y-6">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-bold text-white uppercase tracking-widest block mb-1">Lesão Prévia?</label>
+                          <span className="text-xs text-slate-400">Lesões anteriores são o maior fator de risco para recidivas.</span>
+                        </div>
+                        <button
+                          onClick={() => setHistory(prev => ({ ...prev, previousInjuries: !prev.previousInjuries }))}
+                          className={`w-14 h-8 rounded-full transition-colors flex items-center px-1 ${history.previousInjuries ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                        >
+                          <div className={`w-6 h-6 rounded-full bg-white transition-transform ${history.previousInjuries ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
+
+                      {history.previousInjuries && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 pt-4 border-t border-slate-800/50">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Detalhes da lesão prévia (Local, tipo)</label>
+                            <textarea
+                              value={history.injuryDetails}
+                              onChange={e => setHistory(prev => ({ ...prev, injuryDetails: e.target.value }))}
+                              placeholder="Ex: Entorse de tornozelo direito grau 2..."
+                              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 min-h-[80px]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Tempo de afastamento estimado no passado</label>
+                            <input
+                              type="text"
+                              value={history.timeAwayFromSport}
+                              onChange={e => setHistory(prev => ({ ...prev, timeAwayFromSport: e.target.value }))}
+                              placeholder="Ex: 4 semanas"
+                              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500"
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </Card>
+                </section>
+              </div>
+            )}
+
             {activeTab === 'screening' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {/* 0. Screening Musculoesquelético Pediátrico (pGALS) */}
@@ -557,6 +554,52 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
                 </motion.div>
               )}
             </AnimatePresence>
+            
+            <section className="space-y-4">
+              <h2 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
+                <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
+                2. Hipermobilidade (Score de Beighton)
+              </h2>
+              <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl space-y-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-bold text-white uppercase tracking-widest block mb-1">Apresenta Hipermobilidade Articular?</label>
+                      <span className="text-xs text-slate-400">Avaliação baseada no Escore de Beighton (0-9).</span>
+                    </div>
+                    <button
+                      onClick={() => setHistory(prev => ({ ...prev, hypermobility: !prev.hypermobility }))}
+                      className={`w-14 h-8 rounded-full transition-colors flex items-center px-1 ${history.hypermobility ? 'bg-purple-500' : 'bg-slate-700'}`}
+                    >
+                      <div className={`w-6 h-6 rounded-full bg-white transition-transform ${history.hypermobility ? 'translate-x-6' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+
+                  {history.hypermobility && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 pt-4 border-t border-slate-800/50">
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Escore de Beighton</label>
+                          <span className="text-sm font-black text-purple-400">{history.beightonScore}/9</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="9"
+                          step="1"
+                          value={history.beightonScore}
+                          onChange={e => setHistory(prev => ({ ...prev, beightonScore: parseInt(e.target.value) }))}
+                          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                        />
+                        <p className="text-xxs text-slate-500 uppercase mt-2 hidden sm:block">
+                          Polegares(2) | Dedos Mínimos(2) | Cotovelos(2) | Joelhos(2) | Tronco(1)
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </Card>
+            </section>
           </section>
           </div>
           )}
@@ -923,7 +966,7 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
               3. Testes Funcionais (Screening)
             </h2>
             <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div className="space-y-4 border border-slate-800 p-4 rounded-2xl bg-slate-900/30">
                   <div className="space-y-2">
                     <div className="flex justify-between mb-2">
@@ -1037,6 +1080,44 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-4 border border-slate-800 p-4 rounded-2xl bg-slate-900/30">
+                  <div className="space-y-2">
+                    <div className="flex justify-between mb-2">
+                      <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Controle de Core</label>
+                      <span className="text-sm font-black text-emerald-400">{functionalTests.core}</span>
+                    </div>
+                    <input 
+                      type="range" min="0" max="10" step="1"
+                      value={functionalTests.core}
+                      onChange={(e) => setFunctionalTests(prev => ({ ...prev, core: parseInt(e.target.value) }))}
+                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                    />
+                    <p className="text-xxs text-slate-500 uppercase font-bold text-center">Força e estabilidade central</p>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t border-slate-800/50">
+                    <span className="text-xxs font-bold text-slate-400 uppercase tracking-widest px-1">Padrões Identificados:</span>
+                    <div className="flex flex-col gap-2">
+                      {CORE_ISSUES.map(issue => (
+                        <label key={issue} className="flex items-center gap-2 cursor-pointer group">
+                          <input 
+                            type="checkbox" 
+                            checked={functionalTests.coreIssues.includes(issue)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setFunctionalTests(prev => ({
+                                ...prev,
+                                coreIssues: checked ? [...prev.coreIssues, issue] : prev.coreIssues.filter(i => i !== issue)
+                              }));
+                            }}
+                            className="w-4 h-4 rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 bg-slate-800"
+                          />
+                          <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors uppercase font-bold tracking-wider">{issue}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
           </section>
@@ -1066,6 +1147,96 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
                     {pattern}
                   </button>
                 ))}
+              </div>
+            </Card>
+          </section>
+
+          {/* Score Summary Card */}
+          <section className="space-y-4 pt-4">
+            <h2 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
+              <div className="w-2 h-6 bg-cyan-500 rounded-full"></div>
+              Resultado da Avaliação
+            </h2>
+            <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl overflow-hidden relative">
+              <div className={`absolute top-0 right-0 px-6 py-2 rounded-bl-2xl font-black uppercase tracking-widest text-xs ${assessmentResults.bgColor} ${assessmentResults.color}`}>
+                {assessmentResults.classification}
+              </div>
+
+              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800/50 flex flex-col gap-1">
+                  <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest">Maturação Biológica</span>
+                  {maturationStatus ? (
+                    <span className="text-sm font-black text-cyan-400">{maturationStatus}</span>
+                  ) : (
+                    <span className="text-sm font-bold text-rose-400 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      Avaliação não encontrada ou desatualizada (&gt;90 dias)
+                    </span>
+                  )}
+                </div>
+                <div className={`p-4 rounded-xl border flex flex-col gap-1 ${assessmentResults.bgColor} border-current/20`}>
+                  <span className="text-xxs font-bold uppercase tracking-widest opacity-70" style={{ color: "inherit" }}>Status Funcional</span>
+                  <span className={`text-sm font-black ${assessmentResults.color}`}>{assessmentResults.classification}</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="flex flex-col items-center justify-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800/50">
+                  <span className="text-xxs font-bold text-slate-500 uppercase tracking-widest mb-2">Ortho Score</span>
+                  <div className="relative">
+                    <svg className="w-32 h-32 transform -rotate-90">
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="58"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="transparent"
+                        className="text-slate-800"
+                      />
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="58"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeDasharray={364.4}
+                        strokeDashoffset={364.4 - (364.4 * (assessmentResults.score || 0)) / 100}
+                        className={`${assessmentResults.color} transition-all duration-1000`}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className={`text-3xl font-black ${assessmentResults.color}`}>{assessmentResults.score}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 space-y-6">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <Info size={16} className="text-cyan-500" />
+                      Interpretação Clínica
+                    </h3>
+                    <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">
+                      {assessmentResults.interpretation}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-800/50">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <Activity size={16} className="text-cyan-500" />
+                      Ações Recomendadas
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {assessmentResults.action.split(',').map((act, i) => (
+                        <span key={i} className="px-3 py-1 bg-slate-800 rounded-full text-xxs font-bold text-slate-300 uppercase tracking-wider">
+                          {act.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
           </section>

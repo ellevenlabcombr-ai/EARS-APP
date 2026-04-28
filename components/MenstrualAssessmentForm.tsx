@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Droplets, AlertTriangle, Save, Activity, CalendarHeart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface MenstrualAssessmentProps {
   athleteId: string;
@@ -184,10 +185,18 @@ export function MenstrualAssessmentForm({ athleteId, onCancel, onSave }: Menstru
           <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
             <Droplets className="w-6 h-6 text-pink-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Menstrual</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Saúde Hormonal do Atleta</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação Menstrual"
+            indication="Monitoramento do ciclo para prevenir deficiência de energia e adequar carga de treino/recuperação às fases."
+            application="Preenchimento de formulário sobre regularidade de ciclo, dor (dismenorreia) e fluxo."
+            referenceValues={["Score > 80: Ciclo regular e saudável", "Score 60-79: Alteraçãos leves ou dor ocasional", "Score < 60: Irregularidade ou bloqueio (risco RED-S)"]}
+            deficitGrades={["Leve (Tensão pré-menstrual reportada)", "Moderado (Dismenorreia ou Oligomenorreia)", "Severo (Amenorreia secundária > 3 meses)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação Menstrual</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Saúde Hormonal da Atleta</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

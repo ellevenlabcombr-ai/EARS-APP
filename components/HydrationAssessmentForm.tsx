@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Droplet, AlertTriangle, Save, Activity, Thermometer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface HydrationAssessmentProps {
   athleteId: string;
@@ -184,10 +185,18 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
           <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
             <Droplet className="w-6 h-6 text-blue-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Hidratação</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Status de Hidratação e Impacto</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação da Hidratação"
+            indication="Monitoramento do estado de hidratação para evitar perda de performance e risco de distúrbio eletrolítico."
+            application="Oleta informa perda de peso após o treino, cor da urina e nível de sede (escala USG). Pode envolver medição com refratômetro."
+            referenceValues={["Score > 80: Euidratado", "Score 60-79: Desidratação Leve", "Score < 60: Desidratação Severa (>2% peso corporal)"]}
+            deficitGrades={["Leve (Apenas alteração na cor da urina)", "Moderado (Queda de performance térmica)", "Severo (Tontura, fadiga extrema e alto risco clínico)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação Hidratação</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Status de Hidratação e Impacto</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

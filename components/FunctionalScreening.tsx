@@ -348,10 +348,18 @@ export default function FunctionalScreening({ athleteId, onCancel, onSave }: Fun
           <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
             <Accessibility className="w-6 h-6 text-emerald-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Triagem Funcional</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Baseado no FMS</p>
-          </div>
+          <TestInfoModal
+            title="Triagem Funcional (FMS)"
+            indication="Avaliação qualitativa do movimento para identificar déficits de mobilidade, estabilidade e assimetrias que predispõem a lesões."
+            application="O atleta executa 7 movimentos fundamentais (Agachamento, Passo sobre barreira, Afundo, etc.). Cada um é pontuado de 0 a 3."
+            referenceValues={["Score > 14: Baixo Risco e Boa Qualidade de Movimento", "Score <= 14: Risco Aumentado de Lesão Compensatória"]}
+            deficitGrades={["Dor (Score 0) nos testes de compensação / Red Flag", "Nível 1 (Incapaz de completar)", "Nível 2 (Completa com compensação)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Triagem Funcional</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Baseado no FMS</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

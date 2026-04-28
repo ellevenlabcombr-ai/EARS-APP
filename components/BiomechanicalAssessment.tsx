@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Activity, AlertTriangle, CheckCircle, Info, ChevronRight, Save, X, Dumbbell, Target, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { TestInfoModal } from '@/components/TestInfoModal';
 
 interface BiomechanicalAssessmentProps {
   athleteId?: string;
@@ -184,10 +185,18 @@ export default function BiomechanicalAssessment({
           <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
             <Activity className="w-6 h-6 text-cyan-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">{l.title}</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">{l.subtitle}</p>
-          </div>
+          <TestInfoModal
+            title={l.title}
+            indication="Indicado para identificar alterações no padrão de movimento e fatores predisponentes a lesões (ex: valgo dinâmico)."
+            application="O atleta realiza movimentos base (agachamento, salto, equilíbrio unipodal) sob observação frontal e lateral. Pode envolver análise de vídeo."
+            referenceValues={["Score > 80: Baixo Risco", "Score 60-79: Risco Moderado", "Score < 60: Alto Risco"]}
+            deficitGrades={["Leve (pequenas compensações)", "Moderado (desvios claros, mas com controle)", "Severo (colapso mecânico, ex: valgo acentuado)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">{l.title}</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">{l.subtitle}</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

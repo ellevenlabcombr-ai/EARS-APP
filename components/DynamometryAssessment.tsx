@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { TestInfoModal } from '@/components/TestInfoModal';
 
 interface DynamometryAssessmentProps {
   athleteId: string;
@@ -99,10 +100,18 @@ export default function DynamometryAssessment({ athleteId, onCancel, onSave }: D
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
             <Zap className="w-6 h-6 text-amber-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Dinamometria (K-Force)</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Avaliação de Força Isométrica e Simetria</p>
-          </div>
+          <TestInfoModal
+            title="Dinamometria (K-Force)"
+            indication="Medir força máxima isométrica e detectar assimetrias musculares (diferenças entre direita/esquerda)."
+            application="Uso de dinamômetro portátil (Push/Pull). Realiza-se o teste bilateralmente com 1 repetição de familiarização e 2-3 de esforço máximo (3-5s)."
+            referenceValues={["Diferença > 15%: Risco moderado/alto de lesão", "Diferença 10-15%: Zona de atenção", "Diferença < 10%: Aceitável (Simetria boa)"]}
+            deficitGrades={["Leve (< 10%)", "Moderado (10-15%)", "Severo (> 15% ou dor associada)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">Dinamometria (K-Force)</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Avaliação de Força Isométrica e Simetria</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

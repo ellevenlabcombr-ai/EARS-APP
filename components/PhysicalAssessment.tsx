@@ -23,6 +23,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { TestInfoModal } from '@/components/TestInfoModal';
 
 interface PhysicalAssessmentProps {
   athleteId: string;
@@ -105,10 +106,18 @@ export default function PhysicalAssessment({ athleteId, athleteAge = 25, athlete
           <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
             <Dumbbell className="w-6 h-6 text-indigo-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Física</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Capacidades Físicas & Coordenativas</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação Física"
+            indication="Avaliar a condição atlética geral, incluindo força, resistência, velocidade e agilidade."
+            application="O atleta é submetido a uma bateria de testes motores e fisiológicos padronizados, geralmente em campo ou pista, para aferir o condicionamento."
+            referenceValues={["Score > 80: Condicionamento Excelente", "Score 60-79: Bom / Na média", "Score < 60: Abaixo da média"]}
+            deficitGrades={["Leve (pequeno ajuste de treinamento)", "Moderado (foco primário necessário)", "Severo (impacto significativo na performance)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação Física</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Capacidades Físicas & Coordenativas</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Activity, TrendingDown, ShieldAlert, ActivitySquare, Utensils, AlertTriangle, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface RedSAssessmentProps {
   athleteId: string;
@@ -224,10 +225,18 @@ export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessme
           <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
             <ActivitySquare className="w-6 h-6 text-rose-400" />
           </div>
-          <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Avaliação RED-S</h2>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest">Deficiência Relativa de Energia</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação RED-S"
+            indication="Rastrear risco de RED-S (Deficiência Relativa de Energia no Esporte) e CAT (Tríade da Mulher Atleta)."
+            application="Oleta preenche questionário sobre disponibilidade energética, função menstrual (ou reprodutiva) e densidade óssea."
+            referenceValues={["Score > 80: Risco Baixo", "Score 60-79: Risco Moderado", "Score < 60: Alto Risco Clínico"]}
+            deficitGrades={["Leve (apenas déficit de hidratação/peso rápido)", "Moderado (amenorreia subclínica, microlesões frequentes)", "Severo (amenorreia > 3 meses, fratura por estresse)"]}
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors">Avaliação RED-S</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest text-left">Deficiência Relativa de Energia</p>
+            </div>
+          </TestInfoModal>
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
           <X className="w-5 h-5" />

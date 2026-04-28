@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Brain, AlertTriangle, Save, ArrowLeft, Activity, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestInfoModal } from "@/components/TestInfoModal";
 
 interface NeurologicalAssessmentProps {
   athleteId: string;
@@ -181,13 +182,23 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
           </Button>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-            <Brain className="w-6 h-6 text-cyan-500" />
-            Avaliação Neurológica
-          </h2>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-            Baseline e Rastreio de Concussão
-          </p>
+          <TestInfoModal
+            title="Avaliação Neurológica"
+            indication="Baseline e rastreio de sintomas sugestivos de concussão ou alterações cognitivas."
+            application="Oleta relata sintomas (cefaleia, sensibilidade à luz). Podem ser aplicados testes de memória e equilíbrio."
+            referenceValues={["Score > 80: Normal", "Score 60-79: Suspeita / Monitorar", "Score < 60: Alerta Neuromotor"]}
+            deficitGrades={["Leve (apenas sintomas referidos)", "Moderado (Sintomas + Alteração de equílibrio/memória)", "Severo (Alteração aguda)"]}
+          >
+            <div>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3 hover:text-cyan-400 transition-colors">
+                <Brain className="w-6 h-6 text-cyan-500" />
+                Avaliação Neurológica
+              </h2>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 text-left">
+                Baseline e Rastreio de Concussão
+              </p>
+            </div>
+          </TestInfoModal>
         </div>
 
         <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
