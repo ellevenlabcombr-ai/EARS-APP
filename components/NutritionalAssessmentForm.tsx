@@ -227,7 +227,7 @@ export function NutritionalAssessmentForm({ athleteId, onCancel, onSave }: Nutri
           <TestInfoModal
             title="Avaliação Nutricional (Smart)"
             indication="Triagem de qualidade da dieta, hidratação, suplementação e sinais de deficiência nutricional (RED-S)."
-            application="Oleta preenche um Recordatório Qualitativo. O algoritmo cruza dados de macronutrientes, hidratação e sinais físicos."
+            application="O atleta preenche um Recordatório Qualitativo. O algoritmo cruza dados de macronutrientes, hidratação e sinais físicos."
             referenceValues={["Score > 80: Status Nutricional Adequado", "Score 60-79: Necessita ajustes finos", "Score < 60: Risco Nutricional (Possível deficiência)"]}
             deficitGrades={["Leve (pequenos ajustes de timing e macro)", "Moderado (Sintomas leves, baixa recuperação)", "Severo (Sinais clínicos de deficiência / perda de peso não intencional)"]}
           >

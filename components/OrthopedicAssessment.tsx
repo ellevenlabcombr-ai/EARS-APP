@@ -356,7 +356,7 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
           <TestInfoModal
             title="Avaliação Ortopédica"
             indication="Rastreamento de dores, histórico de lesões e testes de restrição de mobilidade/força para prevenção secundária."
-            application="Oleta relata histórico de lesões e dores atuais via mapa. Testes clínicos básicos (adm, dor palpação) podem ser integrados."
+            application="O atleta relata histórico de lesões e dores atuais via mapa. Testes clínicos básicos (adm, dor palpação) podem ser integrados."
             referenceValues={["Score > 80: Sem restrições", "Score 60-79: Limitações leves", "Score < 60: Atenção clínica necessária"]}
             deficitGrades={["Leve (apenas sintomas durante o esporte)", "Moderado (sintomas limitam o esporte)", "Severo (dor em repouso / atv diárias)"]}
           >
@@ -502,7 +502,15 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
             >
               <h2 className="text-sm font-black text-slate-300 uppercase tracking-widest flex items-center gap-3">
                 <div className="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
-                Screening Musculoesquelético Pediátrico (pGALS)
+                <TestInfoModal
+                  title="Screening Musculoesquelético Pediátrico (pGALS)"
+                  indication="Triagem rápida de anormalidades musculoesqueléticas, neurológicas ou do desenvolvimento infantil."
+                  application="Avalia marcha, coluna, membros superiores e inferiores com movimentos simples (pedir à criança para caminhar, tocar os dedos dos pés, etc)."
+                  referenceValues={["Normal: Movimento livre e sem dor em todas as articulações"]}
+                  deficitGrades={["Alterado: Dor, restrição de amplitude ou assimetria detectada"]}
+                >
+                  <span className="hover:text-cyan-400 transition-colors cursor-pointer">Screening Musculoesquelético Pediátrico (pGALS)</span>
+                </TestInfoModal>
               </h2>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-950 px-3 py-1 rounded-full">
                 {showPgals ? "Ocultar" : "Opcional"}
@@ -558,7 +566,15 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
             <section className="space-y-4">
               <h2 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
                 <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
-                2. Hipermobilidade (Score de Beighton)
+                <TestInfoModal
+                  title="Score de Beighton"
+                  indication="Identificar hipermobilidade articular sistêmica, risco aumentado de luxações e lesões ligamentares."
+                  application="1 ponto para cada lado: dorsiflexão do 5º dedo > 90°, aposição do polegar ao antebraço, hiperextensão do cotovelo > 10°, hiperextensão do joelho > 10°. 1 ponto para flexão do tronco com palmas no chão."
+                  referenceValues={["Score < 4: Mobilidade Normal", "Score >= 4: Hipermobilidade Articular Positiva"]}
+                  deficitGrades={["Hipermóvel: Requer trabalho de força focado em estabilização, cuidado extra com alongamentos extremos."]}
+                >
+                  <span className="hover:text-cyan-400 transition-colors cursor-pointer">2. Hipermobilidade (Score de Beighton)</span>
+                </TestInfoModal>
               </h2>
               <Card className="bg-[#0A1120] border-slate-800 p-6 rounded-3xl space-y-6">
                 <div className="flex flex-col gap-4">
@@ -822,7 +838,17 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
 
                           {ORTHOPEDIC_TESTS[region] && ORTHOPEDIC_TESTS[region].length > 0 && (
                             <div>
-                              <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2">Testes Ortopédicos Especiais</label>
+                              <TestInfoModal
+                                title={`Testes Especiais: ${region}`}
+                                indication="Verificar integridade de ligamentos, meniscos e tendões específicos da articulação."
+                                application={`Realizar os testes provocativos clínicos listados para ${region}.`}
+                                referenceValues={["Negativo: Estrutura aparenta integridade"]}
+                                deficitGrades={["Positivo: Sinal mecânico conclusivo / falseio", "Dor: Sintoma sem restrição mecânica evidente"]}
+                              >
+                                <label className="text-xxs font-bold text-slate-500 uppercase tracking-widest block mb-2 hover:text-cyan-400 transition-colors cursor-pointer inline-flex items-center gap-1">
+                                  Testes Ortopédicos Especiais <Info className="w-3 h-3" />
+                                </label>
+                              </TestInfoModal>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {ORTHOPEDIC_TESTS[region].map(test => {
                                   // @ts-ignore Let's type-cast specialTests to Record<string,string>

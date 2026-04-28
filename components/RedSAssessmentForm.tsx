@@ -228,7 +228,7 @@ export function RedSAssessmentForm({ athleteId, onCancel, onSave }: RedSAssessme
           <TestInfoModal
             title="Avaliação RED-S"
             indication="Rastrear risco de RED-S (Deficiência Relativa de Energia no Esporte) e CAT (Tríade da Mulher Atleta)."
-            application="Oleta preenche questionário sobre disponibilidade energética, função menstrual (ou reprodutiva) e densidade óssea."
+            application="O atleta preenche questionário sobre disponibilidade energética, função menstrual (ou reprodutiva) e densidade óssea."
             referenceValues={["Score > 80: Risco Baixo", "Score 60-79: Risco Moderado", "Score < 60: Alto Risco Clínico"]}
             deficitGrades={["Leve (apenas déficit de hidratação/peso rápido)", "Moderado (amenorreia subclínica, microlesões frequentes)", "Severo (amenorreia > 3 meses, fratura por estresse)"]}
           >

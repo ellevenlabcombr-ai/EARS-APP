@@ -188,7 +188,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
           <TestInfoModal
             title="Avaliação da Hidratação"
             indication="Monitoramento do estado de hidratação para evitar perda de performance e risco de distúrbio eletrolítico."
-            application="Oleta informa perda de peso após o treino, cor da urina e nível de sede (escala USG). Pode envolver medição com refratômetro."
+            application="O atleta informa perda de peso após o treino, cor da urina e nível de sede (escala USG). Pode envolver medição com refratômetro."
             referenceValues={["Score > 80: Euidratado", "Score 60-79: Desidratação Leve", "Score < 60: Desidratação Severa (>2% peso corporal)"]}
             deficitGrades={["Leve (Apenas alteração na cor da urina)", "Moderado (Queda de performance térmica)", "Severo (Tontura, fadiga extrema e alto risco clínico)"]}
           >

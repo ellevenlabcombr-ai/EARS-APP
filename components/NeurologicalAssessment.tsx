@@ -185,7 +185,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           <TestInfoModal
             title="Avaliação Neurológica"
             indication="Baseline e rastreio de sintomas sugestivos de concussão ou alterações cognitivas."
-            application="Oleta relata sintomas (cefaleia, sensibilidade à luz). Podem ser aplicados testes de memória e equilíbrio."
+            application="O atleta relata sintomas (cefaleia, sensibilidade à luz). Podem ser aplicados testes de memória e equilíbrio."
             referenceValues={["Score > 80: Normal", "Score 60-79: Suspeita / Monitorar", "Score < 60: Alerta Neuromotor"]}
             deficitGrades={["Leve (apenas sintomas referidos)", "Moderado (Sintomas + Alteração de equílibrio/memória)", "Severo (Alteração aguda)"]}
           >
