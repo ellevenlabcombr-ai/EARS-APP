@@ -89,14 +89,14 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
                 </div>
               </div>
 
-              <div className="px-6 pb-6 space-y-4">
+              <div className="px-6 pb-6 space-y-5">
                 <div className="flex gap-4">
-                  <div className={`w-4 h-4 mt-1.5 rounded-sm shrink-0 ${colorClass.split(' ')[0]}`} />
+                  <div className={`w-4 h-4 mt-1.5 rounded-sm shrink-0 shadow-sm ${colorClass.split(' ')[0]}`} />
                   <div className="space-y-1">
-                    <h2 className="text-xl font-normal text-gray-900 leading-tight">
+                    <h2 className="text-xl font-black text-gray-900 leading-tight tracking-tight">
                       {event.title}
                     </h2>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-700 font-medium">
                       {isMultiDay && !event.is_all_day ? (
                         `${format(startTime, "EEEE, d 'de' MMMM", { locale: ptBR })} • ${format(startTime, "HH:mm")} – ${format(endTime, "EEEE, d 'de' MMMM", { locale: ptBR })} • ${format(endTime, "HH:mm")}`
                       ) : event.is_all_day ? (
@@ -110,11 +110,11 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
 
                 {event.location && (
                   <div className="flex gap-4">
-                    <MapPin className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
+                    <MapPin className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
                     <div className="space-y-0.5">
-                      <p className="text-sm text-gray-600 font-medium">{event.location}</p>
+                      <p className="text-sm text-gray-900 font-bold">{event.location}</p>
                       {event.address && (
-                        <p className="text-xs text-gray-400">{event.address}</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">{event.address}</p>
                       )}
                     </div>
                   </div>
@@ -122,27 +122,27 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
 
                 {event.athlete_id && (
                   <div className="flex gap-4">
-                    <User className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
+                    <User className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-cyan-100 flex items-center justify-center text-[10px] text-cyan-700 font-bold uppercase">
+                      <div className="w-6 h-6 rounded-full bg-cyan-600 flex items-center justify-center text-[10px] text-white font-black uppercase">
                         {(athleteName || 'A').charAt(0)}
                       </div>
-                      <span className="text-sm text-gray-600 font-medium">{athleteName || 'Atleta Associado'}</span>
+                      <span className="text-sm text-gray-800 font-bold">{athleteName || 'Atleta Associado'}</span>
                     </div>
                   </div>
                 )}
 
                 {event.description && (
                   <div className="flex gap-4">
-                    <Tag className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
-                    <p className="text-sm text-gray-600 leading-relaxed italic">{event.description}</p>
+                    <Tag className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium bg-gray-50 p-2 rounded-lg border border-gray-100">{event.description}</p>
                   </div>
                 )}
 
                 <div className="flex gap-4">
-                  <Clock className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
+                  <Clock className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
                   <div className="flex flex-wrap gap-2">
-                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
+                    <span className={`px-2.5 py-1 rounded shadow-sm text-[10px] font-black uppercase tracking-widest ${colorClass}`}>
                       {event.category === 'arbitration' ? 'Arbitragem' : 
                        event.category === 'clinical' ? 'Clínico' : 
                        event.category === 'competition' ? 'Competição' : 
@@ -150,7 +150,7 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
                        event.category === 'travel' ? 'Viagem' : 'Pessoal'}
                     </span>
                     {event.subcategory && (
-                      <span className="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <span className="px-2.5 py-1 bg-gray-200 rounded text-[10px] font-black text-gray-700 border border-gray-300 uppercase tracking-widest">
                         {event.subcategory}
                       </span>
                     )}

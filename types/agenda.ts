@@ -42,24 +42,24 @@ export const calculatePriority = (event: Partial<AgendaEvent>): number => {
 export const getCategoryColor = (event: AgendaEvent): string => {
   if (event.category === 'clinical') {
     const risk = event.risk_score || 0;
-    if (risk < 4) return 'bg-emerald-500/30 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/10';
-    if (risk < 7) return 'bg-amber-500/30 text-amber-300 border-amber-500/50 shadow-sm shadow-amber-500/10';
-    return 'bg-rose-500/30 text-rose-300 border-rose-500/50 shadow-sm shadow-rose-500/10';
+    if (risk < 4) return 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-500/20';
+    if (risk < 7) return 'bg-amber-500 text-white border-amber-400 shadow-md shadow-amber-400/20';
+    return 'bg-rose-600 text-white border-rose-500 shadow-md shadow-rose-500/20';
   }
   if (event.category === 'competition') {
-    return 'bg-amber-400/40 text-amber-100 border-amber-400/60 shadow-md shadow-amber-400/20';
+    return 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/20';
   }
   if (event.category === 'arbitration') {
-    return 'bg-fuchsia-500/40 text-fuchsia-100 border-fuchsia-500/60 shadow-md shadow-fuchsia-500/20';
+    return 'bg-fuchsia-600 text-white border-fuchsia-500 shadow-lg shadow-fuchsia-500/20';
   }
   if (event.category === 'travel') {
-    return 'bg-violet-500/40 text-violet-100 border-violet-500/60 shadow-md shadow-violet-500/20';
+    return 'bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20';
   }
   if (event.category === 'professional') {
-    return 'bg-cyan-500/40 text-cyan-100 border-cyan-500/60 shadow-md shadow-cyan-500/20';
+    return 'bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20';
   }
   if (event.category === 'personal') {
-    return 'bg-emerald-400/40 text-emerald-100 border-emerald-400/60 shadow-md shadow-emerald-400/20';
+    return 'bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-500/20';
   }
-  return 'bg-slate-700/60 text-white border-slate-600';
+  return 'bg-slate-700 text-white border-slate-600';
 };

@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { EventModal } from "@/components/EventModal";
 import { CreateEventModal } from "@/components/CreateEventModal";
 
+import { AgendaEvent, getCategoryColor, calculatePriority } from "@/types/agenda";
 import { getLocalDateString } from "@/lib/utils";
 
 interface DailyOperationsProps {
@@ -464,9 +465,14 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                               <Users size={10} /> {appt.athletes.name}
                             </span>
                           )}
-                          <span className="text-[9px] sm:text-xxs font-black uppercase px-2 py-0.5 rounded bg-slate-800/50 text-slate-500 border border-slate-800/50 capitalize">
+                          <span className={`text-[9px] sm:text-xxs font-black uppercase px-2 py-0.5 rounded border capitalize ${getCategoryColor(appt as AgendaEvent)}`}>
                             {appt.type}
                           </span>
+                          {appt.subcategory && (
+                            <span className="text-[9px] sm:text-xxs font-black uppercase px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700 capitalize">
+                              {appt.subcategory}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
