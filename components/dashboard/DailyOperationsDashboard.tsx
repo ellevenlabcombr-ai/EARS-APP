@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { 
-  Calendar, Clock, Users, Activity, AlertTriangle, 
+  Calendar, Clock, Users, Activity, AlertTriangle,
   CheckCircle2, ChevronRight, Loader2, RefreshCcw,
   Trophy, AlertCircle, Plus, Stethoscope, ArrowRight,
   ClipboardList, ChevronDown, ChevronUp, BookOpen, User as UserIcon,
@@ -15,6 +15,8 @@ import {
   CalendarDays
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { EventModal } from "@/components/EventModal";
+import { CreateEventModal } from "@/components/CreateEventModal";
 
 import { getLocalDateString } from "@/lib/utils";
 
@@ -26,6 +28,7 @@ interface DailyOperationsProps {
 interface ClinicalSettings {
   critical_readiness_threshold: number;
   critical_pain_threshold: number;
+  attention_readiness_min: number;
   attention_readiness_min: number;
   attention_readiness_max: number;
   attention_pain_min: number;
@@ -57,6 +60,12 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
   const [fullAgenda, setFullAgenda] = useState<any[]>([]);
   const [nextAppointment, setNextAppointment] = useState<any>(null);
 
+  // Event Details/Edit State
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState<any | null>(null);
+
 
 
   const updateAppointmentStatus = async (id: string, status: string, source: string = 'appointment') => {
@@ -71,6 +80,37 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
       fetchData(); // Refresh data
     } catch (error) {
       console.error(`Error updating ${source}:`, error);
+    }
+  };
+
+  const deleteEvent = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este evento?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('agenda_events')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setIsEventModalOpen(false);
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting event:", err);
+    }
+  };
+
+  const handleEditEvent = (event: any) => {
+    setEventToEdit(event);
+    setIsEditModalOpen(true);
+  };
+
+  const handleRowClick = (appt: any) => {
+    if (appt.source === 'smart_agenda') {
+      setSelectedEvent(appt);
+      setIsEventModalOpen(true);
+    } else if (appt.athlete_id) {
+      onViewAthlete(appt.athlete_id);
     }
   };
 
@@ -393,10 +433,8 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                 fullAgenda.map((appt) => (
                   <div 
                     key={appt.id} 
-                    className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all group border-l-4 border-transparent gap-4 ${
-                      appt.athlete_id ? 'cursor-pointer hover:bg-slate-800/30 hover:border-cyan-500/50' : 'hover:bg-slate-800/10'
-                    } ${appt.status === 'completed' ? 'opacity-50 grayscale hover:grayscale-0' : ''}`}
-                    onClick={() => appt.athlete_id && onViewAthlete(appt.athlete_id)}
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all group border-l-4 border-transparent gap-4 cursor-pointer hover:bg-slate-800/30 hover:border-cyan-500/50 ${appt.status === 'completed' ? 'opacity-50 grayscale hover:grayscale-0' : ''}`}
+                    onClick={() => handleRowClick(appt)}
                   >
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6">
                       <div className="text-center w-12 sm:w-16 shrink-0 pt-1 sm:pt-0">
@@ -467,6 +505,22 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
           </CardContent>
         </Card>
       </section>
+      {/* Event Details Modal */}
+      <EventModal 
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+        event={selectedEvent}
+        onEdit={handleEditEvent}
+        onDelete={deleteEvent}
+      />
+
+      {/* Edit Event Modal */}
+      <CreateEventModal 
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onEventCreated={fetchData}
+        initialEvent={eventToEdit}
+      />
     </div>
   );
 }

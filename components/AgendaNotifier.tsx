@@ -68,6 +68,27 @@ export function AgendaNotifier() {
               const reminderText = reminderMinutes === 0 ? 'Agora' : (reminderMinutes < 60 ? `${reminderMinutes} minutos` : (reminderMinutes === 60 ? '1 hora' : '1 dia'));
               const message = `Lembrete: ${event.title} (${reminderText})`;
 
+              // Play audio alert
+              try {
+                const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.5);
+              } catch (audioErr) {
+                console.warn("Could not play audio alert:", audioErr);
+              }
+
               // Show native notification if allowed
               if (hasPermission === 'granted' && 'Notification' in window) {
                 new Notification('Lembrete ELLEVEN', {
