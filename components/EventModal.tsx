@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Clock, Tag, User, AlertTriangle, Trash2, MapPin } from "lucide-react";
+import { X, Clock, Tag, User, AlertTriangle, Trash2, MapPin, Bell } from "lucide-react";
 import { AgendaEvent, getCategoryColor } from "@/types/agenda";
 import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -152,6 +152,12 @@ export function EventModal({ event, isOpen, onClose, onDelete, onEdit }: EventMo
                     {event.subcategory && (
                       <span className="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                         {event.subcategory}
+                      </span>
+                    )}
+                    {event.reminder_minutes !== null && event.reminder_minutes !== undefined && (
+                      <span className="px-2 py-1 bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <Bell className="w-3 h-3" />
+                        Lembrete {event.reminder_minutes === 0 ? 'no horário' : `${event.reminder_minutes} min antes`}
                       </span>
                     )}
                   </div>

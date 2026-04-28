@@ -102,7 +102,7 @@ export function CalendarGrid({ events, onEventClick, currentDate }: CalendarGrid
                   const hourHeight = 640 / 14; // 40rem = 640px
                   
                   let top = (startHour - 7) * hourHeight + (startMin / 60) * hourHeight;
-                  let height = (durationMin / 60) * hourHeight;
+                  let height = 32; // Fixed compact height for all events
 
                   if (event.is_all_day) {
                     top = 0;

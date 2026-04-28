@@ -11,7 +11,8 @@ import {
   CheckCircle2, ChevronRight, Loader2, RefreshCcw,
   Trophy, AlertCircle, Plus, Stethoscope, ArrowRight,
   ClipboardList, ChevronDown, ChevronUp, BookOpen, User as UserIcon,
-  Check, X, Play, StickyNote, Trash2, ListTodo
+  Check, X, Play, StickyNote, Trash2, ListTodo, Bell,
+  CalendarDays
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -47,6 +48,7 @@ const defaultSettings: ClinicalSettings = {
 export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOperationsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [viewDate, setViewDate] = useState<Date>(new Date());
   const [appointments, setAppointments] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [riskAlerts, setRiskAlerts] = useState<any[]>([]);
@@ -77,11 +79,11 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
       setIsLoading(true);
       if (!supabase) return;
 
-      const today = getLocalDateString();
-      const startOfToday = new Date();
-      startOfToday.setHours(0, 0, 0, 0);
-      const endOfToday = new Date();
-      endOfToday.setHours(23, 59, 59, 999);
+      const dateStr = getLocalDateString(viewDate);
+      const startOfView = new Date(viewDate);
+      startOfView.setHours(0, 0, 0, 0);
+      const endOfView = new Date(viewDate);
+      endOfView.setHours(23, 59, 59, 999);
 
       // Fetch all data in parallel
       const [
@@ -93,10 +95,10 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
         settingsRes
       ] = await Promise.all([
         supabase.from('athletes').select('id, name, status').limit(200),
-        supabase.from('appointments').select('id, athlete_id, date, start_time, end_time, status, type, title, athletes (id, name)').eq('date', today).order('start_time', { ascending: true }).limit(100),
-        supabase.from('agenda_events').select('*, athletes (id, name)').gte('start_time', startOfToday.toISOString()).lte('start_time', endOfToday.toISOString()).order('start_time', { ascending: true }).limit(100),
-        supabase.from('wellness_records').select('athlete_id, readiness_score').eq('record_date', today).limit(200),
-        supabase.from('pain_reports').select('athlete_id, pain_level').gte('created_at', today).limit(200),
+        supabase.from('appointments').select('id, athlete_id, date, start_time, end_time, status, type, title, athletes (id, name)').eq('date', dateStr).order('start_time', { ascending: true }).limit(100),
+        supabase.from('agenda_events').select('*, athletes (id, name)').gte('start_time', startOfView.toISOString()).lte('start_time', endOfView.toISOString()).order('start_time', { ascending: true }).limit(100),
+        supabase.from('wellness_records').select('athlete_id, readiness_score').eq('record_date', dateStr).limit(200),
+        supabase.from('pain_reports').select('athlete_id, pain_level').gte('created_at', dateStr).limit(200),
         supabase.from('clinical_settings').select('*').maybeSingle()
       ]);
 
@@ -118,7 +120,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('appointments')
           .select('id, athlete_id, appointment_date, start_time, end_time, status, type, title, athletes (id, name)')
-          .eq('appointment_date', today)
+          .eq('appointment_date', dateStr)
           .order('start_time', { ascending: true });
         
         if (fallbackError) throw fallbackError;
@@ -135,7 +137,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
         ...agendaData.map(e => ({ 
           ...e, 
           source: 'smart_agenda',
-          date: today,
+          date: dateStr,
           // Normalize time strings for display
           start_time: format(new Date(e.start_time), "HH:mm"),
           end_time: format(new Date(e.end_time), "HH:mm"),
@@ -210,12 +212,16 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [viewDate]);
 
   useEffect(() => {
     fetchData();
-    setCurrentTime(new Date());
-  }, [fetchData]);
+    if (getLocalDateString(new Date()) === getLocalDateString(viewDate)) {
+      setCurrentTime(new Date());
+    } else {
+      setCurrentTime(null);
+    }
+  }, [fetchData, viewDate]);
 
   if (isLoading) {
     return (
@@ -254,13 +260,33 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
       <header className="sticky top-0 z-40 bg-[#050B14]/95 backdrop-blur-xl py-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xl">
-        <div>
+        <div className="flex flex-col gap-1">
           <h1 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
             🏠 Agenda e Tarefas
           </h1>
-          <p className="text-slate-400 text-xxs font-black uppercase tracking-widest">
-            {currentTime ? format(currentTime, "EEEE, d 'de' MMMM", { locale: ptBR }) : '...'}
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-slate-400 text-xxs font-black uppercase tracking-widest min-w-[120px]">
+              {format(viewDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
+            </p>
+            <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+              <button 
+                onClick={() => setViewDate(new Date())}
+                className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md transition-all ${getLocalDateString(viewDate) === getLocalDateString(new Date()) ? 'bg-cyan-500 text-[#050B14]' : 'text-slate-400 hover:text-white'}`}
+              >
+                Hoje
+              </button>
+              <button 
+                onClick={() => {
+                  const tomorrow = new Date();
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  setViewDate(tomorrow);
+                }}
+                className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-md transition-all ${getLocalDateString(viewDate) !== getLocalDateString(new Date()) ? 'bg-cyan-500 text-[#050B14]' : 'text-slate-400 hover:text-white'}`}
+              >
+                Amanhã
+              </button>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-2 mr-4 px-3 py-1 bg-slate-900/50 rounded-full border border-slate-800">
@@ -369,7 +395,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                     key={appt.id} 
                     className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all group border-l-4 border-transparent gap-4 ${
                       appt.athlete_id ? 'cursor-pointer hover:bg-slate-800/30 hover:border-cyan-500/50' : 'hover:bg-slate-800/10'
-                    }`}
+                    } ${appt.status === 'completed' ? 'opacity-50 grayscale hover:grayscale-0' : ''}`}
                     onClick={() => appt.athlete_id && onViewAthlete(appt.athlete_id)}
                   >
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6">
@@ -384,6 +410,9 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                           <h4 className="text-sm sm:text-base font-black text-white group-hover:text-cyan-400 transition-colors truncate">
                             {appt.title || appt.type}
                           </h4>
+                          {appt.reminder_minutes !== null && appt.reminder_minutes !== undefined && (
+                            <Bell className="w-3 h-3 text-cyan-500" />
+                          )}
                         </div>
                         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                           {appt.athletes?.name && (

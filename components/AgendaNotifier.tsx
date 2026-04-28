@@ -40,10 +40,8 @@ export function AgendaNotifier() {
 
         const { data, error } = await supabase
           .from('agenda_events')
-          .select('id, title, start_time, reminder_minutes, category, status')
+          .select('*')
           .not('reminder_minutes', 'is', null)
-          .neq('status', 'cancelled')
-          .neq('status', 'completed')
           .gte('start_time', now.toISOString())
           .lte('start_time', lookaheadTime.toISOString());
 
@@ -52,7 +50,9 @@ export function AgendaNotifier() {
 
         const currentTime = now.getTime();
 
-        data.forEach(event => {
+        const activeEvents = data.filter((e: any) => e.status !== 'cancelled' && e.status !== 'completed');
+
+        activeEvents.forEach(event => {
           const eventTime = new Date(event.start_time).getTime();
           const reminderMinutes = event.reminder_minutes as number;
           const notificationTime = eventTime - (reminderMinutes * 60 * 1000);
@@ -89,8 +89,8 @@ export function AgendaNotifier() {
             }
           }
         });
-      } catch (err) {
-        console.error("Error checking reminders:", err);
+      } catch (err: any) {
+        console.error("Error checking reminders:", err.message || err);
       }
     };
 

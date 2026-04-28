@@ -75,7 +75,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         athlete_id: initialEvent.athlete_id || "",
         reminder_minutes: initialEvent.reminder_minutes ?? null,
       });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setErrorMsg("");
     } else if (isOpen && !initialEvent) {
       const now = new Date();
@@ -84,7 +84,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
       now.setHours(now.getHours() + 1);
       const endStr = toLocalInputFormat(now);
 
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         title: "",
         description: "",
@@ -98,7 +98,7 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
         athlete_id: "",
         reminder_minutes: null,
       });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setErrorMsg("");
     }
   }, [isOpen, initialEvent]);
