@@ -375,7 +375,7 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                   </div>
                   <div className="w-1 h-1 rounded-full bg-slate-700"></div>
                   <div className="text-cyan-400 font-black tracking-widest text-sm">
-                    {nextAppointment.start_time} - {nextAppointment.end_time}
+                    {nextAppointment.display_start || (nextAppointment.start_time?.includes('T') ? format(new Date(nextAppointment.start_time), "HH:mm") : nextAppointment.start_time?.substring(0, 5))} - {nextAppointment.display_end || (nextAppointment.end_time?.includes('T') ? format(new Date(nextAppointment.end_time), "HH:mm") : nextAppointment.end_time?.substring(0, 5))}
                   </div>
                 </div>
               </div>
@@ -445,8 +445,8 @@ export function DailyOperationsDashboard({ onNavigate, onViewAthlete }: DailyOpe
                   >
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6">
                       <div className="text-center w-12 sm:w-16 shrink-0 pt-1 sm:pt-0">
-                        <p className="text-xs sm:text-sm font-black text-white">{(appt.display_start || appt.start_time)?.substring(0, 5)}</p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase">{(appt.display_end || appt.end_time)?.substring(0, 5)}</p>
+                        <p className="text-xs sm:text-sm font-black text-white">{appt.display_start || (appt.start_time?.includes('T') ? format(new Date(appt.start_time), "HH:mm") : appt.start_time?.substring(0, 5))}</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">{appt.display_end || (appt.end_time?.includes('T') ? format(new Date(appt.end_time), "HH:mm") : appt.end_time?.substring(0, 5))}</p>
                       </div>
                       <div className="w-px h-10 bg-slate-800/50 hidden sm:block"></div>
                       <div className="min-w-0 pr-2">
