@@ -147,6 +147,7 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
     { id: 1, title: 'Atleta', icon: PersonStanding },
     { id: 2, title: 'Segmentos', icon: Ruler },
     { id: 3, title: 'Pais', icon: Target },
+    { id: 4, title: 'Resultado', icon: Save },
   ];
 
   return (
@@ -167,7 +168,7 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between px-4 max-w-sm mx-auto">
+      <div className="flex items-center justify-between px-4">
         {formSteps.map((s, i) => (
           <React.Fragment key={s.id}>
             <div 
@@ -177,7 +178,7 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400' : 'border-slate-700 text-slate-500'}`}>
                 <s.icon className="w-4 h-4" />
               </div>
-              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+              <span className="text-[0.5rem] font-black uppercase tracking-widest text-center max-w-[4rem] leading-tight">{s.title}</span>
             </div>
             {i < formSteps.length - 1 && (
               <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-cyan-500' : 'bg-slate-800'}`}></div>
@@ -186,93 +187,111 @@ export function MaturationAssessmentForm({ athleteId, onCancel, onSave }: Matura
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <PersonStanding className="w-4 h-4 text-cyan-500" /> Dados Básicos
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <NumberInput label="Idade" value={data.age} unit="anos" onChange={(v) => setData({...data, age: v})} />
-                <NumberInput label="Peso Atual" value={data.weight} unit="kg" onChange={(v) => setData({...data, weight: v})} />
-              </div>
-            </motion.div>
-          )}
+      <div className="space-y-6">
+        {step === 1 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <PersonStanding className="w-4 h-4 text-cyan-500" /> Dados Básicos
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <NumberInput label="Idade" value={data.age} unit="anos" onChange={(v) => setData({...data, age: v})} />
+              <NumberInput label="Peso Atual" value={data.weight} unit="kg" onChange={(v) => setData({...data, weight: v})} />
+            </div>
+          </motion.div>
+        )}
 
-          {step === 2 && (
-             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <Ruler className="w-4 h-4 text-cyan-500" /> Estatura e Segmentos
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <NumberInput label="Altura (Em Pé)" value={data.height} unit="cm" onChange={(v) => setData({...data, height: v})} />
-                <NumberInput label="Altura Sentado" value={data.sittingHeight} unit="cm" onChange={(v) => setData({...data, sittingHeight: v})} />
-              </div>
-            </motion.div>
-          )}
+        {step === 2 && (
+           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <Ruler className="w-4 h-4 text-cyan-500" /> Estatura e Segmentos
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <NumberInput label="Altura (Em Pé)" value={data.height} unit="cm" onChange={(v) => setData({...data, height: v})} />
+              <NumberInput label="Altura Sentado" value={data.sittingHeight} unit="cm" onChange={(v) => setData({...data, sittingHeight: v})} />
+            </div>
+          </motion.div>
+        )}
 
-          {step === 3 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <Target className="w-4 h-4 text-cyan-500" /> Alvo Genético
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <NumberInput label="Altura da Mãe" value={data.motherHeight} unit="cm" onChange={(v) => setData({...data, motherHeight: v})} />
-                <NumberInput label="Altura do Pai" value={data.fatherHeight} unit="cm" onChange={(v) => setData({...data, fatherHeight: v})} />
-              </div>
-            </motion.div>
-          )}
-        </div>
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <Target className="w-4 h-4 text-cyan-500" /> Alvo Genético
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <NumberInput label="Altura da Mãe" value={data.motherHeight} unit="cm" onChange={(v) => setData({...data, motherHeight: v})} />
+              <NumberInput label="Altura do Pai" value={data.fatherHeight} unit="cm" onChange={(v) => setData({...data, fatherHeight: v})} />
+            </div>
+          </motion.div>
+        )}
 
-        {/* Results Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Estabilidade</p>
-                <div className="text-6xl font-black text-white mb-2">{score}</div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+        {step === 4 && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+            <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+              <div className="p-8 text-center border-b border-slate-800">
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-2">Estabilidade</p>
+                <div className="text-7xl font-black text-white mb-3">{score}</div>
+                <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
                   {classification.label}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
-                  <span className="text-[8px] font-bold text-slate-500 uppercase">Índice</span>
-                  <span className="text-xs font-black mt-1 text-cyan-400">{metrics.maturationIndex}</span>
+              <div className="p-6">
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Índice</span>
+                    <span className="text-lg font-black mt-1 text-cyan-400">{metrics.maturationIndex}</span>
+                  </div>
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Razão</span>
+                    <span className="text-lg font-black mt-1 text-cyan-400">{metrics.ratio}</span>
+                  </div>
+                  <div className="col-span-2 bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex flex-col justify-center items-center text-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</span>
+                    <span className="text-lg font-black mt-1 truncate max-w-full text-cyan-400">{growthStatus}</span>
+                  </div>
                 </div>
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
-                  <span className="text-[8px] font-bold text-slate-500 uppercase">Razão</span>
-                  <span className="text-xs font-black mt-1 text-cyan-400">{metrics.ratio}</span>
-                </div>
-                <div className="col-span-2 bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex flex-col justify-center items-center text-center">
-                  <span className="text-[8px] font-bold text-slate-500 uppercase">Status</span>
-                  <span className="text-xs font-black mt-1 truncate max-w-[150px] text-cyan-400">{growthStatus}</span>
-                </div>
-              </div>
 
-              {alerts.length > 0 && (
-                <div className="space-y-2 mb-6">
-                  {alerts.map((alert, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-[10px] font-black">
-                {isSaving ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
+                {alerts.length > 0 && (
+                  <div className="space-y-3 mb-8">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest text-center mb-4">Atenção Crítica</h4>
+                    {alerts.map((alert, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-4 py-3 rounded-xl border border-rose-500/20">
+                        <AlertTriangle className="w-4 h-4 shrink-0" /> {alert}
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
-              </Button>
+
+                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl">
+                  {isSaving ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  ) : (
+                    <Save className="w-5 h-5 mr-3" />
+                  )}
+                  {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+                </Button>
+              </div>
             </div>
+          </motion.div>
+        )}
+
+        {step < 4 && (
+          <div className="flex items-center justify-between pt-6 border-t border-slate-800">
+            <Button 
+              variant="ghost" 
+              onClick={() => step > 1 ? setStep(step - 1) : onCancel()} 
+              className="text-slate-400 hover:text-white uppercase tracking-widest text-[10px] font-black"
+            >
+              {step === 1 ? 'Cancelar' : 'Anterior'}
+            </Button>
+            <Button 
+              onClick={() => setStep(step + 1)} 
+              className="bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-[10px] font-black w-32"
+            >
+              {step === 3 ? 'Ver Resultado' : 'Próximo'}
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

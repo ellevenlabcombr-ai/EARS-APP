@@ -174,6 +174,7 @@ export default function BiomechanicalAssessment({
     { id: 2, title: l.jump, icon: Target },
     { id: 3, title: l.balance, icon: RefreshCw },
     { id: 4, title: 'Indicadores', icon: AlertTriangle },
+    { id: 5, title: 'Resultado', icon: Save },
   ];
 
   return (
@@ -204,7 +205,7 @@ export default function BiomechanicalAssessment({
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400' : 'border-slate-700 text-slate-500'}`}>
                 <s.icon className="w-4 h-4" />
               </div>
-              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+              <span className="text-[0.5rem] font-black uppercase tracking-widest text-center max-w-[4rem] leading-tight">{s.title}</span>
             </div>
             {i < steps.length - 1 && (
               <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-cyan-500' : 'bg-slate-800'}`}></div>
@@ -213,215 +214,231 @@ export default function BiomechanicalAssessment({
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Main Content Area Based on Step */}
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <Card className="bg-slate-900/40 border-slate-800/50">
+      <div className="space-y-6">
+        {step === 1 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <Card className="bg-slate-900/40 border-slate-800/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-cyan-400" /> {l.squat}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                <SliderField label={l.kneeAlignment} value={squat.kneeAlignment} onChange={(v) => setSquat({...squat, kneeAlignment: v})} />
+                <SliderField label={l.hipControl} value={squat.hipControl} onChange={(v) => setSquat({...squat, hipControl: v})} />
+                <SliderField label={l.trunkControl} value={squat.trunkControl} onChange={(v) => setSquat({...squat, trunkControl: v})} />
+                <SliderField label={l.depth} value={squat.depth} onChange={(v) => setSquat({...squat, depth: v})} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {step === 2 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <Card className="bg-slate-900/40 border-slate-800/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                  <Target className="w-4 h-4 text-cyan-400" /> {l.jump}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                <SliderField label={l.landingStability} value={jump.landingStability} onChange={(v) => setJump({...jump, landingStability: v})} />
+                <SliderField label={l.shockAbsorption} value={jump.shockAbsorption} onChange={(v) => setJump({...jump, shockAbsorption: v})} />
+                <SliderField label={l.kneeAlignment} value={jump.kneeAlignment} onChange={(v) => setJump({...jump, kneeAlignment: v})} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <Card className="bg-slate-900/40 border-slate-800/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-cyan-400" /> {l.balance}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                <SliderField label={l.stability} value={balance.stability} onChange={(v) => setBalance({...balance, stability: v})} />
+                <SliderField label={l.control} value={balance.control} onChange={(v) => setBalance({...balance, control: v})} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {step === 4 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="bg-slate-900/40 border-red-900/30">
                 <CardHeader>
-                  <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-cyan-400" /> {l.squat}
+                  <CardTitle className="text-sm font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    {l.valgus}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                  <SliderField label={l.kneeAlignment} value={squat.kneeAlignment} onChange={(v) => setSquat({...squat, kneeAlignment: v})} />
-                  <SliderField label={l.hipControl} value={squat.hipControl} onChange={(v) => setSquat({...squat, hipControl: v})} />
-                  <SliderField label={l.trunkControl} value={squat.trunkControl} onChange={(v) => setSquat({...squat, trunkControl: v})} />
-                  <SliderField label={l.depth} value={squat.depth} onChange={(v) => setSquat({...squat, depth: v})} />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 2 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <Card className="bg-slate-900/40 border-slate-800/50">
-                <CardHeader>
-                  <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                    <Target className="w-4 h-4 text-cyan-400" /> {l.jump}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                  <SliderField label={l.landingStability} value={jump.landingStability} onChange={(v) => setJump({...jump, landingStability: v})} />
-                  <SliderField label={l.shockAbsorption} value={jump.shockAbsorption} onChange={(v) => setJump({...jump, shockAbsorption: v})} />
-                  <SliderField label={l.kneeAlignment} value={jump.kneeAlignment} onChange={(v) => setJump({...jump, kneeAlignment: v})} />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <Card className="bg-slate-900/40 border-slate-800/50">
-                <CardHeader>
-                  <CardTitle className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-cyan-400" /> {l.balance}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                  <SliderField label={l.stability} value={balance.stability} onChange={(v) => setBalance({...balance, stability: v})} />
-                  <SliderField label={l.control} value={balance.control} onChange={(v) => setBalance({...balance, control: v})} />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 4 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <Card className="bg-slate-900/40 border-red-900/30">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
-                      {l.valgus}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">{l.valgusPresent}</span>
-                      <div className="flex bg-slate-800 rounded-lg p-1">
-                        <button 
-                          className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${valgus.present ? 'bg-red-500/20 text-red-400' : 'text-slate-400 hover:text-slate-200'}`}
-                          onClick={() => setValgus({...valgus, present: true})}
-                        >
-                          {l.yes}
-                        </button>
-                        <button 
-                          className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${!valgus.present ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-                          onClick={() => setValgus({...valgus, present: false})}
-                        >
-                          {l.no}
-                        </button>
-                      </div>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">{l.valgusPresent}</span>
+                    <div className="flex bg-slate-800 rounded-lg p-1">
+                      <button 
+                        className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${valgus.present ? 'bg-red-500/20 text-red-400' : 'text-slate-400 hover:text-slate-200'}`}
+                        onClick={() => setValgus({...valgus, present: true})}
+                      >
+                        {l.yes}
+                      </button>
+                      <button 
+                        className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${!valgus.present ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                        onClick={() => setValgus({...valgus, present: false})}
+                      >
+                        {l.no}
+                      </button>
                     </div>
-                    {valgus.present && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                        <SliderField label={l.severity} value={valgus.severity} onChange={(v) => setValgus({...valgus, severity: v})} />
-                      </motion.div>
-                    )}
-                  </CardContent>
-                </Card>
+                  </div>
+                  {valgus.present && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                      <SliderField label={l.severity} value={valgus.severity} onChange={(v) => setValgus({...valgus, severity: v})} />
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
 
-                <Card className="bg-slate-900/40 border-orange-900/30">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-black text-orange-400 uppercase tracking-widest flex items-center gap-2">
-                      <Activity className="w-4 h-4" />
-                      {l.asymmetry}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">{l.asymmetryPresent}</span>
-                      <div className="flex bg-slate-800 rounded-lg p-1">
-                        <button 
-                          className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${asymmetry.present ? 'bg-orange-500/20 text-orange-400' : 'text-slate-400 hover:text-slate-200'}`}
-                          onClick={() => setAsymmetry({...asymmetry, present: true})}
-                        >
-                          {l.yes}
-                        </button>
-                        <button 
-                          className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${!asymmetry.present ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-                          onClick={() => setAsymmetry({...asymmetry, present: false})}
-                        >
-                          {l.no}
-                        </button>
-                      </div>
+              <Card className="bg-slate-900/40 border-orange-900/30">
+                <CardHeader>
+                  <CardTitle className="text-sm font-black text-orange-400 uppercase tracking-widest flex items-center gap-2">
+                    <Activity className="w-4 h-4" />
+                    {l.asymmetry}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">{l.asymmetryPresent}</span>
+                    <div className="flex bg-slate-800 rounded-lg p-1">
+                      <button 
+                        className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${asymmetry.present ? 'bg-orange-500/20 text-orange-400' : 'text-slate-400 hover:text-slate-200'}`}
+                        onClick={() => setAsymmetry({...asymmetry, present: true})}
+                      >
+                        {l.yes}
+                      </button>
+                      <button 
+                        className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${!asymmetry.present ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                        onClick={() => setAsymmetry({...asymmetry, present: false})}
+                      >
+                        {l.no}
+                      </button>
                     </div>
-                    {asymmetry.present && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                        <SliderField label={l.severity} value={asymmetry.severity} onChange={(v) => setAsymmetry({...asymmetry, severity: v})} />
-                      </motion.div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </motion.div>
-          )}
-        </div>
+                  </div>
+                  {asymmetry.present && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                      <SliderField label={l.severity} value={asymmetry.severity} onChange={(v) => setAsymmetry({...asymmetry, severity: v})} />
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        )}
 
-        {/* Results Sidebar */}
-        <div className="space-y-6">
-          <Card className="bg-slate-900/80 border-slate-700 overflow-hidden sticky top-6">
-            <div className={`h-2 w-full ${
-              riskLevel === 'high' ? 'bg-red-500' : 
-              riskLevel === 'moderate' ? 'bg-orange-500' : 'bg-emerald-500'
-            }`} />
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">{l.score}</p>
-                <div className="text-6xl font-black text-white mb-2">{score}</div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  riskLevel === 'high' ? 'bg-red-500/20 text-red-400' : 
-                  riskLevel === 'moderate' ? 'bg-orange-500/20 text-orange-400' : 'bg-emerald-500/20 text-emerald-400'
-                }`}>
-                  {riskLevel === 'high' ? l.riskHigh : riskLevel === 'moderate' ? l.riskModerate : l.riskLow}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-[10px] font-black tracking-widest uppercase text-slate-500 flex items-center gap-2 mb-2">
-                    {l.clinicalInterpretation}
-                  </h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                    {riskLevel === 'high' ? l.highRiskDesc : 
-                     riskLevel === 'moderate' ? l.modRiskDesc : l.lowRiskDesc}
-                  </p>
+        {step === 5 && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+            <Card className="bg-slate-900/80 border-slate-700 overflow-hidden shadow-xl">
+              <div className={`h-2 w-full ${
+                riskLevel === 'high' ? 'bg-red-500' : 
+                riskLevel === 'moderate' ? 'bg-orange-500' : 'bg-emerald-500'
+              }`} />
+              <CardContent className="p-8">
+                <div className="text-center mb-8 border-b border-slate-800 pb-8">
+                  <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-2">{l.score}</p>
+                  <div className="text-7xl font-black text-white mb-3">{score}</div>
+                  <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    riskLevel === 'high' ? 'bg-red-500/20 text-red-400' : 
+                    riskLevel === 'moderate' ? 'bg-orange-500/20 text-orange-400' : 'bg-emerald-500/20 text-emerald-400'
+                  }`}>
+                    {riskLevel === 'high' ? l.riskHigh : riskLevel === 'moderate' ? l.riskModerate : l.riskLow}
+                  </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800">
-                  <h4 className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-3">{l.actions}</h4>
-                  <ul className="space-y-2">
-                    {riskLevel === 'high' && (
-                      <>
-                        <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                          <ChevronRight className="w-4 h-4 text-red-400 shrink-0" />
-                          {l.actionHigh1}
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-xs font-black tracking-widest uppercase text-slate-400 flex items-center gap-2 mb-3">
+                      {l.clinicalInterpretation}
+                    </h4>
+                    <p className="text-sm text-slate-300 leading-relaxed font-medium bg-slate-950 p-4 rounded-xl border border-slate-800/50">
+                      {riskLevel === 'high' ? l.highRiskDesc : 
+                       riskLevel === 'moderate' ? l.modRiskDesc : l.lowRiskDesc}
+                    </p>
+                  </div>
+
+                  <div className="pt-2">
+                    <h4 className="text-xs font-black tracking-widest uppercase text-slate-400 mb-4">{l.actions}</h4>
+                    <ul className="space-y-3">
+                      {riskLevel === 'high' && (
+                        <>
+                          <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-red-500/5 p-3 rounded-xl border border-red-500/10">
+                            <ChevronRight className="w-5 h-5 text-red-400 shrink-0" />
+                            {l.actionHigh1}
+                          </li>
+                          <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-red-500/5 p-3 rounded-xl border border-red-500/10">
+                            <ChevronRight className="w-5 h-5 text-red-400 shrink-0" />
+                            {l.actionHigh2}
+                          </li>
+                          <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-red-500/5 p-3 rounded-xl border border-red-500/10">
+                            <ChevronRight className="w-5 h-5 text-red-400 shrink-0" />
+                            {l.actionHigh3}
+                          </li>
+                        </>
+                      )}
+                      {riskLevel === 'moderate' && (
+                        <>
+                          <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-orange-500/5 p-3 rounded-xl border border-orange-500/10">
+                            <ChevronRight className="w-5 h-5 text-orange-400 shrink-0" />
+                            {l.actionMod1}
+                          </li>
+                          <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-orange-500/5 p-3 rounded-xl border border-orange-500/10">
+                            <ChevronRight className="w-5 h-5 text-orange-400 shrink-0" />
+                            {l.actionMod2}
+                          </li>
+                        </>
+                      )}
+                      {riskLevel === 'low' && (
+                        <li className="flex items-center gap-3 text-sm font-bold text-slate-300 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
+                          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+                          {l.actionLow1}
                         </li>
-                        <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                          <ChevronRight className="w-4 h-4 text-red-400 shrink-0" />
-                          {l.actionHigh2}
-                        </li>
-                        <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                          <ChevronRight className="w-4 h-4 text-red-400 shrink-0" />
-                          {l.actionHigh3}
-                        </li>
-                      </>
-                    )}
-                    {riskLevel === 'moderate' && (
-                      <>
-                        <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                          <ChevronRight className="w-4 h-4 text-orange-400 shrink-0" />
-                          {l.actionMod1}
-                        </li>
-                        <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                          <ChevronRight className="w-4 h-4 text-orange-400 shrink-0" />
-                          {l.actionMod2}
-                        </li>
-                      </>
-                    )}
-                    {riskLevel === 'low' && (
-                      <li className="flex items-start gap-2 text-xs font-bold text-slate-400">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        {l.actionLow1}
-                      </li>
-                    )}
-                  </ul>
+                      )}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              
-              <Button onClick={handleSave} disabled={isSaving} className="w-full mt-6 bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-[10px] font-black">
-                {isSaving ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
-                )}
-                {isSaving ? 'Salvando...' : l.save}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+                
+                <Button onClick={handleSave} disabled={isSaving} className="w-full mt-8 bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl">
+                  {isSaving ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  ) : (
+                    <Save className="w-5 h-5 mr-3" />
+                  )}
+                  {isSaving ? 'Salvando...' : l.save}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {step < 5 && (
+          <div className="flex items-center justify-between pt-6 border-t border-slate-800">
+            <Button 
+              variant="ghost" 
+              onClick={() => step > 1 ? setStep(step - 1) : onCancel()} 
+              className="text-slate-400 hover:text-white uppercase tracking-widest text-[10px] font-black"
+            >
+              {step === 1 ? l.cancel : 'Anterior'}
+            </Button>
+            <Button 
+              onClick={() => setStep(step + 1)} 
+              className="bg-cyan-600 hover:bg-cyan-500 text-white uppercase tracking-widest text-[10px] font-black w-32"
+            >
+              {step === 4 ? 'Ver Resultado' : 'Próximo'}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

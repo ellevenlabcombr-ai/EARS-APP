@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PosturalAnalysisTool, SegmentData } from './PosturalAnalysisTool';
-import { X, Save, ArrowLeft, History, Plus, Trash2, Edit2, SplitSquareHorizontal, Sparkles } from 'lucide-react';
+import { X, Save, ArrowLeft, History, Plus, Trash2, Edit2, SplitSquareHorizontal, Sparkles, Activity } from 'lucide-react';
 import { Button } from './ui/button';
 import { GoogleGenAI, Type } from '@google/genai';
 
@@ -10,6 +10,9 @@ interface PosturalForm {
   lateralR: { url: string; file?: File; segments: SegmentData[] };
   lateralL: { url: string; file?: File; segments: SegmentData[] };
   notes: string;
+  sportFocus: string;
+  assessmentTime: string;
+  dynamicScores: Record<string, number>;
 }
 
 interface PosturalAssessmentModalProps {
@@ -48,7 +51,10 @@ export function PosturalAssessmentModal({
     dorsal: { url: '', segments: [] },
     lateralR: { url: '', segments: [] },
     lateralL: { url: '', segments: [] },
-    notes: ''
+    notes: '',
+    sportFocus: 'general',
+    assessmentTime: new Date().toTimeString().slice(0, 5),
+    dynamicScores: { valgus: 5, singleLeg: 5, trunkControl: 5, landing: 5 }
   });
   
   const [isSaving, setIsSaving] = useState(false);
@@ -115,14 +121,28 @@ export function PosturalAssessmentModal({
   }, [supabase, athleteId]);
 
    
+  const fetchAthleteData = useCallback(async () => {
+    if (!supabase || !athleteId) return;
+    const { data } = await supabase
+      .from('athletes')
+      .select('sport')
+      .eq('id', athleteId)
+      .single();
+    
+    if (data?.sport) {
+      setForm(prev => ({ ...prev, sportFocus: data.sport }));
+    }
+  }, [supabase, athleteId]);
+
   useEffect(() => {
     if (isOpen) {
       fetchHistory();
+      fetchAthleteData();
       setViewState('history');
       resetForm();
       setComparingIds([]);
     }
-  }, [isOpen, athleteId, fetchHistory]);
+  }, [isOpen, athleteId, fetchHistory, fetchAthleteData]);
 
   const uploadImage = async (file: File, path: string) => {
     const fileExt = file.name.split('.').pop();
@@ -157,7 +177,10 @@ export function PosturalAssessmentModal({
       dorsal: { url: raw.dorsal?.url || '', segments: raw.dorsal?.segments || [] },
       lateralR: { url: raw.lateralR?.url || '', segments: raw.lateralR?.segments || [] },
       lateralL: { url: raw.lateralL?.url || '', segments: raw.lateralL?.segments || [] },
-      notes: raw.notes || assessment.notes || ''
+      notes: raw.notes || assessment.notes || '',
+      sportFocus: raw.sportFocus || 'general',
+      assessmentTime: raw.assessmentTime || new Date(assessment.assessment_date).toTimeString().slice(0, 5),
+      dynamicScores: raw.dynamicScores || { valgus: 5, singleLeg: 5, trunkControl: 5, landing: 5 }
     });
     setViewState('form');
   };
@@ -265,7 +288,10 @@ export function PosturalAssessmentModal({
         dorsal: { url: uploads.dorsal, segments: form.dorsal.segments },
         lateralR: { url: uploads.lateralR, segments: form.lateralR.segments },
         lateralL: { url: uploads.lateralL, segments: form.lateralL.segments },
-        notes: form.notes
+        notes: form.notes,
+        sportFocus: form.sportFocus,
+        assessmentTime: form.assessmentTime,
+        dynamicScores: form.dynamicScores
       };
 
       const primaryUrl = uploads.frontal || uploads.dorsal || uploads.lateralR || uploads.lateralL || '';
@@ -338,7 +364,10 @@ export function PosturalAssessmentModal({
       dorsal: { url: '', segments: [] },
       lateralR: { url: '', segments: [] },
       lateralL: { url: '', segments: [] },
-      notes: ''
+      notes: '',
+      sportFocus: 'general',
+      assessmentTime: new Date().toTimeString().slice(0, 5),
+      dynamicScores: { valgus: 5, singleLeg: 5, trunkControl: 5, landing: 5 }
     });
   };
 
@@ -660,6 +689,75 @@ export function PosturalAssessmentModal({
                   onSegmentsChange={(s) => handleSegmentsChange('lateralL', s)}
                   availableSegmentDefinitions={LATERAL_SEGMENTS}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-cyan-500" />
+                    Parâmetros da Avaliação
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Modalidade Esportiva</label>
+                      <select 
+                        value={form.sportFocus}
+                        onChange={(e) => setForm(prev => ({...prev, sportFocus: e.target.value}))}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-cyan-500 outline-none"
+                      >
+                        <option value="general">Geral</option>
+                        <option value="Atletismo">Atletismo</option>
+                        <option value="Basquete">Basquete (Membros Inferiores / Tronco)</option>
+                        <option value="Futebol de Campo">Futebol de Campo (Pelve / Joelho / Rotação Interna)</option>
+                        <option value="Futsal">Futsal</option>
+                        <option value="Handebol">Handebol</option>
+                        <option value="Judô">Judô</option>
+                        <option value="Natação">Natação (Cintura Escapular / Mobilidade Torácica)</option>
+                        <option value="Tênis">Tênis</option>
+                        <option value="Volleyball">Vôlei (Ombro / Cifose / Lombar)</option>
+                        <option value="Vôlei de Praia">Vôlei de Praia</option>
+                        {!['general', 'Atletismo', 'Basquete', 'Futebol de Campo', 'Futsal', 'Handebol', 'Judô', 'Natação', 'Tênis', 'Volleyball', 'Vôlei de Praia'].includes(form.sportFocus) && (
+                           <option value={form.sportFocus}>{form.sportFocus}</option>
+                        )}
+                        <option value="Outro...">Outro...</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Horário da Avaliação (Estabilidade Sagital)</label>
+                      <input 
+                        type="time"
+                        value={form.assessmentTime}
+                        onChange={(e) => setForm(prev => ({...prev, assessmentTime: e.target.value}))}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-cyan-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-cyan-500" />
+                    Scores Dinâmicos (1-10)
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <label className="text-xs font-bold text-slate-400 truncate">Valgo Dinâmico</label>
+                      <input type="number" min="1" max="10" value={form.dynamicScores.valgus} onChange={(e) => setForm(prev => ({...prev, dynamicScores: {...prev.dynamicScores, valgus: Number(e.target.value)}}))} className="w-16 h-10 shrink-0 bg-slate-950 border border-slate-800 rounded-lg px-2 text-center text-white text-sm font-black focus:border-cyan-500 outline-none" />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <label className="text-xs font-bold text-slate-400 truncate">Agachamento Unilateral</label>
+                      <input type="number" min="1" max="10" value={form.dynamicScores.singleLeg} onChange={(e) => setForm(prev => ({...prev, dynamicScores: {...prev.dynamicScores, singleLeg: Number(e.target.value)}}))} className="w-16 h-10 shrink-0 bg-slate-950 border border-slate-800 rounded-lg px-2 text-center text-white text-sm font-black focus:border-cyan-500 outline-none" />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <label className="text-xs font-bold text-slate-400 truncate">Controle de Tronco</label>
+                      <input type="number" min="1" max="10" value={form.dynamicScores.trunkControl} onChange={(e) => setForm(prev => ({...prev, dynamicScores: {...prev.dynamicScores, trunkControl: Number(e.target.value)}}))} className="w-16 h-10 shrink-0 bg-slate-950 border border-slate-800 rounded-lg px-2 text-center text-white text-sm font-black focus:border-cyan-500 outline-none" />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <label className="text-xs font-bold text-slate-400 truncate">Padrão de Aterrissagem</label>
+                      <input type="number" min="1" max="10" value={form.dynamicScores.landing} onChange={(e) => setForm(prev => ({...prev, dynamicScores: {...prev.dynamicScores, landing: Number(e.target.value)}}))} className="w-16 h-10 shrink-0 bg-slate-950 border border-slate-800 rounded-lg px-2 text-center text-white text-sm font-black focus:border-cyan-500 outline-none" />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">

@@ -174,6 +174,7 @@ export function MenstrualAssessmentForm({ athleteId, onCancel, onSave }: Menstru
   const formSteps = [
     { id: 1, title: 'Ciclo', icon: CalendarHeart },
     { id: 2, title: 'Sintomas', icon: Activity },
+    { id: 3, title: 'Resultado', icon: Save },
   ];
 
   return (
@@ -194,7 +195,7 @@ export function MenstrualAssessmentForm({ athleteId, onCancel, onSave }: Menstru
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between px-4 max-w-sm mx-auto">
+      <div className="flex items-center justify-between px-4">
         {formSteps.map((s, i) => (
           <React.Fragment key={s.id}>
             <div 
@@ -204,7 +205,7 @@ export function MenstrualAssessmentForm({ athleteId, onCancel, onSave }: Menstru
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-pink-500 bg-pink-500/10 text-pink-400' : 'border-slate-700 text-slate-500'}`}>
                 <s.icon className="w-4 h-4" />
               </div>
-              <span className="text-[0.6rem] font-black uppercase tracking-widest text-center max-w-[5rem] leading-tight">{s.title}</span>
+              <span className="text-[0.5rem] font-black uppercase tracking-widest text-center max-w-[4rem] leading-tight">{s.title}</span>
             </div>
             {i < formSteps.length - 1 && (
               <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-pink-500' : 'bg-slate-800'}`}></div>
@@ -213,101 +214,119 @@ export function MenstrualAssessmentForm({ athleteId, onCancel, onSave }: Menstru
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <CalendarHeart className="w-4 h-4 text-pink-500" /> Detalhes do Ciclo
-              </h3>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <NumberInput label="Idade da Menarca" value={data.menarcheAge} unit="anos" onChange={(v) => setData({...data, menarcheAge: v})} />
-                  <NumberInput label="Duração do Ciclo" value={data.cycleLength} unit="dias" onChange={(v) => setData({...data, cycleLength: v})} />
-                </div>
-                <SelectGroup 
-                  label="Regularidade" 
-                  value={data.regularity} 
-                  options={[{id: 'regular', label: 'Regular'}, {id: 'irregular', label: 'Irregular'}]}
-                  onChange={(v) => setData({...data, regularity: v})} 
-                />
-                <SelectGroup 
-                  label="Ausência de Menstruação" 
-                  value={data.missedPeriods} 
-                  options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
-                  onChange={(v) => setData({...data, missedPeriods: v})} 
-                />
+      <div className="space-y-6">
+        {step === 1 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <CalendarHeart className="w-4 h-4 text-pink-500" /> Detalhes do Ciclo
+            </h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <NumberInput label="Idade da Menarca" value={data.menarcheAge} unit="anos" onChange={(v) => setData({...data, menarcheAge: v})} />
+                <NumberInput label="Duração do Ciclo" value={data.cycleLength} unit="dias" onChange={(v) => setData({...data, cycleLength: v})} />
               </div>
-            </motion.div>
-          )}
+              <SelectGroup 
+                label="Regularidade" 
+                value={data.regularity} 
+                options={[{id: 'regular', label: 'Regular'}, {id: 'irregular', label: 'Irregular'}]}
+                onChange={(v) => setData({...data, regularity: v})} 
+              />
+              <SelectGroup 
+                label="Ausência de Menstruação" 
+                value={data.missedPeriods} 
+                options={[{id: true, label: 'Sim'}, {id: false, label: 'Não'}]}
+                onChange={(v) => setData({...data, missedPeriods: v})} 
+              />
+            </div>
+          </motion.div>
+        )}
 
-          {step === 2 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-pink-500" /> Sintomas e Fluxo
-              </h3>
-              <div className="space-y-3">
-                <SelectGroup 
-                  label="Intensidade do Fluxo" 
-                  value={data.flow} 
-                  options={[{id: 'light', label: 'Leve'}, {id: 'moderate', label: 'Moderado'}, {id: 'heavy', label: 'Intenso'}]}
-                  onChange={(v) => setData({...data, flow: v})} 
-                />
-                <Slider label="Intensidade da Dor (Cólica)" value={data.pain} onChange={(v) => setData({...data, pain: v})} invertColor />
-                <Slider label="Sintomas de TPM" value={data.pms} onChange={(v) => setData({...data, pms: v})} invertColor />
-              </div>
-            </motion.div>
-          )}
-        </div>
+        {step === 2 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-pink-500" /> Sintomas e Fluxo
+            </h3>
+            <div className="space-y-3">
+              <SelectGroup 
+                label="Intensidade do Fluxo" 
+                value={data.flow} 
+                options={[{id: 'light', label: 'Leve'}, {id: 'moderate', label: 'Moderado'}, {id: 'heavy', label: 'Intenso'}]}
+                onChange={(v) => setData({...data, flow: v})} 
+              />
+              <Slider label="Intensidade da Dor (Cólica)" value={data.pain} onChange={(v) => setData({...data, pain: v})} invertColor />
+              <Slider label="Sintomas de TPM" value={data.pms} onChange={(v) => setData({...data, pms: v})} invertColor />
+            </div>
+          </motion.div>
+        )}
 
-        {/* Results Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Score Menstrual</p>
-                <div className="text-6xl font-black text-white mb-2">{score}</div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+            <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+              <div className="p-8 text-center border-b border-slate-800">
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-2">Score Menstrual</p>
+                <div className="text-7xl font-black text-white mb-3">{score}</div>
+                <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
                   {classification.label}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 mb-6">
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Regularidade</span>
-                  <span className={`text-sm font-black ${metrics.regularityIndex > 70 ? 'text-emerald-400' : metrics.regularityIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.regularityIndex}%</span>
+              <div className="p-6">
+                <div className="grid grid-cols-1 gap-4 mb-8">
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Regularidade</span>
+                    <span className={`text-xl font-black ${metrics.regularityIndex > 70 ? 'text-emerald-400' : metrics.regularityIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.regularityIndex}%</span>
+                  </div>
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Carga Sintomas</span>
+                    <span className={`text-xl font-black ${metrics.symptomLoad < 30 ? 'text-emerald-400' : metrics.symptomLoad < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.symptomLoad}%</span>
+                  </div>
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Estabilidade</span>
+                    <span className={`text-xl font-black ${metrics.hormonalStability > 70 ? 'text-emerald-400' : metrics.hormonalStability > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.hormonalStability}%</span>
+                  </div>
                 </div>
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Carga Sintomas</span>
-                  <span className={`text-sm font-black ${metrics.symptomLoad < 30 ? 'text-emerald-400' : metrics.symptomLoad < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.symptomLoad}%</span>
-                </div>
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Estabilidade</span>
-                  <span className={`text-sm font-black ${metrics.hormonalStability > 70 ? 'text-emerald-400' : metrics.hormonalStability > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.hormonalStability}%</span>
-                </div>
-              </div>
 
-              {alerts.length > 0 && (
-                <div className="space-y-2 mb-6">
-                  {alerts.map((alert, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-pink-600 hover:bg-pink-500 text-white uppercase tracking-widest text-[10px] font-black">
-                {isSaving ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
+                {alerts.length > 0 && (
+                  <div className="space-y-3 mb-8">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest text-center mb-4">Atenção Crítica</h4>
+                    {alerts.map((alert, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-4 py-3 rounded-xl border border-rose-500/20">
+                        <AlertTriangle className="w-4 h-4 shrink-0" /> {alert}
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
-              </Button>
+
+                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-pink-600 hover:bg-pink-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl">
+                  {isSaving ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  ) : (
+                    <Save className="w-5 h-5 mr-3" />
+                  )}
+                  {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+                </Button>
+              </div>
             </div>
+          </motion.div>
+        )}
+
+        {step < 3 && (
+          <div className="flex items-center justify-between pt-6 border-t border-slate-800">
+            <Button 
+              variant="ghost" 
+              onClick={() => step > 1 ? setStep(step - 1) : onCancel()} 
+              className="text-slate-400 hover:text-white uppercase tracking-widest text-[10px] font-black"
+            >
+              {step === 1 ? 'Cancelar' : 'Anterior'}
+            </Button>
+            <Button 
+              onClick={() => setStep(step + 1)} 
+              className="bg-pink-600 hover:bg-pink-500 text-white uppercase tracking-widest text-[10px] font-black w-32"
+            >
+              {step === 2 ? 'Ver Resultado' : 'Próximo'}
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

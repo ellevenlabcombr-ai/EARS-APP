@@ -90,6 +90,7 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
     thigh: 0,
   });
 
+  const [step, setStep] = useState<'form' | 'result'>('form');
   const [score, setScore] = useState(100);
   const [classification, setClassification] = useState({ label: 'Simetria Ideal', color: 'emerald' });
   const [alerts, setAlerts] = useState<string[]>([]);
@@ -215,10 +216,9 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
       animate={{ opacity: 1, y: 0 }}
       className="max-w-5xl mx-auto space-y-6"
     >
-      {/* Header & Summary Card */}
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex items-center justify-between">
         <div className="flex-1">
-          <Button variant="ghost" onClick={onCancel} className="mb-4 text-slate-400 hover:text-white px-0">
+          <Button variant="ghost" onClick={step === 'form' ? onCancel : () => setStep('form')} className="mb-4 text-slate-400 hover:text-white px-0">
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
           </Button>
           <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-3">
@@ -229,144 +229,159 @@ export function AnthropometricAssessmentForm({ athleteId, onCancel, onSave }: An
             Perimetria e Simetria Muscular
           </p>
         </div>
+      </div>
 
-        <div className={`p-6 rounded-3xl border flex-1 flex items-center justify-between ${getColorClasses(classification.color)}`}>
-          <div>
-            <p className="text-xxs font-black uppercase tracking-widest opacity-70 mb-1">Score de Simetria</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black">{score}</span>
-              <span className="text-sm font-bold uppercase tracking-widest opacity-80">{classification.label}</span>
-            </div>
-            {alerts.length > 0 && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                {alerts.map((alert, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xxs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-2 py-1 rounded-md w-fit border border-rose-500/20">
-                    <AlertTriangle className="w-3 h-3" /> {alert}
-                  </div>
-                ))}
+      {step === 'form' && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Basicos */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                 Básicos / Peso (kg)
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <NumberInput label="Peso" value={measurements.weight} unit="kg" onChange={(v) => setMeasurements({...measurements, weight: v})} />
+                <NumberInput label="Altura" value={measurements.height} unit="cm" onChange={(v) => setMeasurements({...measurements, height: v})} />
               </div>
-            )}
-          </div>
-          <Activity className="w-12 h-12 opacity-20" />
-        </div>
-      </div>
 
-      {/* Indices Preview */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Fat %</p>
-          <p className="text-2xl font-black text-indigo-400">
-            {metrics.fatPercentage}%
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Massa Muscular</p>
-          <p className="text-2xl font-black text-indigo-400">
-            {metrics.muscleMass}kg
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">RCQ</p>
-          <p className={`text-2xl font-black ${metrics.whr < 0.85 ? 'text-emerald-400' : metrics.whr <= 0.9 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.whr}
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Braços</p>
-          <p className={`text-2xl font-black ${metrics.armAsymmetry <= 2 ? 'text-emerald-400' : metrics.armAsymmetry <= 5 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.armAsymmetry}%
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Coxas</p>
-          <p className={`text-2xl font-black ${metrics.thighAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.thighAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.thighAsymmetry}%
-          </p>
-        </div>
-        <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center">
-          <p className="text-xxs font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Pant.</p>
-          <p className={`text-2xl font-black ${metrics.calfAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.calfAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {metrics.calfAsymmetry}%
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Basicos */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-             Básicos / Peso (kg)
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberInput label="Peso" value={measurements.weight} unit="kg" onChange={(v) => setMeasurements({...measurements, weight: v})} />
-            <NumberInput label="Altura" value={measurements.height} unit="cm" onChange={(v) => setMeasurements({...measurements, height: v})} />
-          </div>
-
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 mt-6 flex items-center gap-2">
-             Dobra Cutâneas (mm)
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberInput label="Tríceps" value={skinfolds.triceps} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, triceps: v})} />
-            <NumberInput label="Subescapular" value={skinfolds.subscapular} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, subscapular: v})} />
-            <NumberInput label="Peitoral" value={skinfolds.chest} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, chest: v})} />
-            <NumberInput label="Axilar Média" value={skinfolds.axillary} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, axillary: v})} />
-            <NumberInput label="Supra-ilíaca" value={skinfolds.suprailiac} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, suprailiac: v})} />
-            <NumberInput label="Abdominal" value={skinfolds.abdomen} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, abdomen: v})} />
-            <NumberInput label="Coxa" value={skinfolds.thigh} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, thigh: v})} />
-          </div>
-        </div>
-
-        {/* Tronco */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-             Tronco / Perimetria (cm)
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberInput label="Pescoço" value={measurements.neck} unit="cm" onChange={(v) => setMeasurements({...measurements, neck: v})} />
-            <NumberInput label="Ombros" value={measurements.shoulders} unit="cm" onChange={(v) => setMeasurements({...measurements, shoulders: v})} />
-            <NumberInput label="Tórax" value={measurements.chest} unit="cm" onChange={(v) => setMeasurements({...measurements, chest: v})} />
-            <NumberInput label="Cintura" value={measurements.waist} unit="cm" onChange={(v) => setMeasurements({...measurements, waist: v})} />
-            <NumberInput label="Abdome" value={measurements.abdomen} unit="cm" onChange={(v) => setMeasurements({...measurements, abdomen: v})} />
-            <NumberInput label="Quadril" value={measurements.hip} unit="cm" onChange={(v) => setMeasurements({...measurements, hip: v})} />
-          </div>
-        </div>
-
-        {/* Membros */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-            Membros Superiores e Inferiores (cm)
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-900/10 p-3 rounded-2xl border border-slate-800 border-dashed space-y-3">
-               <p className="text-xxs font-bold text-slate-500 uppercase text-center mb-2">Lado Direito</p>
-               <NumberInput label="Braço Relaxado" value={measurements.rightArmRelaxed} unit="cm" onChange={(v) => setMeasurements({...measurements, rightArmRelaxed: v})} />
-               <NumberInput label="Braço Contraído" value={measurements.rightArmFlexed} unit="cm" onChange={(v) => setMeasurements({...measurements, rightArmFlexed: v})} />
-               <NumberInput label="Antebraço" value={measurements.rightForearm} unit="cm" onChange={(v) => setMeasurements({...measurements, rightForearm: v})} />
-               <NumberInput label="Coxa Medial" value={measurements.rightThigh} unit="cm" onChange={(v) => setMeasurements({...measurements, rightThigh: v})} />
-               <NumberInput label="Panturrilha" value={measurements.rightCalf} unit="cm" onChange={(v) => setMeasurements({...measurements, rightCalf: v})} />
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 mt-6 flex items-center gap-2">
+                 Dobra Cutâneas (mm)
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <NumberInput label="Tríceps" value={skinfolds.triceps} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, triceps: v})} />
+                <NumberInput label="Subescapular" value={skinfolds.subscapular} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, subscapular: v})} />
+                <NumberInput label="Peitoral" value={skinfolds.chest} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, chest: v})} />
+                <NumberInput label="Axilar Média" value={skinfolds.axillary} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, axillary: v})} />
+                <NumberInput label="Supra-ilíaca" value={skinfolds.suprailiac} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, suprailiac: v})} />
+                <NumberInput label="Abdominal" value={skinfolds.abdomen} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, abdomen: v})} />
+                <NumberInput label="Coxa" value={skinfolds.thigh} unit="mm" onChange={(v) => setSkinfolds({...skinfolds, thigh: v})} />
+              </div>
             </div>
-            
-            <div className="bg-slate-900/10 p-3 rounded-2xl border border-slate-800 border-dashed space-y-3">
-               <p className="text-xxs font-bold text-slate-500 uppercase text-center mb-2">Lado Esquerdo</p>
-               <NumberInput label="Braço Relaxado" value={measurements.leftArmRelaxed} unit="cm" onChange={(v) => setMeasurements({...measurements, leftArmRelaxed: v})} />
-               <NumberInput label="Braço Contraído" value={measurements.leftArmFlexed} unit="cm" onChange={(v) => setMeasurements({...measurements, leftArmFlexed: v})} />
-               <NumberInput label="Antebraço" value={measurements.leftForearm} unit="cm" onChange={(v) => setMeasurements({...measurements, leftForearm: v})} />
-               <NumberInput label="Coxa Medial" value={measurements.leftThigh} unit="cm" onChange={(v) => setMeasurements({...measurements, leftThigh: v})} />
-               <NumberInput label="Panturrilha" value={measurements.leftCalf} unit="cm" onChange={(v) => setMeasurements({...measurements, leftCalf: v})} />
+
+            {/* Tronco */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                 Tronco / Perimetria (cm)
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <NumberInput label="Pescoço" value={measurements.neck} unit="cm" onChange={(v) => setMeasurements({...measurements, neck: v})} />
+                <NumberInput label="Ombros" value={measurements.shoulders} unit="cm" onChange={(v) => setMeasurements({...measurements, shoulders: v})} />
+                <NumberInput label="Tórax" value={measurements.chest} unit="cm" onChange={(v) => setMeasurements({...measurements, chest: v})} />
+                <NumberInput label="Cintura" value={measurements.waist} unit="cm" onChange={(v) => setMeasurements({...measurements, waist: v})} />
+                <NumberInput label="Abdome" value={measurements.abdomen} unit="cm" onChange={(v) => setMeasurements({...measurements, abdomen: v})} />
+                <NumberInput label="Quadril" value={measurements.hip} unit="cm" onChange={(v) => setMeasurements({...measurements, hip: v})} />
+              </div>
+            </div>
+
+            {/* Membros */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+                Membros Superiores e Inferiores (cm)
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-900/10 p-3 rounded-2xl border border-slate-800 border-dashed space-y-3">
+                   <p className="text-xxs font-bold text-slate-500 uppercase text-center mb-2">Lado Direito</p>
+                   <NumberInput label="Braço Relaxado" value={measurements.rightArmRelaxed} unit="cm" onChange={(v) => setMeasurements({...measurements, rightArmRelaxed: v})} />
+                   <NumberInput label="Braço Contraído" value={measurements.rightArmFlexed} unit="cm" onChange={(v) => setMeasurements({...measurements, rightArmFlexed: v})} />
+                   <NumberInput label="Antebraço" value={measurements.rightForearm} unit="cm" onChange={(v) => setMeasurements({...measurements, rightForearm: v})} />
+                   <NumberInput label="Coxa Medial" value={measurements.rightThigh} unit="cm" onChange={(v) => setMeasurements({...measurements, rightThigh: v})} />
+                   <NumberInput label="Panturrilha" value={measurements.rightCalf} unit="cm" onChange={(v) => setMeasurements({...measurements, rightCalf: v})} />
+                </div>
+                
+                <div className="bg-slate-900/10 p-3 rounded-2xl border border-slate-800 border-dashed space-y-3">
+                   <p className="text-xxs font-bold text-slate-500 uppercase text-center mb-2">Lado Esquerdo</p>
+                   <NumberInput label="Braço Relaxado" value={measurements.leftArmRelaxed} unit="cm" onChange={(v) => setMeasurements({...measurements, leftArmRelaxed: v})} />
+                   <NumberInput label="Braço Contraído" value={measurements.leftArmFlexed} unit="cm" onChange={(v) => setMeasurements({...measurements, leftArmFlexed: v})} />
+                   <NumberInput label="Antebraço" value={measurements.leftForearm} unit="cm" onChange={(v) => setMeasurements({...measurements, leftForearm: v})} />
+                   <NumberInput label="Coxa Medial" value={measurements.leftThigh} unit="cm" onChange={(v) => setMeasurements({...measurements, leftThigh: v})} />
+                   <NumberInput label="Panturrilha" value={measurements.leftCalf} unit="cm" onChange={(v) => setMeasurements({...measurements, leftCalf: v})} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Footer Actions */}
-      <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-        <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
-          Cancelar
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-indigo-500 hover:bg-indigo-400 text-white font-black uppercase text-xxs tracking-widest px-8">
-          {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />} Salvar Avaliação
-        </Button>
-      </div>
+          <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
+            <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white font-bold uppercase text-xxs tracking-widest">
+              Cancelar
+            </Button>
+            <Button onClick={() => setStep('result')} className="bg-indigo-500 hover:bg-indigo-400 text-white font-black uppercase text-xxs tracking-widest px-8">
+              Ver Resultado
+            </Button>
+          </div>
+        </>
+      )}
+
+      {step === 'result' && (
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className={`p-8 rounded-3xl border flex-1 flex flex-col items-center justify-center text-center ${getColorClasses(classification.color)}`}>
+              <Activity className="w-12 h-12 opacity-20 mb-4" />
+              <p className="text-xs font-black uppercase tracking-widest opacity-70 mb-2">Score de Simetria</p>
+              <div className="text-7xl font-black mb-2">{score}</div>
+              <span className="text-sm font-bold uppercase tracking-widest opacity-80 px-4 py-1.5 rounded-full border border-current">{classification.label}</span>
+              
+              {alerts.length > 0 && (
+                <div className="mt-6 flex flex-col gap-2 w-full max-w-sm">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-xl border border-rose-500/20">
+                      <AlertTriangle className="w-4 h-4 shrink-0" /> {alert}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Fat %</p>
+                <p className="text-2xl font-black text-indigo-400">{metrics.fatPercentage}%</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Massa Muscular</p>
+                <p className="text-2xl font-black text-indigo-400">{metrics.muscleMass}kg</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">RCQ</p>
+                <p className={`text-2xl font-black ${metrics.whr < 0.85 ? 'text-emerald-400' : metrics.whr <= 0.9 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.whr}</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Braços</p>
+                <p className={`text-2xl font-black ${metrics.armAsymmetry <= 2 ? 'text-emerald-400' : metrics.armAsymmetry <= 5 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.armAsymmetry}%</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Coxas</p>
+                <p className={`text-2xl font-black ${metrics.thighAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.thighAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.thighAsymmetry}%</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Assimet. Pant.</p>
+                <p className={`text-2xl font-black ${metrics.calfAsymmetry <= 1.5 ? 'text-emerald-400' : metrics.calfAsymmetry <= 3 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.calfAsymmetry}%</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 w-full pt-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => setStep('form')}
+              className="flex-1 border border-slate-800 text-slate-400 hover:text-white uppercase tracking-widest text-xs font-black h-14"
+            >
+              Voltar e Editar
+            </Button>
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl"
+            >
+              {isSaving ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+              ) : (
+                <Save className="w-5 h-5 mr-3" />
+              )}
+              {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+            </Button>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

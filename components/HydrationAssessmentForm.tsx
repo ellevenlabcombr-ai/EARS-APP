@@ -174,6 +174,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
   const formSteps = [
     { id: 1, title: 'Status', icon: Droplet },
     { id: 2, title: 'Fisiologia', icon: Thermometer },
+    { id: 3, title: 'Resultado', icon: Save },
   ];
 
   return (
@@ -194,7 +195,7 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between px-4 max-w-sm mx-auto">
+      <div className="flex items-center justify-between px-4">
         {formSteps.map((s, i) => (
           <React.Fragment key={s.id}>
             <div 
@@ -213,88 +214,106 @@ export function HydrationAssessmentForm({ athleteId, onCancel, onSave }: Hydrati
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <Droplet className="w-4 h-4 text-blue-500" /> Status de Hidratação
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Slider label="Percepção de Hidratação" value={data.perception} onChange={(v) => setData({...data, perception: v})} />
-                <Slider label="Cor da Urina" value={data.urineColor} min={1} max={8} onChange={(v) => setData({...data, urineColor: v})} invertColor />
-                <Slider label="Nível de Sede" value={data.thirst} onChange={(v) => setData({...data, thirst: v})} invertColor />
-                <NumberInput label="Ingestão de Líquidos" value={data.fluidIntake} unit="L/dia" step={0.1} onChange={(v) => setData({...data, fluidIntake: v})} />
-              </div>
-            </motion.div>
-          )}
+      <div className="space-y-6">
+        {step === 1 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <Droplet className="w-4 h-4 text-blue-500" /> Status de Hidratação
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Slider label="Percepção de Hidratação" value={data.perception} onChange={(v) => setData({...data, perception: v})} />
+              <Slider label="Cor da Urina" value={data.urineColor} min={1} max={8} onChange={(v) => setData({...data, urineColor: v})} invertColor />
+              <Slider label="Nível de Sede" value={data.thirst} onChange={(v) => setData({...data, thirst: v})} invertColor />
+              <NumberInput label="Ingestão de Líquidos" value={data.fluidIntake} unit="L/dia" step={0.1} onChange={(v) => setData({...data, fluidIntake: v})} />
+            </div>
+          </motion.div>
+        )}
 
-          {step === 2 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
-                <Thermometer className="w-4 h-4 text-blue-500" /> Impacto Fisiológico
-              </h3>
-              <div className="space-y-4">
-                <NumberInput label="Variação de Peso (Ex: -2 para perda de 2%)" value={data.weightVariation} unit="%" step={0.1} onChange={(v) => setData({...data, weightVariation: v})} />
-                
-                <div className="pt-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sintomas Relatados</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Checkbox label="Dor de Cabeça" checked={data.symptoms.headache} onChange={(v) => setData({...data, symptoms: {...data.symptoms, headache: v}})} />
-                    <Checkbox label="Tontura" checked={data.symptoms.dizziness} onChange={(v) => setData({...data, symptoms: {...data.symptoms, dizziness: v}})} />
-                    <Checkbox label="Cãibras" checked={data.symptoms.cramps} onChange={(v) => setData({...data, symptoms: {...data.symptoms, cramps: v}})} />
-                    <Checkbox label="Fadiga" checked={data.symptoms.fatigue} onChange={(v) => setData({...data, symptoms: {...data.symptoms, fatigue: v}})} />
-                  </div>
+        {step === 2 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-slate-800 pb-2 flex items-center gap-2">
+              <Thermometer className="w-4 h-4 text-blue-500" /> Impacto Fisiológico
+            </h3>
+            <div className="space-y-4">
+              <NumberInput label="Variação de Peso (Ex: -2 para perda de 2%)" value={data.weightVariation} unit="%" step={0.1} onChange={(v) => setData({...data, weightVariation: v})} />
+              
+              <div className="pt-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sintomas Relatados</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Checkbox label="Dor de Cabeça" checked={data.symptoms.headache} onChange={(v) => setData({...data, symptoms: {...data.symptoms, headache: v}})} />
+                  <Checkbox label="Tontura" checked={data.symptoms.dizziness} onChange={(v) => setData({...data, symptoms: {...data.symptoms, dizziness: v}})} />
+                  <Checkbox label="Cãibras" checked={data.symptoms.cramps} onChange={(v) => setData({...data, symptoms: {...data.symptoms, cramps: v}})} />
+                  <Checkbox label="Fadiga" checked={data.symptoms.fatigue} onChange={(v) => setData({...data, symptoms: {...data.symptoms, fatigue: v}})} />
                 </div>
               </div>
-            </motion.div>
-          )}
-        </div>
+            </div>
+          </motion.div>
+        )}
 
-        {/* Results Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden sticky top-6">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Score Hidratação</p>
-                <div className="text-6xl font-black text-white mb-2">{score}</div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+            <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+              <div className="p-8 text-center border-b border-slate-800">
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-2">Score Hidratação</p>
+                <div className="text-7xl font-black text-white mb-3">{score}</div>
+                <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${getColorClasses(classification.color)}`}>
                   {classification.label}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 mb-6">
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Índice Hidratação</span>
-                  <span className={`text-sm font-black ${metrics.hydrationIndex > 70 ? 'text-emerald-400' : metrics.hydrationIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.hydrationIndex}%</span>
+              <div className="p-6">
+                <div className="grid grid-cols-1 gap-4 mb-8">
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Índice de Hidratação</span>
+                    <span className={`text-xl font-black ${metrics.hydrationIndex > 70 ? 'text-emerald-400' : metrics.hydrationIndex > 50 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.hydrationIndex}%</span>
+                  </div>
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/50 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Estresse Fisiológico</span>
+                    <span className={`text-xl font-black ${metrics.physiologicalStress < 30 ? 'text-emerald-400' : metrics.physiologicalStress < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.physiologicalStress}%</span>
+                  </div>
                 </div>
-                <div className="bg-slate-950 rounded-xl p-3 border border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Estresse</span>
-                  <span className={`text-sm font-black ${metrics.physiologicalStress < 30 ? 'text-emerald-400' : metrics.physiologicalStress < 70 ? 'text-amber-400' : 'text-rose-400'}`}>{metrics.physiologicalStress}%</span>
-                </div>
-              </div>
 
-              {alerts.length > 0 && (
-                <div className="space-y-2 mb-6">
-                  {alerts.map((alert, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-3 py-2 rounded-lg border border-rose-500/20">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> {alert}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <Button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-[10px] font-black">
-                {isSaving ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
+                {alerts.length > 0 && (
+                  <div className="space-y-3 mb-8">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest text-center mb-4">Atenção Crítica</h4>
+                    {alerts.map((alert, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-rose-500 bg-rose-500/10 px-4 py-3 rounded-xl border border-rose-500/20">
+                        <AlertTriangle className="w-4 h-4 shrink-0" /> {alert}
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
-              </Button>
+
+                <Button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl">
+                  {isSaving ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  ) : (
+                    <Save className="w-5 h-5 mr-3" />
+                  )}
+                  {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+                </Button>
+              </div>
             </div>
+          </motion.div>
+        )}
+
+        {step < 3 && (
+          <div className="flex items-center justify-between pt-6 border-t border-slate-800">
+            <Button 
+              variant="ghost" 
+              onClick={() => step > 1 ? setStep(step - 1) : onCancel()} 
+              className="text-slate-400 hover:text-white uppercase tracking-widest text-[10px] font-black"
+            >
+              {step === 1 ? 'Cancelar' : 'Anterior'}
+            </Button>
+            <Button 
+              onClick={() => setStep(step + 1)} 
+              className="bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-[10px] font-black w-32"
+            >
+              {step === 2 ? 'Ver Resultado' : 'Próximo'}
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
