@@ -161,11 +161,11 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between px-4">
+      <div className="flex items-center gap-4 overflow-x-auto no-scrollbar px-4 py-2 my-2">
         {steps.map((s, i) => (
           <React.Fragment key={s.id}>
             <div 
-              className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all shrink-0 ${step === s.id ? 'scale-110' : 'opacity-40'}`}
               onClick={() => setStep(s.id)}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-purple-500 bg-purple-500/10 text-purple-400' : 'border-slate-700 text-slate-500'}`}>
@@ -174,7 +174,7 @@ export function PsychologicalAssessment({ athleteId, onCancel, onSave }: Psychol
               <span className="text-[0.5rem] font-black uppercase tracking-widest text-center max-w-[4rem] leading-tight">{s.title}</span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`flex-1 h-[2px] mx-2 mb-8 ${step > s.id ? 'bg-purple-500' : 'bg-slate-800'}`}></div>
+              <div className={`w-8 h-[2px] shrink-0 mb-8 ${step > s.id ? 'bg-purple-500' : 'bg-slate-800'}`}></div>
             )}
           </React.Fragment>
         ))}
