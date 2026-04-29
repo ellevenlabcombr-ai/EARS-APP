@@ -16,10 +16,10 @@ interface NeurologicalAssessmentProps {
   onSave: (data: any) => void;
 }
 
-type Tab = 'sintomas' | 'cognitivo' | 'motor' | 'voms' | 'redflags';
+type Step = number;
 
 export function NeurologicalAssessment({ athleteId, onCancel, onSave }: NeurologicalAssessmentProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('sintomas');
+  const [step, setStep] = useState<Step>(1);
   const [isSaving, setIsSaving] = useState(false);
 
   // === 1. SINTOMAS (SCAT6 / Child SCAT6) ===
@@ -203,13 +203,14 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
     }
   };
 
-  const TABS = [
-    { id: 'sintomas', label: 'Sintomas SCAT', icon: Activity },
-    { id: 'cognitivo', label: 'Cognitivo', icon: Brain },
-    { id: 'motor', label: 'Motor & M-BESS', icon: ArrowLeft }, 
-    { id: 'voms', label: 'VOMS', icon: Eye },
-    { id: 'redflags', label: 'Escolar & Red Flags', icon: AlertTriangle },
-  ] as const;
+  const formSteps = [
+    { id: 1, title: 'Sintomas', icon: Activity },
+    { id: 2, title: 'Cognitivo', icon: Brain },
+    { id: 3, title: 'Motor & M-BESS', icon: ArrowLeft }, 
+    { id: 4, title: 'VOMS', icon: Eye },
+    { id: 5, title: 'Red Flags', icon: AlertTriangle },
+    { id: 6, title: 'Resultado', icon: Save },
+  ];
 
   const VOMS_FIELDS = [
     { key: 'baseline', label: 'Baseline', desc: 'Antes do teste' },
@@ -224,65 +225,45 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
   return (
     <div className="flex flex-col h-full bg-[#050B14] overflow-hidden text-slate-200" style={{ height: 'calc(100vh - 4rem)' }}>
       {/* Header */}
-      <header className="h-20 border-b border-slate-800/50 flex items-center justify-between px-4 sm:px-8 bg-[#0A1120]/80 backdrop-blur-xl shrink-0 sticky top-0 z-50">
+      <div className="flex items-center justify-between p-4 sm:p-6 pb-2 shrink-0 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-400 hover:text-white shrink-0 hidden sm:flex">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
           <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
             <Brain className="w-6 h-6 text-indigo-400" />
           </div>
-          <div>
-             <TestInfoModal
-              title="Avaliação Neurológica Avançada (Child SCAT6 / VOMS)"
-              indication="Rastreio pós-trauma craniano, acompanhamento de concussão ou baseline."
-              application="Questionário de sintomas, testes cognitivos, equilíbrio (mBESS) e testes visuo-vestibulares (VOMS)."
-            >
-              <h2 className="text-lg font-black text-white uppercase tracking-tight -mb-0.5 cursor-pointer hover:text-cyan-400 transition-colors">Avaliação Neurológica</h2>
-            </TestInfoModal>
-            <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest truncate">Protocolo SCAT6 & VOMS pediátrico</p>
-          </div>
+          <TestInfoModal
+            title="Avaliação Neurológica Avançada (Child SCAT6 / VOMS)"
+            indication="Rastreio pós-trauma craniano, acompanhamento de concussão ou baseline."
+            application="Questionário de sintomas, testes cognitivos, equilíbrio (mBESS) e testes visuo-vestibulares (VOMS)."
+          >
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight hover:text-cyan-400 transition-colors cursor-pointer">Avaliação Neurológica</h2>
+              <p className="text-xxs text-slate-500 font-bold uppercase tracking-widest truncate">Protocolo SCAT6 & VOMS pediátrico</p>
+            </div>
+          </TestInfoModal>
         </div>
-
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className={'px-4 sm:px-6 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black uppercase tracking-widest text-xs transition-all flex items-center gap-2'}
-        >
-          {isSaving ? <span className="animate-pulse">...</span> : <Save className="w-4 h-4" />}
-          <span className="hidden sm:inline">Finalizar</span>
-        </button>
-      </header>
-
-      {/* Classification Summary */}
-      <div className="px-4 sm:px-8 py-4 shrink-0 max-w-5xl mx-auto w-full border-b border-slate-800/50">
-        <div className="flex items-center flex-wrap gap-4 justify-between">
-           <div className="flex items-center gap-4">
-             <div className="text-3xl font-black text-white">{score} <span className="text-sm text-slate-500">/ 100</span></div>
-             <div className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest ${classification.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-400' : classification.color === 'amber' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>
-               {classification.label}
-             </div>
-           </div>
-           {alerts.length > 0 && (
-             <div className="flex items-center gap-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1.5 rounded-lg text-xs font-black">
-               <AlertTriangle className="w-4 h-4" />
-               {alerts.length} ALERTA(S)
-             </div>
-           )}
-        </div>
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-slate-500 hover:text-white">
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4 shrink-0 gap-4 max-w-5xl mx-auto w-full">
-        {TABS.map((t) => {
-          const isActive = activeTab === t.id;
-          return (
-            <div key={t.id} onClick={() => setActiveTab(t.id)} className={`cursor-pointer shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${isActive ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'}`}>
-              <t.icon className="w-4 h-4" />
-              <span className="text-xs font-black uppercase tracking-widest">{t.label}</span>
+      {/* Progress Steps */}
+      <div className="flex items-center justify-start md:justify-between gap-4 md:gap-0 overflow-x-auto no-scrollbar px-4 sm:px-6 py-4 my-2 w-full max-w-4xl mx-auto shrink-0">
+        {formSteps.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <div 
+              className={`flex flex-col items-center gap-2 cursor-pointer transition-all shrink-0 ${step === s.id ? 'scale-110' : 'opacity-40'}`}
+              onClick={() => setStep(s.id)}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === s.id ? 'border-indigo-500 bg-indigo-500/10 text-indigo-400' : 'border-slate-700 text-slate-500'}`}>
+                <s.icon className="w-4 h-4" />
+              </div>
+              <span className="text-[0.6rem] md:text-xs font-black uppercase tracking-widest text-center max-w-[5rem] md:max-w-[7rem] leading-tight mt-1">{s.title}</span>
             </div>
-          )
-        })}
+            {i < formSteps.length - 1 && (
+              <div className={`w-8 md:flex-1 h-[2px] shrink-0 mb-8 mx-2 ${step > s.id ? 'bg-indigo-500' : 'bg-slate-800'}`}></div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
 
       {/* Content */}
@@ -290,11 +271,21 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
         <div className="max-w-4xl mx-auto space-y-8 h-full">
 
           {/* TAB 1: SINTOMAS */}
-          {activeTab === 'sintomas' && (
+          {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-               <div className="bg-slate-800/30 border border-slate-700/50 p-4 rounded-xl">
-                 <p className="text-xs text-slate-400 font-bold">Gradue cada sintoma baseando-se em como o atleta se sente AGORA. (0 = Nenhum, 6 = Severo)</p>
-               </div>
+               <TestInfoModal
+                 title="Questionário de Sintomas"
+                 indication="Identificação e quantificação dos sintomas relatados pelo atleta."
+                 application="O atleta deve graduar cada sintoma baseado em como se sente AGORA (0 = Nenhum, 6 = Severo)."
+                 referenceValues={["Sintomas leves: Score 0-2 dependendo do sintoma", "Sintomas severos: Valores altos (4+) em qualquer sintoma", "Red Flags: Dor de cabeça severa, perda de consciência (ver Red Flags no último passo)"]}
+               >
+                 <div className="bg-slate-800/30 border border-slate-700/50 p-4 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                   <p className="text-xs text-slate-400 font-bold flex items-center justify-between">
+                     <span>Gradue cada sintoma baseando-se em como o atleta se sente AGORA. (0 = Nenhum, 6 = Severo)</span>
+                     <FileQuestion className="w-4 h-4 text-cyan-500 shrink-0" />
+                   </p>
+                 </div>
+               </TestInfoModal>
                
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {Object.keys(symptoms).map(key => {
@@ -343,12 +334,22 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           )}
 
           {/* TAB 2: COGNITIVO */}
-          {activeTab === 'cognitivo' && (
+          {step === 2 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                
                {/* Orientation */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">1. Orientação (Maddocks / SCAT)</h3>
+                 <TestInfoModal
+                   title="Orientação (Maddocks / SCAT)"
+                   indication="Avaliar a orientação e memória recente (tempo e espaço)."
+                   application="Faça as 5 perguntas. O atleta deve responder corretamente. Anote se acertou ou errou."
+                   referenceValues={["Sucesso: 5 acertos", "Falha: Qualquer erro pode indicar déficit cognitivo recente decorrente de concussão"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     1. Orientação (Maddocks / SCAT)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-4">
                    {[
                      { k: 'venue', l: 'Onde estamos hoje?' },
@@ -370,7 +371,17 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
                {/* Memory */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">2. Memória Imediata (Liste de Palavras)</h3>
+                 <TestInfoModal
+                   title="Memória Imediata"
+                   indication="Testar a capacidade de retenção imediata."
+                   application="Leia a lista de 5 palavras no ritmo de 1 por segundo. Peça ao atleta para repetir o máximo que conseguir (em qualquer ordem). Repita isso por 3 tentativas (T1, T2, T3) usando as mesmas palavras."
+                   referenceValues={["Bom: Lembrar todas as 5 na última tentativa", "Atenção: Dificuldade progressiva na retenção"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     2. Memória Imediata (Liste de Palavras)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-6">
                     <p className="text-xs text-slate-500 font-bold uppercase">Avalie o número de palavras recordadas corretamente em 3 tentativas.</p>
                     <div className="grid grid-cols-4 gap-4">
@@ -406,7 +417,17 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
                
                {/* Concentration */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">3. Concentração (Dígitos Inversos)</h3>
+                 <TestInfoModal
+                   title="Concentração (Dígitos Inversos/Meses)"
+                   indication="Avaliar a atenção sustentada e a memória de trabalho."
+                   application="Leia os blocos numéricos (1 por segundo). O atleta deve repeti-los na ordem INVERSA. Para os meses, peça que diga os meses do ano de trás para frente."
+                   referenceValues={["Passar 3 e 4 dígitos: Mínimo esperado", "Falhar em sequências simples: Comprometimento de atenção"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     3. Concentração (Dígitos Inversos)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-4">
                    <p className="text-xs text-slate-500 font-bold uppercase mb-4">Leia os dígitos, o atleta deve repetir ao contrário.</p>
                    {[
@@ -435,7 +456,17 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
                </section>
 
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">4. Memória Tardia (Após 5 min)</h3>
+                 <TestInfoModal
+                   title="Memória Tardia"
+                   indication="Testar a consolidação da memória em curto prazo."
+                   application="Após pelo menos 5 minutos da primeira lista, peça ao atleta que lembre das 5 palavras anteriores sem dica."
+                   referenceValues={["Normal: 4 a 5 palavras", "Alterado: Menos de 3 palavras podem sugerir perda de fixação do aprendizado"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     4. Memória Tardia (Após 5 min)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-4">
                    <p className="text-xs text-slate-500 font-bold uppercase mb-4">Das 5 palavras, quantas o atleta lembrou agora?</p>
                    <div className="flex gap-2">
@@ -452,11 +483,21 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           )}
 
           {/* TAB 3: MOTOR E EQUILÍBRIO */}
-          {activeTab === 'motor' && (
+          {step === 3 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                {/* mBESS */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">1. modified BESS (Erros em 20s, chão firme)</h3>
+                 <TestInfoModal
+                   title="modified BESS (mBESS)"
+                   indication="Testar o equilíbrio estático postural."
+                   application="3 posições (Pés Juntos, 1 Perna, Tandem/Ponta-calcanhar), pés descalços, olhos fechados. Conte os erros por 20 segundos em cada (Máx 10 por posição)."
+                   referenceValues={["Erros que pontuam: Abrir olhos, tirar mãos da crista ilíaca, dar passo/tropeçar, flexão > 30º, ficar fora da posição > 5 seg"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     1. modified BESS (Erros em 20s, chão firme)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-6">
                    {[
                      { k: 'mbessDouble', label: 'Bipodal (Double Leg)' },
@@ -482,7 +523,17 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
                {/* Tandem Gait */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">2. Tandem Gait Test</h3>
+                 <TestInfoModal
+                   title="Tandem Gait Test"
+                   indication="Avaliar a locomoção, coordenação dinâmica e controle motor fino."
+                   application="Aplicar uma fita de 3m no chão. O atleta deve marchar (sem tênis) colocando o calcanhar de um pé colado na ponta do outro pé, até o fim da linha, girar rapidamente 180º e voltar."
+                   referenceValues={["Falhas (Marcar NÃO): Sair da linha, afastar o calcanhar do dedo (>1cm), agarrar/Tocar algo", "Tempo normal sugerido: Geralmente abaixo de 14 segundos"]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     2. Tandem Gait Test
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-6">
                    <p className="text-xs text-slate-500 font-bold uppercase mb-4">Marchar calcanhar-ponta em linha reta (3 metros e voltar).</p>
                    
@@ -503,7 +554,17 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
                {/* Finger-to-Nose */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">3. Coordenação (Dedo-Nariz)</h3>
+                 <TestInfoModal
+                   title="Teste Dedo-Nariz (Finger-to-Nose)"
+                   indication="Avaliar a função cerebelar (discriminação e controle)."
+                   application="Sentado, olhos fechados. O atleta abre os braços (ombros 90°) e aponta o indicador de forma rápida e precisa para a ponta de seu próprio nariz assim que o avaliador ordenar."
+                   referenceValues={["Falha: Errar o nariz (dismetria), tremores ou realizar o movimento muito devagar."]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     3. Coordenação (Dedo-Nariz)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <Card className="bg-slate-900/40 border-slate-800 p-6 space-y-4">
                    <div className="flex items-center justify-between">
                      <span className="text-sm font-bold text-slate-300">Teste Feito com Sucesso?</span>
@@ -518,13 +579,21 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           )}
 
           {/* TAB 4: VOMS */}
-          {activeTab === 'voms' && (
+          {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-               <div className="bg-slate-800/30 border border-slate-700/50 p-4 rounded-xl">
-                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                   Vestibular/Ocular Motor Screening (Score de provocação 0-10)
-                 </p>
-               </div>
+               <TestInfoModal
+                 title="VOMS (Vestibular/Ocular Motor Screening)"
+                 indication="Identificar e quantificar disfunções oculomotoras e vestibulares."
+                 application="Em cada teste (como saccades, VOR), o atleta pode sentir os sintomas exacerbados ou provocados. Questione imediatamente após e anote o aumento na dor de cabeça, tontura, náusea ou névoa (0 a 10)."
+                 referenceValues={["Normal: Sem alteração dos sintomas de baseline", "Positivo: Piora de 2 ou mais pontos nos sintomas após a manobra específica"]}
+               >
+                 <div className="bg-slate-800/30 border border-slate-700/50 p-4 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                   <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex justify-between items-center">
+                     <span>Vestibular/Ocular Motor Screening (Score de provocação 0-10)</span>
+                     <FileQuestion className="w-4 h-4 text-cyan-500 shrink-0" />
+                   </p>
+                 </div>
+               </TestInfoModal>
 
                <div className="overflow-x-auto rounded-2xl border border-slate-800 max-w-full">
                  <table className="w-full text-left border-collapse">
@@ -569,8 +638,18 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
                <Card className="bg-slate-900/40 border-slate-800 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
                  <div>
-                   <h4 className="text-sm font-bold text-white mb-1">Near Point of Convergence (NPC)</h4>
-                   <p className="text-xs text-slate-500 font-bold uppercase">Distância até visão dupla, ou até a caneta tocar o nariz (cm).</p>
+                   <TestInfoModal
+                     title="Near Point of Convergence (NPC)"
+                     indication="Testar a convergência ocular e medir o limite visual."
+                     application="Aproxime o dedo ou alvo visual na linha média até a ponta do nariz. Pare quando o atleta relatar 'visão dupla' ou quando os olhos desviarem. Tire a medida 3 vezes e tire a média."
+                     referenceValues={["Normal: Menos de 5cm de distância", "Anormal: Consegue focar apenas além de 5cm de distância (indicativo da Concussão)"]}
+                   >
+                     <h4 className="text-sm font-bold text-white mb-1 w-fit cursor-pointer flex items-center gap-2 hover:text-indigo-300 transition-colors">
+                       Near Point of Convergence (NPC)
+                       <FileQuestion className="w-4 h-4 text-slate-400" />
+                     </h4>
+                   </TestInfoModal>
+                   <p className="text-xs text-slate-500 font-bold uppercase mt-1">Distância até visão dupla, ou até a caneta tocar o nariz (cm).</p>
                  </div>
                  <div className="flex items-center gap-3">
                    <input 
@@ -587,12 +666,22 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
           )}
 
           {/* TAB 5: RED FLAGS & COMPS */}
-          {activeTab === 'redflags' && (
+          {step === 5 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                
                {/* Pediatric Flags */}
                <section className="space-y-4">
-                 <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400">Ativação Pediatria (Pais/Relato)</h3>
+                 <TestInfoModal
+                   title="Ativação Pediatria (Red Flags Comportamentais)"
+                   indication="Identificar sinais de fadiga ou alteração comportamental precoce."
+                   application="Pergunte aos pais, professor ou responsável sobre o comportamento recente da criança, fora do campo mental natural."
+                   referenceValues={["Sem alerta: Nenhuma atitude suspeita", "Atenção (Marcar): Alteração aguda em comportamento, queda em notas, choro/birra anormais, insônia ou letargia."]}
+                 >
+                   <h3 className="text-sm font-black text-white uppercase tracking-widest text-indigo-400 flex items-center gap-2 cursor-pointer hover:text-indigo-300 transition-colors w-fit">
+                     Ativação Pediatria (Pais/Relato)
+                     <FileQuestion className="w-4 h-4" />
+                   </h3>
+                 </TestInfoModal>
                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
                       { key: 'schoolDecline', label: 'Piora no desempenho escolar / dificuldades na aula' },
@@ -615,10 +704,20 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
 
                {/* Absolute Red Flags */}
                <section className="space-y-4 pt-6 border-t border-slate-800/50">
-                 <div className="flex items-center gap-3">
-                   <AlertTriangle className="w-5 h-5 text-rose-500" />
-                   <h3 className="text-sm font-black text-rose-400 uppercase tracking-widest">RED FLAGS IMEDIATOS</h3>
-                 </div>
+                 <TestInfoModal
+                   title="Red Flags Absolutos"
+                   indication="Sinais de gravidade extrema ou suspeita de lesões estruturais severas."
+                   application="Observe no paciente (ou pergunte) os itens listados. A resposta afirmativa de qualquer um exige interrupção e encaminhamento."
+                   referenceValues={["Crítico: Qualquer Red Flag ativada obriga a ida ao Pronto-Socorro com remoção segura e acompanhamento!"]}
+                 >
+                   <div className="flex items-center gap-3 w-fit cursor-pointer hover:opacity-80 transition-opacity mb-4">
+                     <AlertTriangle className="w-5 h-5 text-rose-500" />
+                     <h3 className="text-sm font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                       RED FLAGS IMEDIATOS
+                       <FileQuestion className="w-4 h-4 text-rose-400" />
+                     </h3>
+                   </div>
+                 </TestInfoModal>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
                       { key: 'neckPain', label: 'Dor no pescoço ou sensibilidade' },
@@ -645,6 +744,46 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
                  </div>
                </section>
             </div>
+          )}
+
+          {/* TAB 6: RESULTADO */}
+          {step === 6 && (
+             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
+                <div className="bg-slate-800/50 p-6 flex flex-col items-center justify-center text-center border-b border-slate-800">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Pontuação Geral (0-100)</p>
+                  <div className={`text-6xl font-black mb-3 ${classification.color === 'emerald' ? 'text-emerald-400' : classification.color === 'amber' ? 'text-amber-400' : 'text-rose-400'}`}>
+                    {score}
+                  </div>
+                  <div className={`px-4 py-2 rounded-full border text-xs font-black uppercase tracking-widest ${classification.color === 'emerald' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : classification.color === 'amber' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-rose-500/10 border-rose-500 text-rose-400'}`}>
+                    {classification.label}
+                  </div>
+                </div>
+                
+                <div className="p-6 space-y-6">
+                  {alerts.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">Alertas e Risco Detectados</h4>
+                      {alerts.map((alert, idx) => (
+                        <div key={idx} className="flex items-start gap-3 bg-red-500/10 text-red-400 px-4 py-3 rounded-xl border border-red-500/20">
+                          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                          <span className="text-sm font-bold">{alert}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <Button onClick={handleSave} disabled={isSaving} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white uppercase tracking-widest text-xs font-black h-14 rounded-xl">
+                    {isSaving ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                    ) : (
+                      <Save className="w-5 h-5 mr-3" />
+                    )}
+                    {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           )}
 
         </div>
