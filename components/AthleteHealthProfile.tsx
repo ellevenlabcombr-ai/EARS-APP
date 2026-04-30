@@ -534,12 +534,40 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     
     try {
       setIsGeneratingPdf(true);
+      
       const canvas = await html2canvas(reportRef.current, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#020617',
+        backgroundColor: '#ffffff',
         logging: false,
-        allowTaint: true,
+        onclone: (clonedDoc) => {
+          const reportElement = clonedDoc.querySelector('[ref-report-container]') || clonedDoc.body;
+          if (reportElement instanceof HTMLElement) {
+            // Force white background and dark text for print
+            reportElement.style.backgroundColor = '#ffffff';
+            reportElement.style.color = '#0f172a';
+            
+            // Fix all text colors and borders in the clone
+            const allTexts = reportElement.querySelectorAll('p, span, h1, h2, h3, h4, h5, div');
+            allTexts.forEach(el => {
+              if (el instanceof HTMLElement) {
+                if (el.classList.contains('text-slate-400') || el.classList.contains('text-slate-500')) {
+                   el.style.color = '#64748b';
+                } else if (!el.classList.contains('text-cyan-500') && !el.classList.contains('text-rose-500') && !el.classList.contains('text-emerald-500')) {
+                   el.style.color = '#0f172a';
+                }
+              }
+            });
+
+            const allCards = reportElement.querySelectorAll('.bg-slate-900, .bg-slate-900\\/50, .bg-slate-900\\/60, .bg-slate-900\\/40, .bg-slate-900\\/30');
+            allCards.forEach(card => {
+              if (card instanceof HTMLElement) {
+                card.style.backgroundColor = '#f8fafc';
+                card.style.borderColor = '#e2e8f0';
+              }
+            });
+          }
+        }
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -551,12 +579,12 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       
       const dateStr = new Date(selectedAssessment.assessment_date).toLocaleDateString('pt-BR').replace(/\//g, '-');
       const typeStr = selectedAssessment.assessment_type || 'assessment';
-      const athleteName = athlete.name.split(' ')[0] || 'Athlete';
+      const athleteName = athlete.name.split(' ')[0] || 'Atleta';
       
       pdf.save(`Relatorio_${typeStr}_${athleteName}_${dateStr}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      setNotification({ message: 'Erro ao gerar PDF', type: 'error' });
+      setNotification({ message: 'Erro ao gerar PDF: ' + (error instanceof Error ? error.message : 'Desconhecido'), type: 'error' });
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -3881,7 +3909,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </div>
 
               {/* Content */}
-              <div ref={reportRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+              <div ref={reportRef} data-report-container="true" className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
