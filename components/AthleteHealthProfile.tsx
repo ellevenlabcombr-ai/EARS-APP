@@ -100,6 +100,8 @@ import { AttachmentUploadForm, ATTACHMENT_CATEGORIES } from "./AttachmentUploadF
 import { AttachmentPreviewModal } from "./AttachmentPreviewModal";
 import { AttachmentVersionHistory } from "./AttachmentVersionHistory";
 import { AssessmentVisualizer } from "./AssessmentVisualizer";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ClinicalAlert } from "@/types/database";
 import { calculateRiskClusters, ClinicalTag } from "@/lib/clinical-engine";
@@ -524,6 +526,41 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
   const [showQrModal, setShowQrModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
+
+  const exportToPDF = async () => {
+    if (!reportRef.current || !selectedAssessment) return;
+    
+    try {
+      setIsGeneratingPdf(true);
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#020617',
+        logging: false,
+        allowTaint: true,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      const dateStr = new Date(selectedAssessment.assessment_date).toLocaleDateString('pt-BR').replace(/\//g, '-');
+      const typeStr = selectedAssessment.assessment_type || 'assessment';
+      const athleteName = athlete.name.split(' ')[0] || 'Athlete';
+      
+      pdf.save(`Relatorio_${typeStr}_${athleteName}_${dateStr}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setNotification({ message: 'Erro ao gerar PDF', type: 'error' });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
   const [selectedClinicalRegion, setSelectedClinicalRegion] = useState<{id: string, label: string} | null>(null);
 
   const sportProfile = getSportProfile(athlete.sport);
@@ -3844,7 +3881,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+              <div ref={reportRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
@@ -4043,7 +4080,25 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+              <div className="p-6 border-t border-slate-800 bg-slate-900/50 flex justify-between items-center">
+                <Button 
+                  onClick={exportToPDF}
+                  disabled={isGeneratingPdf}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-widest text-xxs h-10 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-500/20"
+                >
+                  {isGeneratingPdf ? (
+                    <>
+                      <RefreshCcw className="w-3.5 h-3.5 animate-spin" />
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" />
+                      Exportar PDF
+                    </>
+                  )}
+                </Button>
+
                 <Button 
                   onClick={() => setSelectedAssessment(null)}
                   className="bg-slate-800 hover:bg-slate-700 text-white font-black uppercase tracking-widest text-xxs h-10 px-8 rounded-xl"
