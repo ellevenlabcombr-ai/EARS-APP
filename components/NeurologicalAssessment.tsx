@@ -213,13 +213,13 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
   ];
 
   const VOMS_FIELDS = [
-    { key: 'baseline', label: 'Baseline', desc: 'Antes do teste' },
-    { key: 'smoothPursuits', label: 'Smooth Pursuits', desc: 'Acompanhamento suave' },
-    { key: 'saccadesHorizontal', label: 'Saccades (H)', desc: 'Mov. sacádico horizontal' },
-    { key: 'saccadesVertical', label: 'Saccades (V)', desc: 'Mov. sacádico vertical' },
-    { key: 'vorHorizontal', label: 'VOR (H)', desc: 'Reflexo V-O horizontal' },
-    { key: 'vorVertical', label: 'VOR (V)', desc: 'Reflexo V-O vertical' },
-    { key: 'vms', label: 'VMS', desc: 'Sensibilidade visual ao mov.' },
+    { key: 'baseline', label: 'Baseline', desc: 'Antes do teste', application: 'Registre os sintomas do atleta em repouso no momento, antes de realizar qualquer movimento provocativo.', reference: ['Apenas para registro do estado inicial'] },
+    { key: 'smoothPursuits', label: 'Smooth Pursuits', desc: 'Acompanhamento suave', application: 'Segure um alvo a cerca de 1 metro na linha média. Mova-o lentamente para a direita e esquerda 50cm (2 repetições). O atleta deve seguir apenas com os olhos sem mover a cabeça.', reference: ['Normal: Acompanhamento suave e livre de dor.', 'Positivo: Visão tremida ou aumento dos sintomas.'] },
+    { key: 'saccadesHorizontal', label: 'Saccades (H)', desc: 'Mov. sacádico horizontal', application: 'Dois alvos a 1 metro de distância, com 1 metro entre eles (horizontalmente). O atleta move APENAS os olhos rapidamente de um alvo para o outro, 10 vezes completas.', reference: ['Positivo: Piora na dor de cabeça, tontura, náusea (>2pts) e engasgo/visão dupla.'] },
+    { key: 'saccadesVertical', label: 'Saccades (V)', desc: 'Mov. sacádico vertical', application: 'Similar ao Horizontal. Dois alvos dispostos verticalmente (1 metro entre si). O atleta move os olhos de cima para baixo 10 vezes completas.', reference: ['Positivo: Piora de 2 ou mais pontos nos sintomas avaliados.'] },
+    { key: 'vorHorizontal', label: 'VOR (H)', desc: 'Reflexo V-O horizontal', application: 'Atleta foca num alvo (ex dedo) a 1m de distância. Segure e gire a cabeça dele (lado a lado, amplitude 20º) em formato de "não" acompanhando 180 bpm no metrônomo (10 ciclos totais).', reference: ['Incapacidade de manter fixação ou aumento nos sintomas refletem disfunção.'] },
+    { key: 'vorVertical', label: 'VOR (V)', desc: 'Reflexo V-O vertical', application: 'Idêntico ao VOR H, mas com a cabela em movimento "sim" (cima-baixo, 20º) a 180 bpm por 10 ciclos. Olhar deve seguir fixo no alvo frontal.', reference: ['Positivo em caso de perda de fixação ou sintoma exacerbado.'] },
+    { key: 'vms', label: 'VMS', desc: 'Sensibilidade visual ao mov.', application: 'Segurando os braços esticados com polegares cima, atleta foca nos polegares e roda de "bloco" (tronco e cabeça juntos) 80º direita-esquerda, no ritmo de 50bpm. Total 5 ciclos (D/E).', reference: ['O estímulo optocinético deflagra náuseas fortes ou tontura no caso de concussão.'] },
   ];
 
   return (
@@ -612,7 +612,21 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
                        return (
                          <tr key={field.key} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/30 transition-colors">
                            <td className="p-4">
-                             <div className="text-sm font-bold text-slate-200">{field.label}</div>
+                             {field.application ? (
+                               <TestInfoModal
+                                 title={field.label}
+                                 indication={"Screening Vestibular/Oculomotor para " + field.label}
+                                 application={field.application}
+                                 referenceValues={field.reference}
+                               >
+                                 <div className="text-sm font-bold text-slate-200 cursor-pointer hover:text-cyan-400 transition-colors flex items-center gap-1.5 w-fit">
+                                   {field.label}
+                                   <FileQuestion className="w-3.5 h-3.5 text-slate-500" />
+                                 </div>
+                               </TestInfoModal>
+                             ) : (
+                               <div className="text-sm font-bold text-slate-200">{field.label}</div>
+                             )}
                              <div className="text-xxs text-slate-500 font-bold uppercase mt-0.5">{field.desc}</div>
                            </td>
                            {['headache', 'dizziness', 'nausea', 'fogginess'].map(k => (

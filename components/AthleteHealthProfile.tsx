@@ -3249,7 +3249,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
             {activeAssessment !== 'list' && (
               <div className="fixed inset-0 z-[100] bg-[#020617] overflow-y-auto pointer-events-auto">
-                <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 px-6 md:px-8 flex items-center justify-between shadow-lg">
+                <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 pt-[calc(1rem+env(safe-area-inset-top))] px-6 md:px-8 flex items-center justify-between shadow-lg">
                   <Button 
                     onClick={() => setActiveAssessment('list')} 
                     variant="ghost" 
@@ -3416,7 +3416,8 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
             {activeAssessment === 'anthropometric' && (
               <AnthropometricAssessmentForm 
-                athleteId={athlete.id} 
+                athlete={athlete}
+                previousAssessments={clinicalAssessments}
                 onCancel={() => setActiveAssessment('list')}
                 onSave={async (data) => {
                   try {
