@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { parseDateString, getLocalDateString, getTagSuggestions } from "@/lib/utils";
+import { translateKey, translateValue } from "@/lib/translations";
 import { 
   ChevronLeft, 
   Activity, 
@@ -68,6 +69,7 @@ import {
   Tag,
   Globe,
   Award,
+  AlertTriangle,
   CalendarDays
 } from "lucide-react";
 import { GoogleGenAI, Type } from "@google/genai";
@@ -97,6 +99,7 @@ import { PosturalAnalysisTool } from "./PosturalAnalysisTool";
 import { AttachmentUploadForm, ATTACHMENT_CATEGORIES } from "./AttachmentUploadForm";
 import { AttachmentPreviewModal } from "./AttachmentPreviewModal";
 import { AttachmentVersionHistory } from "./AttachmentVersionHistory";
+import { AssessmentVisualizer } from "./AssessmentVisualizer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ClinicalAlert } from "@/types/database";
 import { calculateRiskClusters, ClinicalTag } from "@/lib/clinical-engine";
@@ -204,190 +207,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const translateKey = (key: string, lang: string): string => {
-  const normalizedKey = key.toLowerCase();
-  
-  const ptDict: Record<string, string> = {
-    // common
-    pms: 'TPM',
-    flow: 'Fluxo',
-    pain: 'Dor',
-    regularity: 'Regularidade',
-    'cycle length': 'Duração do Ciclo',
-    'menarche age': 'Idade da Menarca',
-    'missed periods': 'Menstruações Atrasadas',
-    // Sleep
-    duration: 'Duração',
-    bedtime: 'Hora de Dormir',
-    waketime: 'Hora de Acordar',
-    quality: 'Qualidade',
-    feltrested: 'Sentiu-se Descansado',
-    difficultyfallingasleep: 'Dificuldade para Dormir',
-    wokeupduringnight: 'Acordou Durante a Noite',
-    earlyawakening: 'Acordou Muito Cedo',
-    daytimesleepiness: 'Sonolência Diurna',
-    sleepenvironment: 'Ambiente de Sono',
-    caffeinelate: 'Cafeína Tarde',
-    screentime: 'Tempo de Tela',
-    stresslevel: 'Nível de Estresse',
-    
-    // Orthopedic
-    painlevel: 'Nível de Dor',
-    painlocation: 'Local da Dor',
-    functionalimpact: 'Impacto Funcional',
-    training: 'Treino',
-    competition: 'Competição',
-    dailyactivities: 'Atividades Diárias',
-    functionaltests: 'Testes Funcionais',
-    squat: 'Agachamento',
-    jump: 'Salto',
-    balance: 'Equilíbrio',
-    
-    // Biomechanical
-    kneealignment: 'Alinhamento do Joelho',
-    hipcontrol: 'Controle do Quadril',
-    trunkcontrol: 'Controle do Tronco',
-    depth: 'Profundidade',
-    landingstability: 'Estabilidade na Aterrissagem',
-    shockabsorption: 'Absorção de Impacto',
-    stability: 'Estabilidade',
-    control: 'Controle',
-    valgus: 'Valgo',
-    present: 'Presente',
-    severity: 'Severidade',
-    asymmetry: 'Assimetria',
-    
-    // Physical
-    trainingload: 'Carga de Treino',
-    rpe: 'PSE',
-    fatigue: 'Fadiga',
-    recovery: 'Recuperação',
-    
-    // Common
-    score: 'Pontuação',
-    risklevel: 'Nível de Risco',
-    date: 'Data',
-    notes: 'Observações',
-    classification: 'Classificação',
-    alerts: 'Alertas',
-    
-    // Neurological
-    reactiontime: 'Tempo de Reação',
-    coordination: 'Coordenação',
-    dizziness: 'Tontura',
-    
-    // Psychological
-    stress: 'Estresse',
-    anxiety: 'Ansiedade',
-    motivation: 'Motivação',
-    focus: 'Foco',
-    
-    // Nutritional
-    mealsperday: 'Refeições por Dia',
-    hydrationliters: 'Hidratação (Litros)',
-    supplements: 'Suplementos',
-    appetite: 'Apetite',
-    
-    // RED-S
-    energyavailability: 'Disponibilidade de Energia',
-    menstrualstatus: 'Status Menstrual',
-    bonehealth: 'Saúde Óssea',
-    eatinghabits: 'Hábitos Alimentares',
-    
-    // Anthropometric
-    weight: 'Peso',
-    height: 'Altura',
-    bodyfat: 'Gordura Corporal (%)',
-    musclemass: 'Massa Muscular',
-    skinfolds: 'Dobras Cutâneas',
-    measurements: 'Medidas',
-    chest: 'Peitoral',
-    thigh: 'Coxa',
-    abdomen: 'Abdômen',
-    triceps: 'Tríceps',
-    axillary: 'Axilar Médio',
-    suprailiac: 'Suprailíaca',
-    subscapular: 'Subescapular',
-    hip: 'Quadril',
-    neck: 'Pescoço',
-    waist: 'Cintura',
-    leftcalf: 'Panturrilha Esq.',
-    leftthigh: 'Coxa Esq.',
-    rightcalf: 'Panturrilha Dir.',
-    rightthigh: 'Coxa Dir.',
-    leftforearm: 'Antebraço Esq.',
-    rightforearm: 'Antebraço Dir.',
-    shoulders: 'Ombros',
-    leftarmflexed: 'Braço Esq. Contraído',
-    leftarmrelaxed: 'Braço Esq. Relaxado',
-    rightarmflexed: 'Braço Dir. Contraído',
-    rightarmrelaxed: 'Braço Dir. Relaxado',
-    
-    // Maturation
-    tannerstage: 'Estágio de Tanner',
-    phv: 'Pico Vel. Crescimento',
-    growthvelocity: 'Velocidade Crescimento',
-    
-    // Menstrual
-    cyclelength: 'Duração do Ciclo',
-    flowduration: 'Duração do Fluxo',
-    painintensity: 'Intensidade da Dor',
-    symptoms: 'Sintomas',
-    
-    // Hydration
-    urinecolor: 'Cor da Urina',
-    thirstlevel: 'Nível de Sede',
-    weightlossduringexercise: 'Perda de Peso',
-    
-    // Functional
-    fmsscore: 'Score FMS',
-    ybalance: 'Y-Balance Test',
-    hoptest: 'Hop Test',
-    
-    // Dynamometry
-    gripstrength: 'Força de Preensão',
-    quadricepsstrength: 'Força de Quadríceps',
-    hamstringstrength: 'Força de Isquiotibiais',
-    
-    // Postural
-    headalignment: 'Alinhamento da Cabeça',
-    shouldersymmetry: 'Simetria dos Ombros',
-    pelvisalignment: 'Alinhamento da Pelve',
-    footarch: 'Arco do Pé',
-  };
-
-  const ptVal = ptDict[normalizedKey] || ptDict[normalizedKey.replace(/\s+/g, '')];
-  if (lang === "pt" && ptVal) {
-    return ptVal;
-  }
-  
-  if (lang === "en") {
-    const enDict: Record<string, string> = { 
-      trainingload: "Training Load", rpe: "RPE", fatigue: "Fatigue", recovery: "Recovery", score: "Score", risklevel: "Risk Level", date: "Date", notes: "Notes", classification: "Classification", alerts: "Alerts", skinfolds: "Skinfolds", measurements: "Measurements", chest: "Chest", thigh: "Thigh", abdomen: "Abdomen", triceps: "Triceps", axillary: "Axillary", suprailiac: "Suprailiac", subscapular: "Subscapular", hip: "Hip", neck: "Neck", waist: "Waist", 'left calf': "Left Calf", 'left thigh': "Left Thigh", 'right calf': "Right Calf", 'right thigh': "Right Thigh", 'left forearm': "Left Forearm", 'right forearm': "Right Forearm", shoulders: "Shoulders", pms: "PMS", flow: "Flow", pain: "Pain", regularity: "Regularity", 'cycle length': "Cycle Length", 'menarche age': "Menarche Age", 'missed periods': "Missed Periods", duration: "Duration"
-    };
-    const enVal = enDict[normalizedKey] || enDict[normalizedKey.replace(/\s+/g, '')];
-    if (enVal) return enVal;
-  }
-
-  // Convert camelCase or snake_case to Title Case
-  return key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .replace(/^./, str => str.toUpperCase());
-};
-const translateValue = (value: any, lang: string): string => {
-  if (typeof value === 'boolean') return value ? (lang === 'pt' ? 'Sim' : 'Yes') : (lang === 'pt' ? 'Não' : 'No');
-  if (value === null || value === undefined) return 'N/A';
-  if (Array.isArray(value)) return value.map(v => translateValue(v, lang)).join(', ');
-  if (typeof value === 'string') {
-    if (lang !== 'pt') return String(value).charAt(0).toUpperCase() + String(value).slice(1);
-    const dict: Record<string, string> = {
-      'low': 'Baixo', 'medium': 'Médio', 'high': 'Alto', 'normal': 'Normal', 'abnormal': 'Anormal', 'positive': 'Positivo', 'negative': 'Negativo', 'yes': 'Sim', 'no': 'Não', 'true': 'Sim', 'false': 'Não', 'left': 'Esquerda', 'right': 'Direita', 'bilateral': 'Bilateral', 'mild': 'Leve', 'moderate': 'Moderado', 'severe': 'Severo', 'regular': 'Regular', 'irregular': 'Irregular'
-    };
-    return dict[value.toLowerCase()] || (String(value).charAt(0).toUpperCase() + String(value).slice(1));
-  }
-  return String(value);
-};
 const renderDataNode = (key: string, value: any, lang: string, depth = 0): React.ReactNode => {
   // Skip internal or redundant fields at root level
   if (depth === 0 && ['classification', 'classification_color', 'alerts', 'score', 'athlete_id', 'id', 'created_at', 'assessment_date', 'clinical_report', 'clinical_alerts'].includes(key)) return null;
@@ -1790,6 +1609,25 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     }
   };
 
+  const latestAssessmentsByType = useMemo(() => {
+    return clinicalAssessments.reduce((acc, curr) => {
+      // clinicalAssessments sorted by date desc, so the first one we find for a type is the latest
+      if (curr.score !== null && curr.score !== undefined && !acc[curr.assessment_type]) {
+         acc[curr.assessment_type] = curr;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+  }, [clinicalAssessments]);
+
+  const { globalAssessmentScore, assessmentAlerts } = useMemo(() => {
+    const assessmentValues = Object.values(latestAssessmentsByType);
+    const score = assessmentValues.length > 0 
+      ? Math.round(assessmentValues.reduce((sum, a) => sum + Number(a.score), 0) / assessmentValues.length)
+      : null;
+    const alerts = assessmentValues.flatMap(a => (a.alerts || []).map((alert: string) => ({ type: a.assessment_type, message: alert })));
+    return { globalAssessmentScore: score, assessmentAlerts: alerts };
+  }, [latestAssessmentsByType]);
+
   const statusCfg = getStatusConfig(athlete.status);
   const riskCfg = getRiskConfig(athlete.riskLevel || 'Baixo');
   const StatusIcon = statusCfg.icon;
@@ -1837,7 +1675,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       />
 
             {/* Top App Bar */}
-      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 pt-10 pb-4 flex flex-col lg:grid lg:grid-cols-4 lg:grid-rows-[auto_auto_1fr] gap-x-8 gap-y-6">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-4 sm:px-6 pt-24 sm:pt-10 pb-24 sm:pb-4 flex flex-col lg:grid lg:grid-cols-4 lg:grid-rows-[auto_auto_1fr] gap-x-8 gap-y-6">
         <div className="col-span-full mb-0 lg:mb-2">
           <Button onClick={onBack} variant="ghost" className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-slate-800"><ChevronLeft className="w-4 h-4 mr-2" /> Voltar para Dashboard</Button>
         </div>
@@ -2060,6 +1898,30 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         <div className="col-span-full lg:row-start-4 order-4 space-y-10 min-w-0 pb-32">
         {activeTab === 'overview' && (
           <div className="space-y-10 pb-32">
+            {/* Clinical Alerts Banner */}
+            {assessmentAlerts.length > 0 && (
+              <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-rose-500/20 rounded-lg shrink-0">
+                    <AlertTriangle className="w-5 h-5 text-rose-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white uppercase tracking-wider">Alertas Clínicos Ativos</h4>
+                    <p className="text-xs text-rose-200/70">O atleta possui {assessmentAlerts.length} alerta(s) nas avaliações recentes.</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setActiveTab('clinical')}
+                  className="bg-transparent border-rose-500/30 font-bold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                >
+                  <span className="hidden sm:inline">Ver Detalhes</span>
+                  <span className="sm:hidden">Ver</span>
+                </Button>
+              </div>
+            )}
+
             {/* Session Mode Toggle Container */}
             <div className="flex items-center justify-between bg-slate-900/40 border border-slate-800/50 p-6 rounded-[2rem] backdrop-blur-md shadow-2xl overflow-hidden relative group">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -3126,6 +2988,65 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
         {activeTab === 'clinical' && (
           <div className="space-y-8">
+            {/* Global Assessment Score Card */}
+            {globalAssessmentScore !== null && (
+              <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 items-center shadow-2xl relative overflow-hidden">
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div className="flex flex-col items-center justify-center shrink-0 space-y-3 p-6 bg-slate-900/80 rounded-[2rem] border border-slate-800/50 shadow-inner min-w-[200px]">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest text-center">Score Geral<br/>de Avaliações</p>
+                  <div className="relative flex items-center justify-center w-32 h-32">
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle cx="64" cy="64" r="56" className="stroke-slate-800" strokeWidth="12" fill="none" />
+                      <circle 
+                        cx="64" cy="64" r="56" 
+                        strokeWidth="12" fill="none" 
+                        strokeDasharray={351.8} 
+                        strokeDashoffset={351.8 - (351.8 * globalAssessmentScore) / 100}
+                        strokeLinecap="round"
+                        className={`transition-all duration-1000 ease-out ${globalAssessmentScore < 60 ? 'stroke-rose-500' : globalAssessmentScore < 80 ? 'stroke-amber-500' : 'stroke-cyan-500'}`}
+                      />
+                    </svg>
+                    <span className="absolute text-4xl font-black text-white">{globalAssessmentScore}</span>
+                  </div>
+                </div>
+
+                <div className="flex-1 w-full space-y-6 z-10">
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <Stethoscope className="w-5 h-5 text-cyan-400" />
+                      Resumo Clínico Estruturado
+                    </h3>
+                    <p className="text-sm text-slate-400">Padronização dos dados encontrados nas últimas avaliações clínicas e físicas realizadas.</p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {assessmentAlerts.length > 0 ? (
+                      <div className="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
+                        <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Alertas Recentes das Avaliações</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {assessmentAlerts.map((alert, i) => (
+                            <div key={i} className="flex gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl items-start">
+                              <AlertTriangle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
+                              <div>
+                                <p className="text-xs font-bold text-slate-300 leading-snug">{alert.message}</p>
+                                <p className="text-[9px] font-black uppercase text-slate-500 mt-1">{translateKey(alert.type, language)}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-xl">
+                        <ShieldCheck className="w-5 h-5 shrink-0" />
+                        <p className="text-sm font-bold">Nenhum alerta ativo nas avaliações recentes.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Clinical Alerts Section */}
             <div className="space-y-4">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
@@ -3249,7 +3170,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
             {activeAssessment !== 'list' && (
               <div className="fixed inset-0 z-[100] bg-[#020617] overflow-y-auto pointer-events-auto">
-                <div className="p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 w-full max-w-7xl mx-auto space-y-6 min-h-screen">
+                <div className="p-4 sm:p-6 md:p-8 pt-[calc(max(env(safe-area-inset-top),_2rem)+2rem)] sm:pt-6 w-full max-w-7xl mx-auto space-y-6 min-h-screen">
 
             {activeAssessment === 'biomechanical' && (
               <BiomechanicalAssessment 
@@ -4050,9 +3971,12 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       )}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 gap-3">
-                      {(selectedAssessment.raw_data || selectedAssessment.data) && Object.entries(selectedAssessment.raw_data || selectedAssessment.data).map(([key, value]) => renderDataNode(key, value, language))}
-                    </div>
+                    <AssessmentVisualizer 
+                      data={selectedAssessment.raw_data || selectedAssessment.data} 
+                      type={selectedAssessment.assessment_type} 
+                      language={language} 
+                      selectedAssessment={selectedAssessment} 
+                    />
                   )}
                 </div>
 

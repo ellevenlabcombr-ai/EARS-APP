@@ -65,7 +65,6 @@ export function CreateEventModal({ isOpen, onClose, onSave, initialEvent }: Crea
     };
 
     if (isOpen && initialEvent) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: initialEvent.title || "",
         description: initialEvent.description || "",

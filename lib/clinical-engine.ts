@@ -53,10 +53,11 @@ export function calculateRiskClusters(input: EngineInput): EngineOutput {
   const isDangerousSpike = acwr > 1.5;
   
   // Cross-Assessment Junction
-  const hasStructuralRisk = assessments.some(a => 
-    (a.type?.toLowerCase().includes('ortho') || a.type?.toLowerCase().includes('biomech')) && 
-    (a.score < 60 || a.classification?.toLowerCase().includes('risk'))
-  );
+  const hasStructuralRisk = assessments.some(a => {
+    const type = (a.type || a.assessment_type || '').toLowerCase();
+    return (type.includes('ortho') || type.includes('biomech') || type.includes('func') || type.includes('phys')) && 
+           (a.score < 60 || (a.classification || '').toLowerCase().includes('risk') || (a.classification || '').toLowerCase().includes('risco'));
+  });
 
   if (hasSignificantPain || acwr > 1.3 || isDangerousSpike || hasStructuralRisk) {
     const trendImpact = trendScore < -0.3 ? 15 : 0;
