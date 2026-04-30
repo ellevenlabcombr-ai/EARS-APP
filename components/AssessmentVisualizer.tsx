@@ -11,12 +11,13 @@ interface AssessmentVisualizerProps {
   type: string;
   language: string;
   selectedAssessment: any;
+  isExporting?: boolean;
 }
 
 // Ignore these keys when parsing as they are usually handled by the main modal or are metadata
 const IGNORED_KEYS = ['classification', 'classification_color', 'alerts', 'score', 'athlete_id', 'id', 'created_at', 'assessment_date', 'clinical_report', 'clinical_alerts', 'notes'];
 
-export function AssessmentVisualizer({ data, type, language, selectedAssessment }: AssessmentVisualizerProps) {
+export function AssessmentVisualizer({ data, type, language, selectedAssessment, isExporting = false }: AssessmentVisualizerProps) {
   
   const { numericMetrics, nestedNumericGroups, textMetrics, booleanMetrics, arrayMetrics } = useMemo(() => {
     let numMet: { name: string; value: number; originalKey: string }[] = [];
@@ -105,8 +106,8 @@ export function AssessmentVisualizer({ data, type, language, selectedAssessment 
               <div className="h-[250px] w-full -ml-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={group.data}>
-                    <PolarGrid stroke="#334155" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }} />
+                    <PolarGrid stroke={isExporting ? "#e2e8f0" : "#334155"} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: isExporting ? "#475569" : "#94a3b8", fontSize: 10, fontWeight: 700 }} />
                     <Radar
                       name={group.name}
                       dataKey="value"
@@ -114,10 +115,12 @@ export function AssessmentVisualizer({ data, type, language, selectedAssessment 
                       fill="#06b6d4"
                       fillOpacity={0.3}
                     />
-                    <RechartsTooltip 
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#06b6d4' }}
-                    />
+                    {!isExporting && (
+                      <RechartsTooltip 
+                        contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: '#06b6d4' }}
+                      />
+                    )}
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
@@ -136,21 +139,23 @@ export function AssessmentVisualizer({ data, type, language, selectedAssessment 
             <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={numericMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isExporting ? "#f1f5f9" : "#1e293b"} vertical={false} />
                 <XAxis 
                     dataKey="name" 
-                    tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} 
+                    tick={{ fill: isExporting ? "#64748b" : "#64748b", fontSize: 10, fontWeight: 700 }} 
                     axisLine={false} 
                     tickLine={false}
                     angle={-45}
                     textAnchor="end"
                     height={60}
                 />
-                <YAxis tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                <RechartsTooltip 
+                <YAxis tick={{ fill: isExporting ? "#64748b" : "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+                {!isExporting && (
+                  <RechartsTooltip 
                     contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', fontWeight: 'bold' }}
                     cursor={{ fill: '#1e293b', opacity: 0.4 }}
-                />
+                  />
+                )}
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {numericMetrics.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

@@ -527,6 +527,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
   const [copied, setCopied] = useState(false);
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfMode, setPdfMode] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   const exportToPDF = async () => {
@@ -534,6 +535,10 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
     
     try {
       setIsGeneratingPdf(true);
+      setPdfMode(true);
+      
+      // Wait a bit for React to re-render in PDF mode
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       const canvas = await html2canvas(reportRef.current, {
         scale: 2,
@@ -541,26 +546,44 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
         backgroundColor: '#ffffff',
         logging: false,
         onclone: (clonedDoc) => {
-          const reportElement = clonedDoc.querySelector('[ref-report-container]') || clonedDoc.body;
+          const reportElement = clonedDoc.querySelector('[data-report-container="true"]') || clonedDoc.body;
           if (reportElement instanceof HTMLElement) {
             // Force white background and dark text for print
             reportElement.style.backgroundColor = '#ffffff';
             reportElement.style.color = '#0f172a';
+            reportElement.style.padding = '40px';
+            reportElement.style.height = 'auto';
+            reportElement.style.overflow = 'visible';
+
+            // Ensure the specific PDF header is visible
+            const pdfHeader = reportElement.querySelector('[data-pdf-header="true"]');
+            if (pdfHeader instanceof HTMLElement) {
+                pdfHeader.style.display = 'block';
+            }
             
             // Fix all text colors and borders in the clone
-            const allTexts = reportElement.querySelectorAll('p, span, h1, h2, h3, h4, h5, div');
-            allTexts.forEach(el => {
+            const allElements = reportElement.querySelectorAll('*');
+            allElements.forEach(el => {
               if (el instanceof HTMLElement) {
-                if (el.classList.contains('text-slate-400') || el.classList.contains('text-slate-500')) {
-                   el.style.color = '#64748b';
-                } else if (!el.classList.contains('text-cyan-500') && !el.classList.contains('text-rose-500') && !el.classList.contains('text-emerald-500')) {
-                   el.style.color = '#0f172a';
+                // Remove slate backgrounds and borders that don't look good on white
+                if (el.className.includes('bg-slate') || el.className.includes('bg-cyan-500/5')) {
+                  el.style.backgroundColor = '#f1f5f9';
+                  el.style.borderColor = '#cbd5e1';
+                }
+                
+                // Ensure text is dark enough
+                const color = window.getComputedStyle(el).color;
+                if (color.includes('rgba(255, 255, 255') || color === 'rgb(255, 255, 255)') {
+                  el.style.color = '#0f172a';
+                } else if (el.classList.contains('text-slate-400') || el.classList.contains('text-slate-500')) {
+                  el.style.color = '#475569';
                 }
               }
             });
 
-            const allCards = reportElement.querySelectorAll('.bg-slate-900, .bg-slate-900\\/50, .bg-slate-900\\/60, .bg-slate-900\\/40, .bg-slate-900\\/30');
-            allCards.forEach(card => {
+            // Specific fixes for charts or nested cards
+            const cards = reportElement.querySelectorAll('.bg-slate-900\\/50, .bg-slate-900\\/60, .bg-slate-900\\/40, .bg-slate-900\\/30');
+            cards.forEach(card => {
               if (card instanceof HTMLElement) {
                 card.style.backgroundColor = '#f8fafc';
                 card.style.borderColor = '#e2e8f0';
@@ -575,6 +598,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
+      // Handle page breaking or just single long page
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
       const dateStr = new Date(selectedAssessment.assessment_date).toLocaleDateString('pt-BR').replace(/\//g, '-');
@@ -587,6 +611,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
       setNotification({ message: 'Erro ao gerar PDF: ' + (error instanceof Error ? error.message : 'Desconhecido'), type: 'error' });
     } finally {
       setIsGeneratingPdf(false);
+      setPdfMode(false);
     }
   };
   const [selectedClinicalRegion, setSelectedClinicalRegion] = useState<{id: string, label: string} | null>(null);
@@ -3910,6 +3935,20 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
               {/* Content */}
               <div ref={reportRef} data-report-container="true" className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                {/* PDF Only Header */}
+                <div data-pdf-header="true" className="hidden border-b-2 border-slate-200 pb-6 mb-8 text-slate-900">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h1 className="text-3xl font-black uppercase tracking-tighter">Relatório de Avaliação</h1>
+                      <p className="text-sm font-bold text-slate-500">PeakPerformance Clinical Engine</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-bold">{athlete.name}</p>
+                      <p className="text-sm text-slate-500">{athlete.sport} • {athlete.gender === 'male' ? 'Masculino' : 'Feminino'}</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/50">
@@ -4041,6 +4080,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
                       type={selectedAssessment.assessment_type} 
                       language={language} 
                       selectedAssessment={selectedAssessment} 
+                      isExporting={pdfMode}
                     />
                   )}
                 </div>
