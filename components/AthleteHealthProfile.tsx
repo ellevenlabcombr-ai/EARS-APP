@@ -3249,19 +3249,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
 
             {activeAssessment !== 'list' && (
               <div className="fixed inset-0 z-[100] bg-[#020617] overflow-y-auto pointer-events-auto">
-                <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 pt-[calc(1rem+env(safe-area-inset-top))] px-6 md:px-8 flex items-center justify-between shadow-lg">
-                  <Button 
-                    onClick={() => setActiveAssessment('list')} 
-                    variant="ghost" 
-                    className="text-slate-400 hover:text-white uppercase text-xxs font-black tracking-widest bg-slate-900/50 shadow-md border border-slate-800"
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-2" /> Voltar
-                  </Button>
-                  <h2 className="text-sm font-black text-white uppercase tracking-widest hidden sm:block">
-                    Avaliação em Andamento
-                  </h2>
-                </div>
-                <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto space-y-6">
+                <div className="p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 w-full max-w-7xl mx-auto space-y-6 min-h-screen">
 
             {activeAssessment === 'biomechanical' && (
               <BiomechanicalAssessment 
@@ -3282,6 +3270,7 @@ export function AthleteHealthProfile({ athlete: initialAthlete, onBack, onSave }
             {activeAssessment === 'sleep' && (
               <SleepAssessment 
                 athleteId={athlete.id} 
+                onBack={() => setActiveAssessment('list')}
                 onSave={async (score, data) => {
                   try {
                     await saveAssessment('sleep', data, score);

@@ -291,7 +291,7 @@ export function AnthropometricAssessmentForm({ athlete, previousAssessments, onC
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#050B14] overflow-hidden text-slate-200" style={{ height: 'calc(100vh - 4rem)' }}>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between p-4 sm:p-6 pb-2 shrink-0 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-3">
@@ -337,7 +337,7 @@ export function AnthropometricAssessmentForm({ athlete, previousAssessments, onC
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-32 custom-scrollbar">
+      <div className="px-4 sm:px-8 pb-32">
         <div className="max-w-4xl mx-auto space-y-8 h-full">
 
           {/* TAB 1: Básicos */}
@@ -560,7 +560,7 @@ export function AnthropometricAssessmentForm({ athlete, previousAssessments, onC
       </div>
 
       {/* Footer / Navigation */}
-      <div className="sticky bottom-0 bg-[#050B14]/90 backdrop-blur-md p-4 sm:p-6 border-t border-slate-800/50 z-20 shrink-0">
+      <div className="pt-6 border-t border-slate-800">
         <div className="flex justify-between items-center max-w-4xl mx-auto w-full">
           {step > 1 ? (
              <Button variant="ghost" onClick={() => setStep((step - 1) as any)} className="text-slate-400 hover:text-white shrink-0">

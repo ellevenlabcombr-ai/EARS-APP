@@ -165,7 +165,7 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#050B14] overflow-hidden text-slate-200" style={{ height: 'calc(100vh - 4rem)' }}>
+    <div className="space-y-6">
       {/* Header */}
       <header className="h-20 border-b border-slate-800/50 flex items-center justify-between px-4 sm:px-8 bg-[#0A1120]/80 backdrop-blur-xl shrink-0 sticky top-0 z-50">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -219,7 +219,7 @@ export function OrthopedicAssessment({ athleteId, athleteName, onBack, onSave }:
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-32 custom-scrollbar">
+      <div className="px-4 sm:px-8 pb-32">
         <div className="max-w-4xl mx-auto space-y-8 h-full">
 
           {/* === TAB 1: ANAMNESE === */}

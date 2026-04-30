@@ -223,7 +223,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#050B14] overflow-hidden text-slate-200" style={{ height: 'calc(100vh - 4rem)' }}>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between p-4 sm:p-6 pb-2 shrink-0 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export function NeurologicalAssessment({ athleteId, onCancel, onSave }: Neurolog
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-32 custom-scrollbar">
+      <div className="px-4 sm:px-8 pb-32">
         <div className="max-w-4xl mx-auto space-y-8 h-full">
 
           {/* TAB 1: SINTOMAS */}
